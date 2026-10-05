@@ -9,7 +9,7 @@ import streamlit as st
 import plotly.express as px
 
 # ====================================================================
-# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS POR SUBPROYECTO ---
+# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
 # ====================================================================
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
@@ -29,11 +29,10 @@ ESTRUCTURA_MAESTRA = {
             "Obras Civiles": {
                 "C519 CGI-SHP-019-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
-                    "tiene_supervision": "Sí",
+                    "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                     "nombre_supervisor": "Luis Rojas",
                     "coordinador_shp": "Wilbert Salas",
                     "administrador_contratos": "Victor Calvo",
-                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
                     "urls_excluidas": [
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4UH-sGf0Rj-R934_tj1S8w&viewModel=detail&moduleId=folders",
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oruowhl0STa9w2M9Vo3gZQ&viewModel=detail&moduleId=folders",
@@ -46,36 +45,15 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
-                },
-                "C534 CGI-SHP-034-2025": {
-                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
-                    "tiene_supervision": "Sí",
-                    "nombre_supervisor": "Luis Rojas",
-                    "coordinador_shp": "Jaime Flores",
-                    "administrador_contratos": "Victor Calvo",
-                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
-                    "urls_excluidas": [
-                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
-                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
-                    ],
-                    "carpetas_config": [
-                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
-                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
-                    ]
                 }
             },
             "Obras Electromecanicas": {
                 "C601 CGI-SHP-001-2025": {
                     "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
-                    "tiene_supervision": "Sí",
+                    "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
                     "coordinador_shp": "Joseph Beltran",
                     "administrador_contratos": "Victor Calvo",
-                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
                     "urls_excluidas": [
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZUirAImDTluEAH7D1z2xCA&viewModel=detail&moduleId=folders",
@@ -86,25 +64,6 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.iLK0CFTcRE-f5vPgXsuWGQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
-                    ]
-                },
-                "C603 CGI-SHP-003-2025": {
-                    "nombre_proyecto": "994440 Paquete OEM 02 - C603 SGMC BISA",
-                    "tiene_supervision": "Sí",
-                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
-                    "coordinador_shp": "Christian Garrido / Ronald Valdivia",
-                    "administrador_contratos": "Victor Calvo",
-                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
-                    "urls_excluidas": [
-                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hVkYLUDGTBWxaaPw1rDMwA&viewModel=detail&moduleId=folders",
-                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XxU1AWhiR2GfKKRlKDC5xw&viewModel=detail&moduleId=folders",
-                    ],
-                    "carpetas_config": [
-                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.KZ0ThTUiSGaev5XQ8aBmlA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ubR1IJdXQJOxKBgw_MUgRg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
-                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9315eaIrR-SN4m22KNQ6WA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P3K04-MYRZ27fNfyl4grnQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 }
             }
@@ -138,22 +97,21 @@ ESTRUCTURA_MAESTRA = {
         "I26R20 Reparacion de Tanque C402-026": {
             "config": {
                 "campos_personalizados": {
-                    "11981550": "REV",
-                    "11981548": "PENDIENTE POR",
-                    "11981549": "FECHA",
-                    "11981551": "ESTADO"
+                    "6011837": "REV",
+                    "6011840": "PENDIENTE POR",
+                    "6011839": "FECHA",
+                    "6011838": "ESTADO"
                 },
-                "id_campo_fecha": "11981549",
-                "id_campo_pendiente": "11981548"
+                "id_campo_fecha": "6011839",
+                "id_campo_pendiente": "6011840"
             },
             "General": {
                 "C619 CGI-SHP-019-2026": {
                     "nombre_proyecto": "I26R20 Reparacion de Tanque C402-026 - C619 - CHEC",
-                    "tiene_supervision": "Sí",
-                    "nombre_supervisor": "Ing. Supervisor",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "N/A",
                     "coordinador_shp": "Juan Purilla / Erick Mayta",
                     "administrador_contratos": "Hugo Cardenas",
-                    "project_id": "6030afc6-005c-4bb8-937e-c9a97850d14",
                     "urls_excluidas": [
                         "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
                         "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders",
@@ -184,7 +142,7 @@ ESTRUCTURA_MAESTRA = {
             "Mina": {
                 "C624 CGI-SHP-024-2026": {
                     "nombre_proyecto": "PC2026 Paquete 03 Mina - C624 / CVC",
-                    "tiene_supervision": "NO",
+                    "tipo_contrato": "Contrato Directo",
                     "nombre_supervisor": "",
                     "coordinador_shp": "Victor Injante",
                     "administrador_contratos": "Hugo Cardenas",
@@ -462,7 +420,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     return dataframes_por_pestana
 
 # ====================================================================
-# --- 4. INTERFAZ WEB STREAMLIT CON RESUMEN Y GRÁFICOS ---
+# --- 4. INTERFAZ WEB STREAMLIT CON PRECARGA Y TIPOS DE CONTRATO ---
 # ====================================================================
 st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_icon="📊")
 
@@ -515,20 +473,31 @@ info_contrato = contratos_dict[contrato_activo]
 st.sidebar.markdown("---")
 st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• {tipo_obra_activo}\n• Contrato: **{contrato_activo}**")
 
-# Carga de datos
-with st.spinner(f'Procesando carpetas y metadatos para el contrato {contrato_activo}...'):
+# --- PRECARGA AUTOMÁTICA AL INICIAR ---
+with st.spinner(f'Inicializando y precargando metadatos para {contrato_activo}...'):
     datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo)
 
 if not datos_pestanas:
     st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
 else:
-    # --- TARJETA DE DATOS GENERALES ---
+    # --- TARJETA DE DATOS GENERALES Y TIPO DE CONTRATO ---
+    tipo_contrato_val = info_contrato.get("tipo_contrato", "Con Supervisión")
+    
     with st.expander("📌 Datos Generales del Contrato y Equipo Asignado", expanded=True):
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("¿Tiene Supervisión?", info_contrato.get("tiene_supervision", "Sí"))
-        c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "Ing. BISA"))
-        c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "Roberto Cano"))
-        c4.metric("Administrador Contratos", info_contrato.get("administrador_contratos", "Victor Calvo"))
+        c1, c2, c3, c4, c5 = st.columns(5)
+        c1.metric("Modalidad", tipo_contrato_val)
+        
+        if tipo_contrato_val == "Tripartito":
+            emp1 = info_contrato.get("nombre_empresa_1", "Empresa 1")
+            emp2 = info_contrato.get("nombre_empresa_2", "Empresa 2")
+            c2.metric("Empresa 1", emp1)
+            c3.metric("Empresa 2", emp2)
+        else:
+            c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "N/A"))
+            c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
+            
+        c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
+        c5.metric("Estado Caché", "Activo (1h)")
 
     col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
     
@@ -585,7 +554,7 @@ else:
 
     st.markdown("---")
 
-    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL ---
+    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL Y FILTRO POR TIPO DE CONTRATO ---
     st.subheader("Detalle por Carpeta / Disciplina")
     nombres_carpetas = list(datos_pestanas.keys())
     pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
@@ -593,8 +562,21 @@ else:
     df_actual = datos_pestanas[pestana_seleccionada].copy()
 
     if col_pendiente in df_actual.columns:
+        # Definición de roles según la modalidad del contrato
+        if tipo_contrato_val == "Tripartito":
+            emp1 = info_contrato.get("nombre_empresa_1", "EMPRESA 1")
+            emp2 = info_contrato.get("nombre_empresa_2", "EMPRESA 2")
+            roles_permitidos = [emp1.upper(), emp2.upper(), "SHP", "CERRADO"]
+        elif tipo_contrato_val == "Contrato Directo":
+            roles_permitidos = ["CONTRATISTA", "SHP", "CERRADO"]
+        else: # Con Supervisión
+            roles_permitidos = ["CONTRATISTA", "SUPERVISION", "SHP", "CERRADO"]
+
         estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
+        
+        st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles esperados: *{', '.join(roles_permitidos)}*)")
         filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
+        
         df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
         st.dataframe(df_filtrado, width='stretch', height=400)
     else:
