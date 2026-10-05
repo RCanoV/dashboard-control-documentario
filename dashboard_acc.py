@@ -261,8 +261,8 @@ ESTRUCTURA_MAESTRA = {
                     "5737741": "FECHA",
                     "5737742": "ESTADO"
                 },
-                "id_campo_fecha": "6011839",
-                "id_campo_pendiente": "6011840"
+                "id_campo_fecha": "5737741",
+                "id_campo_pendiente": "5737740"
             },
             "Mina": {
                 "C624 CGI-SHP-024-2026": {
