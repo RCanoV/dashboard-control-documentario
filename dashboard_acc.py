@@ -16,14 +16,38 @@ NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 # Estructura con 4 niveles: Alcance -> Subproyecto -> Tipo de Obra -> Contrato
 ESTRUCTURA_MAESTRA = {
     "Proyectos Mayores": {
-        "Tercera Línea": {
+        "994440 - Tercera Línea": {
+            
+            "Obras Civiles": {
+                            "C534 CGI-SHP-034-2025": {
+                                "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                                "tiene_supervision": "Sí",
+                                "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                                "coordinador_shp": "Joseph Beltran",
+                                "administrador_contratos": "Victor Calvo",
+                                "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                                "urls_excluidas": [
+                                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
+                                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
+                                ],
+                                "carpetas_config": [
+                                    {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                                    {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                                    {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                                    {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                                    {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                                    {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                                ]
+                            }
+                        },
+            
             "Obras Electromecanicas": {
-                "C601": {
+                "C601 CGI-SHP-001-2025": {
                     "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
                     "tiene_supervision": "Sí",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
-                    "coordinador_shp": "Roberto Cano",
-                    "administrador_contratos": "Administrador SHP",
+                    "coordinador_shp": "Joseph Beltran",
+                    "administrador_contratos": "Victor Calvo",
                     "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
                     "urls_excluidas": [
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
