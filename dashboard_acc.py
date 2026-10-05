@@ -97,13 +97,13 @@ ESTRUCTURA_MAESTRA = {
         "I26R20 Reparacion de Tanque C402-026": {
             "config": {
                 "campos_personalizados": {
-                    "6011837": "REV",
-                    "6011840": "PENDIENTE POR",
-                    "6011839": "FECHA",
-                    "6011838": "ESTADO"
+                    "11981550": "REV",
+                    "11981548": "PENDIENTE POR",
+                    "11981549": "FECHA",
+                    "11981551": "ESTADO"
                 },
-                "id_campo_fecha": "6011839",
-                "id_campo_pendiente": "6011840"
+                "id_campo_fecha": "11981549",
+                "id_campo_pendiente": "11981548"
             },
             "General": {
                 "C619 CGI-SHP-019-2026": {
@@ -530,10 +530,26 @@ else:
                 cant_rol = (estados == rol).sum()
                 fila_res[rol.title()] = cant_rol
                 abiertos_carp += cant_rol
+            
+            # --- CÁLCULO DEL DOCUMENTO CON MAYOR RETRASO ---
+            df_abiertos = df[estados != "CERRADO"].copy()
+            if not df_abiertos.empty and 'DIAS' in df_abiertos.columns:
+                df_abiertos['DIAS_NUM'] = pd.to_numeric(df_abiertos['DIAS'], errors='coerce').fillna(0)
+                if df_abiertos['DIAS_NUM'].max() > 0:
+                    max_idx = df_abiertos['DIAS_NUM'].idxmax()
+                    doc_codigo = str(df_abiertos.loc[max_idx, COL_CODIGO])
+                    dias_retraso = int(df_abiertos.loc[max_idx, 'DIAS_NUM'])
+                    responsable = str(df_abiertos.loc[max_idx, col_pendiente]).strip()
+                    fila_res["Mayor Retraso"] = f"{doc_codigo} ({dias_retraso} días) [{responsable}]"
+                else:
+                    fila_res["Mayor Retraso"] = "Sin retrasos"
+            else:
+                fila_res["Mayor Retraso"] = "Sin pendientes"
         else:
             fila_res["Cerrados"] = 0
             for rol in roles_pendientes:
                 fila_res[rol.title()] = 0
+            fila_res["Mayor Retraso"] = "N/A"
                 
         total_cerrados += cerrados_carp
         total_abiertos += abiertos_carp
@@ -551,12 +567,12 @@ else:
     st.subheader(f"Resumen General por Carpeta - Contrato: {contrato_activo}")
     df_resumen = pd.DataFrame(resumen_lista)
     
-    col_g1, col_g2 = st.columns([1.2, 1])
+    col_g1, col_g2 = st.columns([1.3, 1])
     with col_g1:
         st.dataframe(df_resumen, width='stretch', hide_index=True)
     with col_g2:
         if not df_resumen.empty:
-            columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total"]]
+            columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
             fig = px.bar(
                 df_resumen, 
                 x="Carpeta", 
