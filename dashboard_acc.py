@@ -9,30 +9,35 @@ import streamlit as st
 import plotly.express as px
 
 # ====================================================================
-# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y CONTRATOS ---
+# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
 # ====================================================================
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
-# Cada contrato almacena su propia configuración, carpetas y condiciones de búsqueda
+# Estructura con 4 niveles: Alcance -> Subproyecto -> Tipo de Obra -> Contrato
 ESTRUCTURA_MAESTRA = {
     "Proyectos Mayores": {
         "Tercera Línea": {
-            "C601": {
-                "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
-                "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZUirAImDTluEAH7D1z2xCA&viewModel=detail&moduleId=folders",
-                ],
-                "carpetas_config": [
-                    {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6ayy3aotR1iZErdo8ZQZpA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                    {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cWeBjsVeQJOe9T2dgiDLRQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
-                    {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.iLK0CFTcRE-f5vPgXsuWGQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                    {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                    {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
-                ]
+            "Obras Electromecanicas": {
+                "C601": {
+                    "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Roberto Cano",
+                    "administrador_contratos": "Administrador SHP",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZUirAImDTluEAH7D1z2xCA&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6ayy3aotR1iZErdo8ZQZpA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cWeBjsVeQJOe9T2dgiDLRQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.iLK0CFTcRE-f5vPgXsuWGQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                }
             }
-            # Aquí puedes seguir agregando más contratos (ej. C521, C609, etc.) con sus propias carpetas
         },
         "Proyecto Ampliacion": {}
     },
@@ -312,7 +317,7 @@ st.markdown(f"**Institución:** Shougang Hierro Perú")
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=150)
 st.sidebar.title("Estructura de Proyectos")
 
-# Filtros en cascada (Nivel 1 -> Nivel 2 -> Nivel 3)
+# Filtros en cascada (Nivel 1 -> Nivel 2 -> Nivel 3 -> Nivel 4)
 grupo_activo = st.sidebar.selectbox("1. Tipo de Alcance:", list(ESTRUCTURA_MAESTRA.keys()))
 
 subproyectos_dict = ESTRUCTURA_MAESTRA.get(grupo_activo, {})
@@ -322,25 +327,40 @@ if not subproyectos_dict:
 
 subproyecto_activo = st.sidebar.selectbox("2. Subproyecto:", list(subproyectos_dict.keys()))
 
-contratos_dict = subproyectos_dict.get(subproyecto_activo, {})
-if not contratos_dict:
-    st.warning(f"No hay contratos configurados en el subproyecto '{subproyecto_activo}'.")
+tipos_obra_dict = subproyectos_dict.get(subproyecto_activo, {})
+if not tipos_obra_dict:
+    st.warning(f"No hay tipos de obra configurados en '{subproyecto_activo}'.")
     st.stop()
 
-contrato_activo = st.sidebar.selectbox("3. Contrato / Componente:", list(contratos_dict.keys()))
+tipo_obra_activo = st.sidebar.selectbox("3. Tipo de Obra:", list(tipos_obra_dict.keys()))
+
+contratos_dict = tipos_obra_dict.get(tipo_obra_activo, {})
+if not contratos_dict:
+    st.warning(f"No hay contratos configurados en '{tipo_obra_activo}'.")
+    st.stop()
+
+contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
 st.sidebar.markdown("---")
-st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• Contrato: **{contrato_activo}**")
+st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• {tipo_obra_activo}\n• Contrato: **{contrato_activo}**")
 
-# Carga de datos usando la configuración específica de este contrato
+# Carga de datos del contrato seleccionado
 with st.spinner(f'Procesando carpetas y metadatos para el contrato {contrato_activo}...'):
     datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato)
 
 if not datos_pestanas:
     st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
 else:
-    # --- MÉTRICAS DEL CONTRATO ---
+    # --- TARJETA DE DATOS GENERALES DEL CONTRATO ---
+    with st.expander("📌 Datos Generales del Contrato y Equipo Asignado", expanded=True):
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("¿Tiene Supervisión?", info_contrato.get("tiene_supervision", "N/A"))
+        c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "N/A"))
+        c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
+        c4.metric("Administrador Contratos", info_contrato.get("administrador_contratos", "N/A"))
+
+    # --- MÉTRICAS DE DOCUMENTOS ---
     col_pendiente = CAMPOS_PERSONALIZADOS.get(ID_CAMPO_PENDIENTE, "PENDIENTE POR")
     total_cerrados = 0
     total_abiertos = 0
@@ -351,14 +371,13 @@ else:
             total_cerrados += (estados == "CERRADO").sum()
             total_abiertos += (estados != "CERRADO").sum()
 
-    st.markdown("---")
     m1, m2, m3 = st.columns(3)
     m1.metric("Total de Documentos", total_cerrados + total_abiertos)
     m2.metric("Documentos Cerrados", total_cerrados)
     m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención", delta_color="inverse")
     st.markdown("---")
 
-    # --- PESTAÑAS O VISTAS POR CARPETA DEL CONTRATO ---
+    # --- VISTAS POR CARPETA ---
     nombres_carpetas = list(datos_pestanas.keys())
     pestana_seleccionada = st.selectbox("Seleccionar Carpeta / Disciplina:", nombres_carpetas)
     
