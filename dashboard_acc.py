@@ -501,29 +501,44 @@ else:
 
     col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
     
+    # --- DETERMINAR ROLES SEGÚN TIPO DE CONTRATO ---
+    if tipo_contrato_val == "Tripartito":
+        emp1 = info_contrato.get("nombre_empresa_1", "EMPRESA 1")
+        emp2 = info_contrato.get("nombre_empresa_2", "EMPRESA 2")
+        roles_pendientes = [emp1.upper(), emp2.upper(), "SHP"]
+    elif tipo_contrato_val == "Contrato Directo":
+        roles_pendientes = ["CONTRATISTA", "SHP"]
+    else: # Con Supervisión
+        roles_pendientes = ["CONTRATISTA", "SUPERVISION", "SHP"]
+
     # --- CONSOLIDAR MÉTRICAS PARA RESUMEN Y GRÁFICO ---
     total_cerrados = 0
     total_abiertos = 0
     resumen_lista = []
 
     for nombre_carpeta, df in datos_pestanas.items():
+        fila_res = {"Carpeta": nombre_carpeta}
+        cerrados_carp = 0
+        abiertos_carp = 0
+        
         if col_pendiente in df.columns:
             estados = df[col_pendiente].astype(str).str.strip().str.upper()
             cerrados_carp = (estados == "CERRADO").sum()
-            abiertos_carp = (estados != "CERRADO").sum()
-        else:
-            cerrados_carp = 0
-            abiertos_carp = len(df)
+            fila_res["Cerrados"] = cerrados_carp
             
+            for rol in roles_pendientes:
+                cant_rol = (estados == rol).sum()
+                fila_res[rol.title()] = cant_rol
+                abiertos_carp += cant_rol
+        else:
+            fila_res["Cerrados"] = 0
+            for rol in roles_pendientes:
+                fila_res[rol.title()] = 0
+                
         total_cerrados += cerrados_carp
         total_abiertos += abiertos_carp
-        
-        resumen_lista.append({
-            "Carpeta": nombre_carpeta,
-            "Cerrados": cerrados_carp,
-            "Pendientes": abiertos_carp,
-            "Total": cerrados_carp + abiertos_carp
-        })
+        fila_res["Total"] = cerrados_carp + abiertos_carp
+        resumen_lista.append(fila_res)
 
     # --- MÉTRICAS PRINCIPALES ---
     m1, m2, m3 = st.columns(3)
@@ -541,13 +556,13 @@ else:
         st.dataframe(df_resumen, width='stretch', hide_index=True)
     with col_g2:
         if not df_resumen.empty:
+            columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total"]]
             fig = px.bar(
                 df_resumen, 
                 x="Carpeta", 
-                y=["Cerrados", "Pendientes"], 
-                title="Estado Documentario por Carpeta",
-                barmode="group",
-                color_discrete_map={"Cerrados": "#2CA02C", "Pendientes": "#D62728"}
+                y=columnas_grafico, 
+                title="Estado Documentario por Carpeta y Responsable",
+                barmode="group"
             )
             fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
             st.plotly_chart(fig, use_container_width=True)
@@ -562,19 +577,10 @@ else:
     df_actual = datos_pestanas[pestana_seleccionada].copy()
 
     if col_pendiente in df_actual.columns:
-        # Definición de roles según la modalidad del contrato
-        if tipo_contrato_val == "Tripartito":
-            emp1 = info_contrato.get("nombre_empresa_1", "EMPRESA 1")
-            emp2 = info_contrato.get("nombre_empresa_2", "EMPRESA 2")
-            roles_permitidos = [emp1.upper(), emp2.upper(), "SHP", "CERRADO"]
-        elif tipo_contrato_val == "Contrato Directo":
-            roles_permitidos = ["CONTRATISTA", "SHP", "CERRADO"]
-        else: # Con Supervisión
-            roles_permitidos = ["CONTRATISTA", "SUPERVISION", "SHP", "CERRADO"]
-
+        roles_con_cerrado = roles_pendientes + ["CERRADO"]
         estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
         
-        st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles esperados: *{', '.join(roles_permitidos)}*)")
+        st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
         filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
         
         df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
