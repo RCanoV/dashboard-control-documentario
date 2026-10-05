@@ -138,13 +138,13 @@ ESTRUCTURA_MAESTRA = {
         "I26R20 Reparacion de Tanque C402-026": {
             "config": {
                 "campos_personalizados": {
-                    "6011837": "REV",
-                    "6011840": "PENDIENTE POR",
-                    "6011839": "FECHA",
-                    "6011838": "ESTADO"
+                    "11981550": "REV",
+                    "11981548": "PENDIENTE POR",
+                    "11981549": "FECHA",
+                    "11981551": "ESTADO"
                 },
-                "id_campo_fecha": "6011839",
-                "id_campo_pendiente": "6011840"
+                "id_campo_fecha": "11981549",
+                "id_campo_pendiente": "11981548"
             },
             "General": {
                 "C619 CGI-SHP-019-2026": {
