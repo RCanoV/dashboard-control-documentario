@@ -9,32 +9,35 @@ import streamlit as st
 import plotly.express as px
 
 # ====================================================================
-# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA DE PROYECTOS ---
+# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y CONTRATOS ---
 # ====================================================================
-NOMBRE_PROYECTO = "Control Documentario - Shougang Hierro Perú"
+NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
-# Estructura permanente y organizada por grupos, subproyectos y contratos
+# Cada contrato almacena su propia configuración, carpetas y condiciones de búsqueda
 ESTRUCTURA_MAESTRA = {
     "Proyectos Mayores": {
         "Tercera Línea": {
             "C601": {
-                "nombre": "C601 CHEC BISA",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6ayy3aotR1iZErdo8ZQZpA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10
+                "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
+                "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZUirAImDTluEAH7D1z2xCA&viewModel=detail&moduleId=folders",
+                ],
+                "carpetas_config": [
+                    {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6ayy3aotR1iZErdo8ZQZpA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                    {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cWeBjsVeQJOe9T2dgiDLRQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                    {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.iLK0CFTcRE-f5vPgXsuWGQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                    {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                    {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                ]
             }
-            # Aquí puedes agregar más contratos fácilmente copiando la estructura anterior:
-            # "C521": { "nombre": "Descripción del contrato", "url": "URL_BIM360", "longitud_maxima": 10 }
+            # Aquí puedes seguir agregando más contratos (ej. C521, C609, etc.) con sus propias carpetas
         },
-        "Proyecto Ampliacion": {
-            # Subproyectos y contratos de Ampliación
-        }
+        "Proyecto Ampliacion": {}
     },
-    "Proyectos Menores": {
-        # Subproyectos y contratos menores
-    },
-    "Plan de Conservacion": {
-        # Subproyectos y contratos de conservación
-    }
+    "Proyectos Menores": {},
+    "Plan de Conservacion": {}
 }
 
 CAMPOS_PERSONALIZADOS = {
@@ -55,11 +58,6 @@ ORDEN_COLUMNAS_DESEADO = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PE
 # ====================================================================
 CLIENT_ID = st.secrets["CLIENT_ID"]
 CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
-
-URLS_EXCLUIDAS = [
-    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
-    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZUirAImDTluEAH7D1z2xCA&viewModel=detail&moduleId=folders",
-]
 
 # ====================================================================
 # --- 3. LÓGICA DE API AUTODESK ---
@@ -224,88 +222,104 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
 @st.cache_data(ttl=3600)
-def extraer_datos_contrato(url_carpeta, longitud_maxima):
+def extraer_datos_contrato_completo(contrato_key, info_contrato):
     token = obtener_token()
-    if not token or not url_carpeta:
-        return pd.DataFrame()
+    if not token:
+        return {}
     
     headers = {"Authorization": f"Bearer {token}", "x-ads-region": "US"}
-    ids_excluidos = obtener_ids_excluidos(URLS_EXCLUIDAS)
-    datos_filtrados = []
     
-    try:
-        project_id_raw = url_carpeta.split("projects/")[1].split("?")[0].split("/")[0]
-        project_id = project_id_raw if project_id_raw.startswith("b.") else "b." + project_id_raw
-        
-        if "folderUrn=" in url_carpeta:
-            folder_id = url_carpeta.split("folderUrn=")[1].split("&")[0].replace("%3A", ":")
-        elif "folders/" in url_carpeta:
-            folder_id = url_carpeta.split("folders/")[1].split("/")[0].replace("%3A", ":")
-        else:
-            return pd.DataFrame()
-        
-        escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos)
-        if not datos_filtrados:
-            return pd.DataFrame()
-            
-        df_completo = pd.DataFrame(datos_filtrados)
-        
-        for campo_id in CAMPOS_PERSONALIZADOS.keys():
-            col_name = f"CAMPO_CUSTOM_{campo_id}"
-            if col_name not in df_completo.columns:
-                df_completo[col_name] = pd.NaT if campo_id == ID_CAMPO_FECHA else ""
+    urls_excluidas_raw = info_contrato.get("urls_excluidas", [])
+    ids_excluidos = obtener_ids_excluidos(urls_excluidas_raw)
+    carpetas_config = info_contrato.get("carpetas_config", [])
+    
+    dataframes_por_pestana = {}
+    col_pendiente = CAMPOS_PERSONALIZADOS.get(ID_CAMPO_PENDIENTE)
 
-        fechas_convertidas = pd.to_datetime(df_completo[f"CAMPO_CUSTOM_{ID_CAMPO_FECHA}"], errors='coerce')
-        if fechas_convertidas.dt.tz is not None:
-            fechas_convertidas = fechas_convertidas.dt.tz_localize(None)
+    for config_carpeta in carpetas_config:
+        url_carpeta = config_carpeta.get("url")
+        nombre_pestana = config_carpeta.get("nombre", "Sin_Nombre")
+        longitud_maxima = config_carpeta.get("longitud_maxima", 10)
         
-        fecha_hoy = pd.Timestamp.now().normalize()
-        df_completo["DIAS"] = (fecha_hoy - fechas_convertidas).dt.days
-        df_completo[f"CAMPO_CUSTOM_{ID_CAMPO_FECHA}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
-        df_completo["DIAS"] = df_completo["DIAS"].fillna("")
-
-        columnas_finales = ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] + [f"CAMPO_CUSTOM_{c}" for c in CAMPOS_PERSONALIZADOS.keys()] + ["DIAS"]
-        df = df_completo[columnas_finales].copy()
-        
-        col_pendiente = CAMPOS_PERSONALIZADOS.get(ID_CAMPO_PENDIENTE)
-        diccionario_renombres = {
-            "NOMBRE_DEL_ARCHIVO": COL_CODIGO, 
-            "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": COL_DESCRIPCION,
-        }
-        for campo_id, nombre_columna in CAMPOS_PERSONALIZADOS.items():
-            diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
+        if not url_carpeta:
+            continue
             
-        df = df.rename(columns=diccionario_renombres)
-        columnas_existentes = [col for col in ORDEN_COLUMNAS_DESEADO if col in df.columns]
-        df = df[columnas_existentes]
-
-        if col_pendiente in df.columns:
-            df.loc[df[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
+        try:
+            project_id_raw = url_carpeta.split("projects/")[1].split("?")[0].split("/")[0]
+            project_id = project_id_raw if project_id_raw.startswith("b.") else "b." + project_id_raw
             
-        return df
-    except Exception as e:
-        return pd.DataFrame()
+            if "folderUrn=" in url_carpeta:
+                folder_id = url_carpeta.split("folderUrn=")[1].split("&")[0].replace("%3A", ":")
+            elif "folders/" in url_carpeta:
+                folder_id = url_carpeta.split("folders/")[1].split("/")[0].replace("%3A", ":")
+            else:
+                continue
+            
+            datos_filtrados = []
+            escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos)
+            
+            if not datos_filtrados:
+                continue
+                
+            df_completo = pd.DataFrame(datos_filtrados)
+            
+            for campo_id in CAMPOS_PERSONALIZADOS.keys():
+                col_name = f"CAMPO_CUSTOM_{campo_id}"
+                if col_name not in df_completo.columns:
+                    df_completo[col_name] = pd.NaT if campo_id == ID_CAMPO_FECHA else ""
+
+            fechas_convertidas = pd.to_datetime(df_completo[f"CAMPO_CUSTOM_{ID_CAMPO_FECHA}"], errors='coerce')
+            if fechas_convertidas.dt.tz is not None:
+                fechas_convertidas = fechas_convertidas.dt.tz_localize(None)
+            
+            fecha_hoy = pd.Timestamp.now().normalize()
+            df_completo["DIAS"] = (fecha_hoy - fechas_convertidas).dt.days
+            df_completo[f"CAMPO_CUSTOM_{ID_CAMPO_FECHA}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
+            df_completo["DIAS"] = df_completo["DIAS"].fillna("")
+
+            columnas_finales = ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] + [f"CAMPO_CUSTOM_{c}" for c in CAMPOS_PERSONALIZADOS.keys()] + ["DIAS"]
+            df = df_completo[columnas_finales].copy()
+            
+            diccionario_renombres = {
+                "NOMBRE_DEL_ARCHIVO": COL_CODIGO, 
+                "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": COL_DESCRIPCION,
+            }
+            for campo_id, nombre_columna in CAMPOS_PERSONALIZADOS.items():
+                diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
+                
+            df = df.rename(columns=diccionario_renombres)
+            columnas_existentes = [col for col in ORDEN_COLUMNAS_DESEADO if col in df.columns]
+            df = df[columnas_existentes]
+
+            if col_pendiente in df.columns:
+                df.loc[df[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
+            
+            dataframes_por_pestana[nombre_pestana] = df
+
+        except Exception as e:
+            continue
+
+    return dataframes_por_pestana
 
 # ====================================================================
-# --- 4. INTERFAZ WEB CON FILTROS EN CASCADA ---
+# --- 4. INTERFAZ WEB STREAMLIT CON JERARQUÍA EN CASCADA ---
 # ====================================================================
 st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_icon="📊")
 
 st.title(f"📊 Dashboard de Control Documentario")
-st.markdown(f"**Proyecto:** {NOMBRE_PROYECTO}")
+st.markdown(f"**Institución:** Shougang Hierro Perú")
 
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=150)
 st.sidebar.title("Estructura de Proyectos")
 
-# 1. Selector de Grupo Principal
+# Filtros en cascada (Nivel 1 -> Nivel 2 -> Nivel 3)
 grupo_activo = st.sidebar.selectbox("1. Tipo de Alcance:", list(ESTRUCTURA_MAESTRA.keys()))
 
 subproyectos_dict = ESTRUCTURA_MAESTRA.get(grupo_activo, {})
 if not subproyectos_dict:
-    st.warning(f"No hay subproyectos configurados todavía en '{grupo_activo}'.")
+    st.warning(f"No hay subproyectos configurados en '{grupo_activo}'.")
     st.stop()
 
-# 2. Selector de Subproyecto
 subproyecto_activo = st.sidebar.selectbox("2. Subproyecto:", list(subproyectos_dict.keys()))
 
 contratos_dict = subproyectos_dict.get(subproyecto_activo, {})
@@ -313,37 +327,44 @@ if not contratos_dict:
     st.warning(f"No hay contratos configurados en el subproyecto '{subproyecto_activo}'.")
     st.stop()
 
-# 3. Selector de Contrato
 contrato_activo = st.sidebar.selectbox("3. Contrato / Componente:", list(contratos_dict.keys()))
-
 info_contrato = contratos_dict[contrato_activo]
-url_contrato = info_contrato.get("url")
-long_max = info_contrato.get("longitud_maxima", 10)
 
 st.sidebar.markdown("---")
-st.sidebar.info(f"**Vista activa:**\n• {grupo_activo}\n• {subproyecto_activo}\n• Contrato: {contrato_activo}")
+st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• Contrato: **{contrato_activo}**")
 
-# Extracción de datos del contrato seleccionado
-with st.spinner(f'Cargando metadatos para el contrato {contrato_activo} desde BIM 360...'):
-    df_actual = extraer_datos_contrato(url_contrato, long_max)
+# Carga de datos usando la configuración específica de este contrato
+with st.spinner(f'Procesando carpetas y metadatos para el contrato {contrato_activo}...'):
+    datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato)
 
-if df_actual.empty:
-    st.info(f"El contrato {contrato_activo} no contiene registros o la URL de la carpeta está pendiente de configurar.")
+if not datos_pestanas:
+    st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
 else:
+    # --- MÉTRICAS DEL CONTRATO ---
     col_pendiente = CAMPOS_PERSONALIZADOS.get(ID_CAMPO_PENDIENTE, "PENDIENTE POR")
+    total_cerrados = 0
+    total_abiertos = 0
     
-    total_total = len(df_actual)
-    total_cerrados = (df_actual[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO").sum() if col_pendiente in df_actual.columns else 0
-    total_abiertos = total_total - total_cerrados
+    for df in datos_pestanas.values():
+        if col_pendiente in df.columns:
+            estados = df[col_pendiente].astype(str).str.strip().str.upper()
+            total_cerrados += (estados == "CERRADO").sum()
+            total_abiertos += (estados != "CERRADO").sum()
 
+    st.markdown("---")
     m1, m2, m3 = st.columns(3)
-    m1.metric("Total de Documentos", total_total)
+    m1.metric("Total de Documentos", total_cerrados + total_abiertos)
     m2.metric("Documentos Cerrados", total_cerrados)
     m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención", delta_color="inverse")
     st.markdown("---")
 
-    st.subheader(f"Contrato: {contrato_activo} - {info_contrato.get('nombre', '')}")
+    # --- PESTAÑAS O VISTAS POR CARPETA DEL CONTRATO ---
+    nombres_carpetas = list(datos_pestanas.keys())
+    pestana_seleccionada = st.selectbox("Seleccionar Carpeta / Disciplina:", nombres_carpetas)
     
+    df_actual = datos_pestanas[pestana_seleccionada].copy()
+    st.subheader(f"Contrato: {contrato_activo} ({info_contrato.get('nombre_proyecto', '')}) > {pestana_seleccionada}")
+
     if col_pendiente in df_actual.columns:
         estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
         filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
