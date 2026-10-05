@@ -9,58 +9,67 @@ import streamlit as st
 import plotly.express as px
 
 # ====================================================================
-# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
+# --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS POR SUBPROYECTO ---
 # ====================================================================
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
-# Estructura con 4 niveles: Alcance -> Subproyecto -> Tipo de Obra -> Contrato
+# Estructura con 4 niveles: Alcance -> Subproyecto (con sus campos personalizados propios) -> Tipo de Obra -> Contrato
 ESTRUCTURA_MAESTRA = {
     "Proyectos Mayores": {
         "994440 - Tercera Línea": {
-            
+            # Configuración de campos personalizados específicos para este subproyecto
+            "config": {
+                "campos_personalizados": {
+                    "6011837": "REV",
+                    "6011840": "PENDIENTE POR",
+                    "6011839": "FECHA",
+                    "6011838": "ESTADO"
+                },
+                "id_campo_fecha": "6011839",
+                "id_campo_pendiente": "6011840"
+            },
             "Obras Civiles": {
-                            "C534 CGI-SHP-019-2025": {
-                                "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
-                                "tiene_supervision": "Sí",
-                                "nombre_supervisor": "Luis Rojas",
-                                "coordinador_shp": "Wilbert Salas",
-                                "administrador_contratos": "Victor Calvo",
-                                "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
-                                "urls_excluidas": [
-                                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4UH-sGf0Rj-R934_tj1S8w&viewModel=detail&moduleId=folders",
-                                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oruowhl0STa9w2M9Vo3gZQ&viewModel=detail&moduleId=folders",
-                                ],
-                                "carpetas_config": [
-                                    {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8XNGFh6XTcy8HwGVqgx0tA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                                    {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.qGCrERygRvWHVF__AF2hzQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
-                                    {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                                    {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.dq0X5F6lT-e8xtT57iEn5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                                    {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                                    {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
-                                ]
-                            },
-                            "C534 CGI-SHP-034-2025": {
-                                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
-                                    "tiene_supervision": "Sí",
-                                    "nombre_supervisor": "Luis Rojas",
-                                    "coordinador_shp": "Jaime Flores",
-                                    "administrador_contratos": "Victor Calvo",
-                                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
-                                    "urls_excluidas": [
-                                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
-                                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
-                                    ],
-                                    "carpetas_config": [
-                                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
-                                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
-                                    ]
-                                                        }
-                        },
-            
+                "C519 CGI-SHP-019-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "Wilbert Salas",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4UH-sGf0Rj-R934_tj1S8w&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oruowhl0STa9w2M9Vo3gZQ&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8XNGFh6XTcy8HwGVqgx0tA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.qGCrERygRvWHVF__AF2hzQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.dq0X5F6lT-e8xtT57iEn5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                },
+                "C534 CGI-SHP-034-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "Jaime Flores",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                }
+            },
             "Obras Electromecanicas": {
                 "C601 CGI-SHP-001-2025": {
                     "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
@@ -81,41 +90,265 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-                "C601 CGI-SHP-003-2025": {
-                                    "nombre_proyecto": "994440 Paquete OEM 02 - C603 SGMC BISA",
-                                    "tiene_supervision": "Sí",
-                                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
-                                    "coordinador_shp": "Christian Garrido / Ronald Valdivia",
-                                    "administrador_contratos": "Victor Calvo",
-                                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
-                                    "urls_excluidas": [
-                                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hVkYLUDGTBWxaaPw1rDMwA&viewModel=detail&moduleId=folders",
-                                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XxU1AWhiR2GfKKRlKDC5xw&viewModel=detail&moduleId=folders",
-                                    ],
-                                    "carpetas_config": [
-                                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.KZ0ThTUiSGaev5XQ8aBmlA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ubR1IJdXQJOxKBgw_MUgRg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
-                                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9315eaIrR-SN4m22KNQ6WA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P3K04-MYRZ27fNfyl4grnQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
-                                    ]
-                                }
+                "C603 CGI-SHP-003-2025": {
+                    "nombre_proyecto": "994440 Paquete OEM 02 - C603 SGMC BISA",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Christian Garrido / Ronald Valdivia",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hVkYLUDGTBWxaaPw1rDMwA&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XxU1AWhiR2GfKKRlKDC5xw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.KZ0ThTUiSGaev5XQ8aBmlA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ubR1IJdXQJOxKBgw_MUgRg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9315eaIrR-SN4m22KNQ6WA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P3K04-MYRZ27fNfyl4grnQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                }
             }
         },
-        "Proyecto Ampliacion": {}
+        "I25G50 Subestacon Mina 02": {
+            "config": {
+                "campos_personalizados": {
+                    # Aquí defines los IDs y nombres de atributos específicos para este proyecto
+                    "OTRO_ID_1": "REV",
+                    "OTRO_ID_2": "PENDIENTE POR",
+                    "OTRO_ID_3": "FECHA",
+                    "OTRO_ID_4": "ESTADO"
+                },
+                "id_campo_fecha": "OTRO_ID_3",
+                "id_campo_pendiente": "OTRO_ID_2"
+            }
+        }
     },
-    "Proyectos Menores": {},
-    "Plan de Conservacion": {}
-}
+    "Proyectos Menores": {
 
-CAMPOS_PERSONALIZADOS = {
-    "6011837": "REV",
-    "6011840": "PENDIENTE POR",
-    "6011839": "FECHA",
-    "6011838": "ESTADO"
+        "994440 - Tercera Línea": {
+            # Configuración de campos personalizados específicos para este subproyecto
+            "config": {
+                "campos_personalizados": {
+                    "6011837": "REV",
+                    "6011840": "PENDIENTE POR",
+                    "6011839": "FECHA",
+                    "6011838": "ESTADO"
+                },
+                "id_campo_fecha": "6011839",
+                "id_campo_pendiente": "6011840"
+            },
+            "Obras Civiles": {
+                "C519 CGI-SHP-019-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "Wilbert Salas",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4UH-sGf0Rj-R934_tj1S8w&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oruowhl0STa9w2M9Vo3gZQ&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8XNGFh6XTcy8HwGVqgx0tA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.qGCrERygRvWHVF__AF2hzQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.dq0X5F6lT-e8xtT57iEn5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                },
+                "C534 CGI-SHP-034-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "Jaime Flores",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                }
+            },
+            "Obras Electromecanicas": {
+                "C601 CGI-SHP-001-2025": {
+                    "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Joseph Beltran",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZUirAImDTluEAH7D1z2xCA&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6ayy3aotR1iZErdo8ZQZpA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cWeBjsVeQJOe9T2dgiDLRQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.iLK0CFTcRE-f5vPgXsuWGQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+                "C603 CGI-SHP-003-2025": {
+                    "nombre_proyecto": "994440 Paquete OEM 02 - C603 SGMC BISA",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Christian Garrido / Ronald Valdivia",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hVkYLUDGTBWxaaPw1rDMwA&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XxU1AWhiR2GfKKRlKDC5xw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.KZ0ThTUiSGaev5XQ8aBmlA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ubR1IJdXQJOxKBgw_MUgRg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9315eaIrR-SN4m22KNQ6WA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P3K04-MYRZ27fNfyl4grnQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                }
+            }
+        },
+        "I25G50 Subestacon Mina 02": {
+            "config": {
+                "campos_personalizados": {
+                    # Aquí defines los IDs y nombres de atributos específicos para este proyecto
+                    "OTRO_ID_1": "REV",
+                    "OTRO_ID_2": "PENDIENTE POR",
+                    "OTRO_ID_3": "FECHA",
+                    "OTRO_ID_4": "ESTADO"
+                },
+                "id_campo_fecha": "OTRO_ID_3",
+                "id_campo_pendiente": "OTRO_ID_2"
+            }
+        }
+
+    },
+    "Plan de Conservacion": {
+        
+        "994440 - Tercera Línea": {
+            # Configuración de campos personalizados específicos para este subproyecto
+            "config": {
+                "campos_personalizados": {
+                    "6011837": "REV",
+                    "6011840": "PENDIENTE POR",
+                    "6011839": "FECHA",
+                    "6011838": "ESTADO"
+                },
+                "id_campo_fecha": "6011839",
+                "id_campo_pendiente": "6011840"
+            },
+            "Obras Civiles": {
+                "C519 CGI-SHP-019-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "Wilbert Salas",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4UH-sGf0Rj-R934_tj1S8w&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oruowhl0STa9w2M9Vo3gZQ&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8XNGFh6XTcy8HwGVqgx0tA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.qGCrERygRvWHVF__AF2hzQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.dq0X5F6lT-e8xtT57iEn5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                },
+                "C534 CGI-SHP-034-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "Jaime Flores",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                }
+            },
+            "Obras Electromecanicas": {
+                "C601 CGI-SHP-001-2025": {
+                    "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Joseph Beltran",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Bji4Uop7SSGwBSj2kKdmLg&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZUirAImDTluEAH7D1z2xCA&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6ayy3aotR1iZErdo8ZQZpA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cWeBjsVeQJOe9T2dgiDLRQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.iLK0CFTcRE-f5vPgXsuWGQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+                "C603 CGI-SHP-003-2025": {
+                    "nombre_proyecto": "994440 Paquete OEM 02 - C603 SGMC BISA",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Christian Garrido / Ronald Valdivia",
+                    "administrador_contratos": "Victor Calvo",
+                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hVkYLUDGTBWxaaPw1rDMwA&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XxU1AWhiR2GfKKRlKDC5xw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.KZ0ThTUiSGaev5XQ8aBmlA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ubR1IJdXQJOxKBgw_MUgRg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9315eaIrR-SN4m22KNQ6WA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P3K04-MYRZ27fNfyl4grnQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                }
+            }
+        },
+        "I25G50 Subestacon Mina 02": {
+            "config": {
+                "campos_personalizados": {
+                    # Aquí defines los IDs y nombres de atributos específicos para este proyecto
+                    "OTRO_ID_1": "REV",
+                    "OTRO_ID_2": "PENDIENTE POR",
+                    "OTRO_ID_3": "FECHA",
+                    "OTRO_ID_4": "ESTADO"
+                },
+                "id_campo_fecha": "OTRO_ID_3",
+                "id_campo_pendiente": "OTRO_ID_2"
+            }
+        }
+    }
 }
-ID_CAMPO_FECHA = "6011839"
-ID_CAMPO_PENDIENTE = "6011840"
 
 COL_CODIGO = "CODIGO"
 COL_DESCRIPCION = "DESCRIPCION"
@@ -192,7 +425,7 @@ def obtener_tip_version_metadata(token, project_id, item_id):
         break
     return response.json().get("data", {}) if response.status_code == 200 else {}
 
-def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name):
+def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_personalizados):
     item_id = item.get("id", "")
     token_val = headers["Authorization"].split(" ")[1]
     
@@ -225,7 +458,7 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name):
             break
             
         if res_attr.status_code == 200:
-            campos_objetivo = list(CAMPOS_PERSONALIZADOS.keys())
+            campos_objetivo = list(campos_personalIZADOS.keys()) if 'campos_personalIZADOS' in locals() else list(campos_personalizados.keys())
             for attr in res_attr.json():
                 attr_id = str(attr.get("id"))
                 if attr_id in campos_objetivo:
@@ -233,7 +466,7 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name):
                     
     return registro_plano
 
-def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, ruta_actual="Raíz"):
+def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
     if folder_id.replace("%3A", ":") in ids_excluidos:
         return
 
@@ -272,7 +505,7 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
                     continue
                 if len(name) <= longitud_maxima:
                     sub_urn = urllib.parse.quote(item["id"], safe='')
-                    escanear_recursivo(project_id, sub_urn, headers, lista_datos, longitud_maxima, ids_excluidos, f"{ruta_actual} > {name}")
+                    escanear_recursivo(project_id, sub_urn, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, f"{ruta_actual} > {name}")
             
             elif tipo == "items":
                 if ".pdf" in name.lower():
@@ -280,7 +513,7 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
 
         if items_pdf:
             with ThreadPoolExecutor(max_workers=5) as executor:
-                futures = [executor.submit(procesar_archivo_pdf, i[0], project_id, headers, ruta_actual, i[1]) for i in items_pdf]
+                futures = [executor.submit(procesar_archivo_pdf, i[0], project_id, headers, ruta_actual, i[1], campos_personalizados) for i in items_pdf]
                 for future in as_completed(futures):
                     res_item = future.result()
                     if res_item:
@@ -290,7 +523,7 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
 @st.cache_data(ttl=3600)
-def extraer_datos_contrato_completo(contrato_key, info_contrato):
+def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personalizados, id_campo_fecha, id_campo_pendiente):
     token = obtener_token()
     if not token:
         return {}
@@ -302,7 +535,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato):
     carpetas_config = info_contrato.get("carpetas_config", [])
     
     dataframes_por_pestana = {}
-    col_pendiente = CAMPOS_PERSONALIZADOS.get(ID_CAMPO_PENDIENTE)
+    col_pendiente = campos_personalizados.get(id_campo_pendiente)
 
     for config_carpeta in carpetas_config:
         url_carpeta = config_carpeta.get("url")
@@ -324,39 +557,42 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato):
                 continue
             
             datos_filtrados = []
-            escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos)
+            escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos, campos_personalizados)
             
             if not datos_filtrados:
                 continue
                 
             df_completo = pd.DataFrame(datos_filtrados)
             
-            for campo_id in CAMPOS_PERSONALIZADOS.keys():
+            for campo_id in campos_personalizados.keys():
                 col_name = f"CAMPO_CUSTOM_{campo_id}"
                 if col_name not in df_completo.columns:
-                    df_completo[col_name] = pd.NaT if campo_id == ID_CAMPO_FECHA else ""
+                    df_completo[col_name] = pd.NaT if campo_id == id_campo_fecha else ""
 
-            fechas_convertidas = pd.to_datetime(df_completo[f"CAMPO_CUSTOM_{ID_CAMPO_FECHA}"], errors='coerce')
+            fechas_convertidas = pd.to_datetime(df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"], errors='coerce')
             if fechas_convertidas.dt.tz is not None:
                 fechas_convertidas = fechas_convertidas.dt.tz_localize(None)
             
             fecha_hoy = pd.Timestamp.now().normalize()
             df_completo["DIAS"] = (fecha_hoy - fechas_convertidas).dt.days
-            df_completo[f"CAMPO_CUSTOM_{ID_CAMPO_FECHA}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
+            df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
             df_completo["DIAS"] = df_completo["DIAS"].fillna("")
 
-            columnas_finales = ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] + [f"CAMPO_CUSTOM_{c}" for c in CAMPOS_PERSONALIZADOS.keys()] + ["DIAS"]
+            columnas_finales = ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()] + ["DIAS"]
             df = df_completo[columnas_finales].copy()
             
             diccionario_renombres = {
                 "NOMBRE_DEL_ARCHIVO": COL_CODIGO, 
                 "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": COL_DESCRIPCION,
             }
-            for campo_id, nombre_columna in CAMPOS_PERSONALIZADOS.items():
+            for campo_id, nombre_columna in campos_personalizados.items():
                 diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
                 
             df = df.rename(columns=diccionario_renombres)
-            columnas_existentes = [col for col in ORDEN_COLUMNAS_DESEADO if col in df.columns]
+            
+            # Ordenar columnas dinámicamente según los campos del subproyecto
+            orden_columnas_dinamico = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS"]
+            columnas_existentes = [col for col in orden_columnas_dinamico if col in df.columns]
             df = df[columnas_existentes]
 
             if col_pendiente in df.columns:
@@ -389,8 +625,26 @@ if not subproyectos_dict:
     st.stop()
 
 subproyecto_activo = st.sidebar.selectbox("2. Subproyecto:", list(subproyectos_dict.keys()))
+subproyecto_data = subproyectos_dict.get(subproyecto_activo, {})
 
-tipos_obra_dict = subproyectos_dict.get(subproyecto_activo, {})
+# Obtener configuración de campos personalizados específicos del subproyecto
+config_sub = subproyecto_data.get("config", {
+    "campos_personalizados": {
+        "6011837": "REV",
+        "6011840": "PENDIENTE POR",
+        "6011839": "FECHA",
+        "6011838": "ESTADO"
+    },
+    "id_campo_fecha": "6011839",
+    "id_campo_pendiente": "6011840"
+})
+
+campos_pers_activos = config_sub.get("campos_personalizados")
+id_fec_activo = config_sub.get("id_campo_fecha")
+id_pen_activo = config_sub.get("id_campo_pendiente")
+
+# Filtrar los Tipos de Obra (excluyendo la llave de configuración interna "config")
+tipos_obra_dict = {k: v for k, v in subproyecto_data.items() if k != "config"}
 if not tipos_obra_dict:
     st.warning(f"No hay tipos de obra configurados en '{subproyecto_activo}'.")
     st.stop()
@@ -408,9 +662,9 @@ info_contrato = contratos_dict[contrato_activo]
 st.sidebar.markdown("---")
 st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• {tipo_obra_activo}\n• Contrato: **{contrato_activo}**")
 
-# Carga de datos del contrato seleccionado
+# Carga de datos del contrato usando los campos personalizados del subproyecto
 with st.spinner(f'Procesando carpetas y metadatos para el contrato {contrato_activo}...'):
-    datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato)
+    datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo)
 
 if not datos_pestanas:
     st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
@@ -424,7 +678,7 @@ else:
         c4.metric("Administrador Contratos", info_contrato.get("administrador_contratos", "N/A"))
 
     # --- MÉTRICAS DE DOCUMENTOS ---
-    col_pendiente = CAMPOS_PERSONALIZADOS.get(ID_CAMPO_PENDIENTE, "PENDIENTE POR")
+    col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
     total_cerrados = 0
     total_abiertos = 0
     
