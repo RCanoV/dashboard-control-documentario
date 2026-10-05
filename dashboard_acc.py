@@ -13,11 +13,9 @@ import plotly.express as px
 # ====================================================================
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
-# Estructura con 4 niveles: Alcance -> Subproyecto (con sus campos personalizados propios) -> Tipo de Obra -> Contrato
 ESTRUCTURA_MAESTRA = {
     "Proyectos Mayores": {
         "994440 - Tercera Línea": {
-            # Configuración de campos personalizados específicos para este subproyecto
             "config": {
                 "campos_personalizados": {
                     "6011837": "REV",
@@ -114,34 +112,30 @@ ESTRUCTURA_MAESTRA = {
         "998316 Nuevo Muelle San Nicolas": {
             "config": {
                 "campos_personalizados": {
-                    # Aquí defines los IDs y nombres de atributos específicos para este proyecto
-                    "OTRO_ID_1": "REV",
-                    "OTRO_ID_2": "PENDIENTE POR",
-                    "OTRO_ID_3": "FECHA",
-                    "OTRO_ID_4": "ESTADO"
+                    "6011837": "REV",
+                    "6011840": "PENDIENTE POR",
+                    "6011839": "FECHA",
+                    "6011838": "ESTADO"
                 },
-                "id_campo_fecha": "OTRO_ID_3",
-                "id_campo_pendiente": "OTRO_ID_2"
+                "id_campo_fecha": "6011839",
+                "id_campo_pendiente": "6011840"
             }
         },
         "I25G50 Subestacion Mina 02": {
-                    "config": {
-                        "campos_personalizados": {
-                            # Aquí defines los IDs y nombres de atributos específicos para este proyecto
-                            "OTRO_ID_1": "REV",
-                            "OTRO_ID_2": "PENDIENTE POR",
-                            "OTRO_ID_3": "FECHA",
-                            "OTRO_ID_4": "ESTADO"
-                        },
-                        "id_campo_fecha": "OTRO_ID_3",
-                        "id_campo_pendiente": "OTRO_ID_2"
-                    }
-                }
+            "config": {
+                "campos_personalizados": {
+                    "6011837": "REV",
+                    "6011840": "PENDIENTE POR",
+                    "6011839": "FECHA",
+                    "6011838": "ESTADO"
+                },
+                "id_campo_fecha": "6011839",
+                "id_campo_pendiente": "6011840"
+            }
+        }
     },
     "Proyectos Menores": {
-
         "I26R20 Reparacion de Tanque C402-026": {
-            # Configuración de campos personalizados específicos para este subproyecto
             "config": {
                 "campos_personalizados": {
                     "6011837": "REV",
@@ -155,6 +149,8 @@ ESTRUCTURA_MAESTRA = {
             "General": {
                 "C619 CGI-SHP-019-2026": {
                     "nombre_proyecto": "I26R20 Reparacion de Tanque C402-026 - C619 - CHEC",
+                    "tiene_supervision": "Sí",
+                    "nombre_supervisor": "Ing. Supervisor",
                     "coordinador_shp": "Juan Purilla / Erick Mayta",
                     "administrador_contratos": "Hugo Cardenas",
                     "project_id": "6030afc6-005c-4bb8-937e-c9a97850d14",
@@ -168,18 +164,13 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z4k_ZGrnTMeQlOJyTN9p0A&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.f5BtCYtRS6yeRdPNgA5-qA&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CGg_avSiQXKunwiqy7mSKg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
-                        
                     ]
                 }
-            },
-            
+            }
         }
-
     },
     "Plan de Conservacion": {
-        
         "Paquete 03 Mina": {
-            # Configuración de campos personalizados específicos para este subproyecto
             "config": {
                 "campos_personalizados": {
                     "5737743": "REV",
@@ -210,9 +201,6 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.TkNgo2NmRWiAjICC9hftHA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 }
-            },
-            "San Nicolas": {
-                
             }
         }
     }
@@ -220,13 +208,16 @@ ESTRUCTURA_MAESTRA = {
 
 COL_CODIGO = "CODIGO"
 COL_DESCRIPCION = "DESCRIPCION"
-ORDEN_COLUMNAS_DESEADO = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS"]
 
 # ====================================================================
-# --- 2. CREDENCIALES SEGURAS ---
+# --- 2. CREDENCIALES (SEGURAS NUBE / LOCAL) ---
 # ====================================================================
-CLIENT_ID = st.secrets["CLIENT_ID"]
-CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+try:
+    CLIENT_ID = st.secrets["CLIENT_ID"]
+    CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+except:
+    CLIENT_ID = "v1qczmMgnll6AUsLAPKuPVC31GaKLNnqmFsVvc6OA2Seqx4H"
+    CLIENT_SECRET = "MAKRfMaqiXWBTJiFY5sJP3BLqwcRDWClc0LjFN79HYKBoyOcBfC7ObjCdRkQzebW"
 
 # ====================================================================
 # --- 3. LÓGICA DE API AUTODESK ---
@@ -326,7 +317,7 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
             break
             
         if res_attr.status_code == 200:
-            campos_objetivo = list(campos_personalIZADOS.keys()) if 'campos_personalIZADOS' in locals() else list(campos_personalizados.keys())
+            campos_objetivo = list(campos_personalizados.keys())
             for attr in res_attr.json():
                 attr_id = str(attr.get("id"))
                 if attr_id in campos_objetivo:
@@ -397,13 +388,13 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
         return {}
     
     headers = {"Authorization": f"Bearer {token}", "x-ads-region": "US"}
-    
     urls_excluidas_raw = info_contrato.get("urls_excluidas", [])
     ids_excluidos = obtener_ids_excluidos(urls_excluidas_raw)
     carpetas_config = info_contrato.get("carpetas_config", [])
     
     dataframes_por_pestana = {}
     col_pendiente = campos_personalizados.get(id_campo_pendiente)
+    orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS"]
 
     for config_carpeta in carpetas_config:
         url_carpeta = config_carpeta.get("url")
@@ -457,10 +448,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
                 diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
                 
             df = df.rename(columns=diccionario_renombres)
-            
-            # Ordenar columnas dinámicamente según los campos del subproyecto
-            orden_columnas_dinamico = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS"]
-            columnas_existentes = [col for col in orden_columnas_dinamico if col in df.columns]
+            columnas_existentes = [col for col in orden_columnas_deseado if col in df.columns]
             df = df[columnas_existentes]
 
             if col_pendiente in df.columns:
@@ -474,7 +462,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     return dataframes_por_pestana
 
 # ====================================================================
-# --- 4. INTERFAZ WEB STREAMLIT CON JERARQUÍA EN CASCADA ---
+# --- 4. INTERFAZ WEB STREAMLIT CON RESUMEN Y GRÁFICOS ---
 # ====================================================================
 st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_icon="📊")
 
@@ -484,7 +472,6 @@ st.markdown(f"**Institución:** Shougang Hierro Perú")
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=150)
 st.sidebar.title("Estructura de Proyectos")
 
-# Filtros en cascada (Nivel 1 -> Nivel 2 -> Nivel 3 -> Nivel 4)
 grupo_activo = st.sidebar.selectbox("1. Tipo de Alcance:", list(ESTRUCTURA_MAESTRA.keys()))
 
 subproyectos_dict = ESTRUCTURA_MAESTRA.get(grupo_activo, {})
@@ -495,7 +482,6 @@ if not subproyectos_dict:
 subproyecto_activo = st.sidebar.selectbox("2. Subproyecto:", list(subproyectos_dict.keys()))
 subproyecto_data = subproyectos_dict.get(subproyecto_activo, {})
 
-# Obtener configuración de campos personalizados específicos del subproyecto
 config_sub = subproyecto_data.get("config", {
     "campos_personalizados": {
         "6011837": "REV",
@@ -511,10 +497,9 @@ campos_pers_activos = config_sub.get("campos_personalizados")
 id_fec_activo = config_sub.get("id_campo_fecha")
 id_pen_activo = config_sub.get("id_campo_pendiente")
 
-# Filtrar los Tipos de Obra (excluyendo la llave de configuración interna "config")
 tipos_obra_dict = {k: v for k, v in subproyecto_data.items() if k != "config"}
 if not tipos_obra_dict:
-    st.warning(f"No hay tipos de obra configurados en '{subproyecto_activo}'.")
+    st.warning(f"No hay tipos de obra o contratos configurados en '{subproyecto_activo}'.")
     st.stop()
 
 tipo_obra_activo = st.sidebar.selectbox("3. Tipo de Obra:", list(tipos_obra_dict.keys()))
@@ -530,44 +515,82 @@ info_contrato = contratos_dict[contrato_activo]
 st.sidebar.markdown("---")
 st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• {tipo_obra_activo}\n• Contrato: **{contrato_activo}**")
 
-# Carga de datos del contrato usando los campos personalizados del subproyecto
+# Carga de datos
 with st.spinner(f'Procesando carpetas y metadatos para el contrato {contrato_activo}...'):
     datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo)
 
 if not datos_pestanas:
     st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
 else:
-    # --- TARJETA DE DATOS GENERALES DEL CONTRATO ---
+    # --- TARJETA DE DATOS GENERALES ---
     with st.expander("📌 Datos Generales del Contrato y Equipo Asignado", expanded=True):
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("¿Tiene Supervisión?", info_contrato.get("tiene_supervision", "N/A"))
-        c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "N/A"))
-        c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
-        c4.metric("Administrador Contratos", info_contrato.get("administrador_contratos", "N/A"))
+        c1.metric("¿Tiene Supervisión?", info_contrato.get("tiene_supervision", "Sí"))
+        c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "Ing. BISA"))
+        c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "Roberto Cano"))
+        c4.metric("Administrador Contratos", info_contrato.get("administrador_contratos", "Victor Calvo"))
 
-    # --- MÉTRICAS DE DOCUMENTOS ---
     col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
+    
+    # --- CONSOLIDAR MÉTRICAS PARA RESUMEN Y GRÁFICO ---
     total_cerrados = 0
     total_abiertos = 0
-    
-    for df in datos_pestanas.values():
+    resumen_lista = []
+
+    for nombre_carpeta, df in datos_pestanas.items():
         if col_pendiente in df.columns:
             estados = df[col_pendiente].astype(str).str.strip().str.upper()
-            total_cerrados += (estados == "CERRADO").sum()
-            total_abiertos += (estados != "CERRADO").sum()
+            cerrados_carp = (estados == "CERRADO").sum()
+            abiertos_carp = (estados != "CERRADO").sum()
+        else:
+            cerrados_carp = 0
+            abiertos_carp = len(df)
+            
+        total_cerrados += cerrados_carp
+        total_abiertos += abiertos_carp
+        
+        resumen_lista.append({
+            "Carpeta": nombre_carpeta,
+            "Cerrados": cerrados_carp,
+            "Pendientes": abiertos_carp,
+            "Total": cerrados_carp + abiertos_carp
+        })
 
+    # --- MÉTRICAS PRINCIPALES ---
     m1, m2, m3 = st.columns(3)
     m1.metric("Total de Documentos", total_cerrados + total_abiertos)
     m2.metric("Documentos Cerrados", total_cerrados)
     m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención", delta_color="inverse")
     st.markdown("---")
 
-    # --- VISTAS POR CARPETA ---
+    # --- TABLA RESUMEN GENERAL Y GRÁFICO DE BARRAS ---
+    st.subheader(f"Resumen General por Carpeta - Contrato: {contrato_activo}")
+    df_resumen = pd.DataFrame(resumen_lista)
+    
+    col_g1, col_g2 = st.columns([1.2, 1])
+    with col_g1:
+        st.dataframe(df_resumen, width='stretch', hide_index=True)
+    with col_g2:
+        if not df_resumen.empty:
+            fig = px.bar(
+                df_resumen, 
+                x="Carpeta", 
+                y=["Cerrados", "Pendientes"], 
+                title="Estado Documentario por Carpeta",
+                barmode="group",
+                color_discrete_map={"Cerrados": "#2CA02C", "Pendientes": "#D62728"}
+            )
+            fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
+            st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("---")
+
+    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL ---
+    st.subheader("Detalle por Carpeta / Disciplina")
     nombres_carpetas = list(datos_pestanas.keys())
-    pestana_seleccionada = st.selectbox("Seleccionar Carpeta / Disciplina:", nombres_carpetas)
+    pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
     
     df_actual = datos_pestanas[pestana_seleccionada].copy()
-    st.subheader(f"Contrato: {contrato_activo} ({info_contrato.get('nombre_proyecto', '')}) > {pestana_seleccionada}")
 
     if col_pendiente in df_actual.columns:
         estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
