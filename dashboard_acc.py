@@ -46,6 +46,26 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
+
+                 "C519 CGI-SHP-027-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 02 - C527 - CHEC",
+                    "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "W. Salas V. Injante",
+                    "administrador_contratos": "Victor Calvo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.3y89r3vUSNK38q9RBNMcTw&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.5B-xkz92QcKaWuRIW-4jOQ&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.nfZJis6zTwmuhwSkHy3q6Q&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Z3sU9UeUS6-hA3FmXbsBzA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O_EGlk_BR3mKQ7iXlFpJHg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HU3HnztHR369GIhLTsDCSA&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.nBwFxIOaSRGRiL9Ka5URxQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Cm_uBP0wRHyvXG3hRMJnGg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                },
                 "C534 CGI-SHP-034-2025": {
                         "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
                         "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
@@ -83,6 +103,25 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.iLK0CFTcRE-f5vPgXsuWGQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+
+                 "C601 CGI-SHP-004-2026": {
+                    "nombre_proyecto": "994440 Paquete OEM 05A - C604 CCCC BISA",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "A. Nina / J. Salazar",
+                    "administrador_contratos": "Gonzalo Vargas",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UJKXYjhISuytzIB_rqyjng&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.H3kuOcFhTk6pJOW9IJ0DhA&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.g756st7KT3yVaRZOztyTSg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.TgPRi37tQnqLGHFE6GLelQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.YVxMOXejTX-HS_LbD6dHkA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XqxxFA-MQWaF83BGQfVKMg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bKUwofRQS2uZ-NKyB3YhpA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
 
