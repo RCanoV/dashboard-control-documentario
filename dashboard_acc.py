@@ -709,11 +709,11 @@ st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_ic
 col_head1, col_head2 = st.columns([5, 1])
 with col_head1:
     st.title("📊 Dashboard de Control Documentario")
-    st.markdown("**Institución:** Shougang Hierro Perú")
+    st.markdown("**Empresa:** Shougang Hierro Perú")
 
 with col_head2:
     st.image(
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png",
+        "LOGO OFICIAL SHP (2).bmp",
         width=130
     )
 
@@ -765,7 +765,7 @@ st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_a
 
 # --- NUEVO: Logo personal y autoría en la barra lateral ---
 # Cambia el nombre de este archivo si es diferente en tu repositorio de GitHub
-url_logo_personal = "mi_logo.png"
+url_logo_personal = "rcano.png"
 
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 col_firma1, col_firma2 = st.sidebar.columns([1, 3])
