@@ -66,6 +66,26 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Cm_uBP0wRHyvXG3hRMJnGg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
+
+                "CGI-SHP-030-2025": {
+                    "nombre_proyecto": "994440 Paquete CIVIL 03 - C530 - CHEC",
+                    "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "W. Salas V. Injante",
+                    "administrador_contratos": "Victor Calvo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.2BAc3d6BQd6QPx9NYLsR8g&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.s06ONvkCTMOwnyHS5GqFdQ&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.YFrF_lHvS468ojtMthPv-Q&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.-6wYCzgjSm-wSEPFjpbkYA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cDG2JObXQYyLlYKomvxEVw&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.n_1rlmgQS0OG626yut5eeA&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.YYQ1fUa6SW-P7sXpddjTig&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4lKp7659QoG7BWZnbXveGg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                },
                 "CGI-SHP-034-2025": {
                         "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
                         "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
@@ -85,6 +105,7 @@ ESTRUCTURA_MAESTRA = {
                             {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                         ]
                     }
+                
             },
             "Obras Electromecanicas": {
                 "CGI-SHP-001-2026": {
