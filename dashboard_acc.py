@@ -163,7 +163,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-                 },
+                 
                 "Paquete 03 - CGI-SHP-005-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 03 - C602 SGMC BISA",
                     "tipo_contrato": "Con Supervisión",
