@@ -27,7 +27,7 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_pendiente": "6011840"
             },
             "Obras Civiles": {
-                "CGI-SHP-019-2025": {
+                "Paquete 01 - CGI-SHP-019-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 01 - C519 - SGMC",
                     "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                     "nombre_supervisor": "Luis Rojas",
@@ -47,7 +47,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
 
-                 "CGI-SHP-027-2025": {
+                 "Paquete 02 CIVIL - CGI-SHP-027-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 02 - C527 - CHEC",
                     "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                     "nombre_supervisor": "Luis Rojas",
@@ -67,7 +67,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
 
-                "CGI-SHP-030-2025": {
+                "Paquete 03 - CGI-SHP-030-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 03 - C530 - CHEC",
                     "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                     "nombre_supervisor": "Luis Rojas",
@@ -86,7 +86,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4lKp7659QoG7BWZnbXveGg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
-                "CGI-SHP-034-2025": {
+                "Paquete 05 - CGI-SHP-034-2025": {
                         "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
                         "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                         "nombre_supervisor": "Luis Rojas",
