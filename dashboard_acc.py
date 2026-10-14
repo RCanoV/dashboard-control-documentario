@@ -1,5 +1,6 @@
 import os
 import time
+import io
 import requests
 import pandas as pd
 import urllib.parse
@@ -7,6 +8,12 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import streamlit as st
 import plotly.express as px
+
+# ReportLab para la exportación de tablas a PDF
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 # ====================================================================
 # --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
@@ -29,7 +36,7 @@ ESTRUCTURA_MAESTRA = {
             "Obras Civiles": {
                 "Paquete 01 - CGI-SHP-019-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 01 - C519 - SGMC",
-                    "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
+                    "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Luis Rojas",
                     "coordinador_shp": "Wilbert Salas",
                     "administrador_contratos": "Victor Calvo",
@@ -46,10 +53,9 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
-
-                 "Paquete 02 CIVIL - CGI-SHP-027-2025": {
+                "Paquete 02 CIVIL - CGI-SHP-027-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 02 - C527 - CHEC",
-                    "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
+                    "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Luis Rojas",
                     "coordinador_shp": "W. Salas V. Injante",
                     "administrador_contratos": "Victor Calvo",
@@ -66,10 +72,9 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Cm_uBP0wRHyvXG3hRMJnGg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
-
                 "Paquete 03 - CGI-SHP-030-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 03 - C530 - CHEC",
-                    "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
+                    "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Luis Rojas",
                     "coordinador_shp": "W. Salas V. Injante",
                     "administrador_contratos": "Victor Calvo",
@@ -88,7 +93,7 @@ ESTRUCTURA_MAESTRA = {
                 },
                 "Paquete 04 - CGI-SHP-039-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 43 - C539 - SGMC",
-                    "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
+                    "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Luis Rojas",
                     "coordinador_shp": "W. Salas V. Injante",
                     "administrador_contratos": "Victor Calvo",
@@ -106,25 +111,24 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
                 "Paquete 05 - CGI-SHP-034-2025": {
-                        "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
-                        "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
-                        "nombre_supervisor": "Luis Rojas",
-                        "coordinador_shp": "Norman Chura",
-                        "administrador_contratos": "Victor Calvo",
-                        "urls_excluidas": [
-                            "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
-                            "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
-                        ],
-                        "carpetas_config": [
-                            {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                            {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
-                            {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                            {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                            {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                            {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
-                        ]
-                    }
-                
+                    "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Luis Rojas",
+                    "coordinador_shp": "Norman Chura",
+                    "administrador_contratos": "Victor Calvo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IxQiNfJ5TQia_4CkkcWlow&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z8sjrzhJSY633BycxBdtOw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.COHiEf-5Rv-1_GdCyjRIWg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.sm5zScUMS_eGMUzBTZH-UA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QtkTHz6ZRhCMo_q8EICxJg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1kdLDO2tTFuxq5Fgu0EG7g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IvwY65OaQMuJloGhZnSRdg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.WxYPFm9uQ-2zV3vSNEh8yg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                    ]
+                }
             },
             "Obras Electromecanicas": {
                 "Paquete 01 - CGI-SHP-001-2026": {
@@ -163,7 +167,6 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-                 
                 "Paquete 03 - CGI-SHP-005-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 03 - C602 SGMC BISA",
                     "tipo_contrato": "Con Supervisión",
@@ -182,7 +185,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4Pex6mj3Q2aUH8kNnMVicA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-             "Paquete 04 - CGI-SHP-006-2026": {
+                "Paquete 04 - CGI-SHP-006-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 04 - C605 CHEC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -200,8 +203,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zr5NBPPPREegjBM3tgREkw&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-
-                 "Paquete 05A - CGI-SHP-004-2026": {
+                "Paquete 05A - CGI-SHP-004-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 05A - C604 CCCC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -219,7 +221,6 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bKUwofRQS2uZ-NKyB3YhpA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-
                 "Paquete 05B - CGI-SHP-010-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 05B - C610 COVEC BISA",
                     "tipo_contrato": "Con Supervisión",
@@ -238,7 +239,6 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Y31XHPY2Sy265fvyKhPt_g&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-                
                 "Paquete 06 - CGI-SHP-011-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 06 - C611 AID BISA",
                     "tipo_contrato": "Con Supervisión",
@@ -257,8 +257,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Zba0ob9tTk6PCFB-k9akUA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-            
-            "Paquete 07 - CGI-SHP-012-2026": {
+                "Paquete 07 - CGI-SHP-012-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 06 - C611 AID BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -276,8 +275,6 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 }
-
-                
             }
         },
         "998316 Nuevo Muelle San Nicolas": {
@@ -390,7 +387,71 @@ except:
     CLIENT_SECRET = "MAKRfMaqiXWBTJiFY5sJP3BLqwcRDWClc0LjFN79HYKBoyOcBfC7ObjCdRkQzebW"
 
 # ====================================================================
-# --- 3. LÓGICA DE API AUTODESK ---
+# --- 3. FUNCIONES DE EXPORTACIÓN A PDF (REPORTLAB) ---
+# ====================================================================
+def exportar_df_a_pdf(df: pd.DataFrame, titulo: str) -> io.BytesIO:
+    """Convierte cualquier DataFrame de pandas a un documento PDF descargable."""
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(letter),
+        leftMargin=25,
+        rightMargin=25,
+        topMargin=25,
+        bottomMargin=25
+    )
+    elements = []
+    styles = getSampleStyleSheet()
+
+    titulo_style = styles["Heading2"]
+    titulo_style.alignment = 0
+
+    cell_style = ParagraphStyle(
+        name="CellText",
+        parent=styles["Normal"],
+        fontSize=7,
+        leading=9
+    )
+    header_style = ParagraphStyle(
+        name="HeaderCellText",
+        parent=styles["Normal"],
+        fontSize=7,
+        leading=9,
+        textColor=colors.whitesmoke,
+        fontName="Helvetica-Bold"
+    )
+
+    elements.append(Paragraph(titulo, titulo_style))
+    elements.append(Spacer(1, 10))
+
+    encabezados = [Paragraph(str(col), header_style) for col in df.columns]
+    data_matrix = [encabezados]
+
+    for _, row in df.iterrows():
+        fila = []
+        for val in row:
+            texto = "" if pd.isna(val) else str(val)
+            fila.append(Paragraph(texto, cell_style))
+        data_matrix.append(fila)
+
+    tabla = Table(data_matrix, repeatRows=1)
+    tabla.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
+    ]))
+
+    elements.append(tabla)
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+# ====================================================================
+# --- 4. LÓGICA DE API AUTODESK ---
 # ====================================================================
 def obtener_ids_excluidos(urls):
     ids = set()
@@ -632,12 +693,21 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     return dataframes_por_pestana
 
 # ====================================================================
-# --- 4. INTERFAZ WEB STREAMLIT CON PRECARGA Y TIPOS DE CONTRATO ---
+# --- 5. INTERFAZ WEB STREAMLIT ---
 # ====================================================================
 st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_icon="📊")
 
-st.title(f"📊 Dashboard de Control Documentario")
-st.markdown(f"**Institución:** Shougang Hierro Perú")
+# --- ENCABEZADO CON LOGO EN LA PARTE SUPERIOR DERECHA ---
+col_head1, col_head2 = st.columns([5, 1])
+with col_head1:
+    st.title("📊 Dashboard de Control Documentario")
+    st.markdown("**Institución:** Shougang Hierro Perú")
+
+with col_head2:
+    st.image(
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png",
+        width=130
+    )
 
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=150)
 st.sidebar.title("Estructura de Proyectos")
@@ -720,7 +790,7 @@ else:
         roles_pendientes = [emp1.upper(), emp2.upper(), "SHP"]
     elif tipo_contrato_val == "Contrato Directo":
         roles_pendientes = ["CONTRATISTA", "SHP"]
-    else: # Con Supervisión
+    else:
         roles_pendientes = ["CONTRATISTA", "SUPERVISION", "SHP"]
 
     # --- CONSOLIDAR MÉTRICAS PARA RESUMEN Y GRÁFICO ---
@@ -782,6 +852,19 @@ else:
     col_g1, col_g2 = st.columns([1.3, 1])
     with col_g1:
         st.dataframe(df_resumen, width='stretch', hide_index=True)
+        # Botón de exportación a PDF para la tabla resumen
+        if not df_resumen.empty:
+            pdf_resumen = exportar_df_a_pdf(
+                df_resumen, 
+                f"Resumen General - {contrato_activo} ({datetime.now().strftime('%d/%m/%Y')})"
+            )
+            st.download_button(
+                label="📄 Exportar Resumen a PDF",
+                data=pdf_resumen,
+                file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf",
+                mime="application/pdf",
+                key="btn_descarga_resumen"
+            )
     with col_g2:
         if not df_resumen.empty:
             columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
@@ -797,7 +880,7 @@ else:
 
     st.markdown("---")
 
-    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL Y FILTRO POR TIPO DE CONTRATO ---
+    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL, GRÁFICO Y FILTRO ---
     st.subheader("Detalle por Carpeta / Disciplina")
     nombres_carpetas = list(datos_pestanas.keys())
     pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
@@ -812,6 +895,86 @@ else:
         filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
         
         df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
-        st.dataframe(df_filtrado, width='stretch', height=400)
+        
+        if not df_filtrado.empty:
+            # Crear columnas para colocar la tabla junto al gráfico
+            col_tabla, col_grafico = st.columns([1.5, 1])
+            
+            with col_tabla:
+                st.dataframe(df_filtrado, width='stretch', height=400)
+                
+                # Botón de exportación a PDF para la tabla detallada filtrada
+                pdf_detalle = exportar_df_a_pdf(
+                    df_filtrado, 
+                    f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}"
+                )
+                st.download_button(
+                    label="📄 Exportar Detalle a PDF",
+                    data=pdf_detalle,
+                    file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf",
+                    mime="application/pdf",
+                    key="btn_descarga_detalle"
+                )
+                
+            with col_grafico:
+                # Generar el gráfico basado en la tabla filtrada
+                df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
+                df_counts.columns = [col_pendiente, 'Cantidad']
+                
+                fig_detalle = px.pie(
+                    df_counts, 
+                    names=col_pendiente, 
+                    values='Cantidad', 
+                    hole=0.4,
+                    title=f"Distribución de Responsables"
+                )
+                fig_detalle.update_layout(margin=dict(t=40, b=10, l=10, r=10))
+                st.plotly_chart(fig_detalle, use_container_width=True)
+        else:
+            st.info("No hay documentos que coincidan con el filtro seleccionado.")
+            
     else:
+        # En caso no exista la columna de responsable
         st.dataframe(df_actual, width='stretch', height=400)
+        
+        if not df_actual.empty:
+            # Botón de exportación a PDF para la tabla detallada sin filtro
+            pdf_detalle = exportar_df_a_pdf(
+                df_actual, 
+                f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}"
+            )
+            st.download_button(
+                label="📄 Exportar Detalle a PDF",
+                data=pdf_detalle,
+                file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf",
+                mime="application/pdf",
+                key="btn_descarga_detalle_alt"
+            )
+
+# ====================================================================
+# --- 6. AUTORÍA EN LA ESQUINA INFERIOR DERECHA ---
+# ====================================================================
+st.markdown(
+    """
+    <style>
+    .footer-autor {
+        position: fixed;
+        bottom: 12px;
+        right: 25px;
+        background-color: rgba(255, 255, 255, 0.92);
+        color: #2D3748;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+        z-index: 999999;
+        border: 1px solid #E2E8F0;
+    }
+    </style>
+    <div class="footer-autor">
+        Desarrollado por <b>Roberto Cano</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
