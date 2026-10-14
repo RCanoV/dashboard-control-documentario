@@ -755,6 +755,27 @@ info_contrato = contratos_dict[contrato_activo]
 st.sidebar.markdown("---")
 st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• {tipo_obra_activo}\n• Contrato: **{contrato_activo}**")
 
+# --- NUEVO: Logo definido y autoría en la barra lateral ---
+# Cambia "URL_DE_TU_LOGO_AQUI.png" por la ruta local de tu imagen o un link web
+url_logo_personal = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" # Ejemplo de logo (cámbialo)
+
+st.sidebar.markdown("<br>", unsafe_allow_html=True)
+
+col_firma1, col_firma2 = st.sidebar.columns([1, 3])
+with col_firma1:
+    st.image(url_logo_personal, use_container_width=True)
+with col_firma2:
+    st.markdown(
+        """
+        <div style="font-size: 13px; color: #4A5568; margin-top: 5px;">
+            Desarrollado por<br>
+            <b>Roberto Cano</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 # --- PRECARGA AUTOMÁTICA AL INICIAR ---
 with st.spinner(f'Inicializando y precargando metadatos para {contrato_activo}...'):
     datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo)
@@ -951,30 +972,3 @@ else:
                 key="btn_descarga_detalle_alt"
             )
 
-# ====================================================================
-# --- 6. AUTORÍA EN LA ESQUINA INFERIOR DERECHA ---
-# ====================================================================
-st.markdown(
-    """
-    <style>
-    .footer-autor {
-        position: fixed;
-        bottom: 12px;
-        right: 25px;
-        background-color: rgba(255, 255, 255, 0.92);
-        color: #2D3748;
-        padding: 6px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
-        z-index: 999999;
-        border: 1px solid #E2E8F0;
-    }
-    </style>
-    <div class="footer-autor">
-        Desarrollado por <b>Roberto Cano</b>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
