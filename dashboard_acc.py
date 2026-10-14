@@ -387,7 +387,7 @@ except:
     CLIENT_SECRET = "MAKRfMaqiXWBTJiFY5sJP3BLqwcRDWClc0LjFN79HYKBoyOcBfC7ObjCdRkQzebW"
 
 # ====================================================================
-# --- 3. FUNCIONES DE EXPORTACIÓN A PDF (REPORTLAB) ---
+# --- 3. FUNCIONES DE EXPORTACIÓN A PDF Y EXCEL ---
 # ====================================================================
 def exportar_df_a_pdf(df: pd.DataFrame, titulo: str) -> io.BytesIO:
     """Convierte cualquier DataFrame de pandas a un documento PDF descargable."""
@@ -447,6 +447,14 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str) -> io.BytesIO:
 
     elements.append(tabla)
     doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+def exportar_df_a_excel(df: pd.DataFrame) -> io.BytesIO:
+    """Convierte un DataFrame a un archivo Excel (.xlsx) usando openpyxl."""
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Documentos')
     buffer.seek(0)
     return buffer
 
@@ -755,15 +763,18 @@ info_contrato = contratos_dict[contrato_activo]
 st.sidebar.markdown("---")
 st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• {tipo_obra_activo}\n• Contrato: **{contrato_activo}**")
 
-# --- NUEVO: Logo definido y autoría en la barra lateral ---
-# Cambia "URL_DE_TU_LOGO_AQUI.png" por la ruta local de tu imagen o un link web
-url_logo_personal = "LOGO OFICIAL SHP (2).bmp" # Ejemplo de logo (cámbialo)
+# --- NUEVO: Logo personal y autoría en la barra lateral ---
+# Cambia el nombre de este archivo si es diferente en tu repositorio de GitHub
+url_logo_personal = "mi_logo.png"
 
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
-
 col_firma1, col_firma2 = st.sidebar.columns([1, 3])
 with col_firma1:
-    st.image(url_logo_personal, use_container_width=True)
+    # Solo intentará cargar el logo si existe el archivo o es un link válido
+    try:
+        st.image(url_logo_personal, use_container_width=True)
+    except:
+        pass
 with col_firma2:
     st.markdown(
         """
@@ -774,7 +785,6 @@ with col_firma2:
         """,
         unsafe_allow_html=True
     )
-
 
 # --- PRECARGA AUTOMÁTICA AL INICIAR ---
 with st.spinner(f'Inicializando y precargando metadatos para {contrato_activo}...'):
@@ -873,19 +883,16 @@ else:
     col_g1, col_g2 = st.columns([1.3, 1])
     with col_g1:
         st.dataframe(df_resumen, width='stretch', hide_index=True)
-        # Botón de exportación a PDF para la tabla resumen
+        # Botones de exportación PDF y EXCEL
         if not df_resumen.empty:
-            pdf_resumen = exportar_df_a_pdf(
-                df_resumen, 
-                f"Resumen General - {contrato_activo} ({datetime.now().strftime('%d/%m/%Y')})"
-            )
-            st.download_button(
-                label="📄 Exportar Resumen a PDF",
-                data=pdf_resumen,
-                file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf",
-                mime="application/pdf",
-                key="btn_descarga_resumen"
-            )
+            c_btn1, c_btn2 = st.columns(2)
+            with c_btn1:
+                pdf_resumen = exportar_df_a_pdf(df_resumen, f"Resumen General - {contrato_activo} ({datetime.now().strftime('%d/%m/%Y')})")
+                st.download_button(label="📄 Exportar Resumen (PDF)", data=pdf_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_resumen_pdf")
+            with c_btn2:
+                excel_resumen = exportar_df_a_excel(df_resumen)
+                st.download_button(label="📊 Exportar Resumen (Excel)", data=excel_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_resumen_excel")
+
     with col_g2:
         if not df_resumen.empty:
             columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
@@ -901,7 +908,7 @@ else:
 
     st.markdown("---")
 
-  # --- VISTA DETALLADA POR CARPETA INDIVIDUAL, GRÁFICO Y FILTRO ---
+    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL, GRÁFICO (BARRAS) Y FILTRO ---
     st.subheader("Detalle por Carpeta / Disciplina")
     nombres_carpetas = list(datos_pestanas.keys())
     pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
@@ -914,7 +921,7 @@ else:
         
         st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
         
-        # --- NUEVA DISTRIBUCIÓN: Filtros a la izquierda, Gráfico a la derecha ---
+        # Filtros a la izquierda, Gráfico a la derecha (Ahora Gráfico de Barras)
         col_filtros, col_grafico = st.columns([1, 1])
         
         with col_filtros:
@@ -927,50 +934,46 @@ else:
                 df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
                 df_counts.columns = [col_pendiente, 'Cantidad']
                 
-                fig_detalle = px.pie(
+                # GRÁFICO DE BARRAS EN LUGAR DE PASTEL
+                fig_detalle = px.bar(
                     df_counts, 
-                    names=col_pendiente, 
-                    values='Cantidad', 
-                    hole=0.4,
-                    title="Distribución de Responsables"
+                    x=col_pendiente, 
+                    y='Cantidad', 
+                    color=col_pendiente,
+                    title="Distribución de Responsables",
+                    text='Cantidad'
                 )
-                # Reducimos la altura para que no empuje la tabla muy abajo
-                fig_detalle.update_layout(height=220, margin=dict(t=30, b=0, l=10, r=10))
+                fig_detalle.update_layout(
+                    height=250, 
+                    margin=dict(t=30, b=0, l=10, r=10),
+                    showlegend=False,
+                    xaxis_title="",
+                    yaxis_title="Cantidad"
+                )
                 st.plotly_chart(fig_detalle, use_container_width=True)
         
-        # --- TABLA A TODO LO ANCHO DEBAJO ---
+        # Tabla detallada y botones debajo a todo lo ancho
         if not df_filtrado.empty:
             st.dataframe(df_filtrado, width='stretch', height=400)
             
-            # Botón de exportación a PDF para la tabla detallada filtrada
-            pdf_detalle = exportar_df_a_pdf(
-                df_filtrado, 
-                f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}"
-            )
-            st.download_button(
-                label="📄 Exportar Detalle a PDF",
-                data=pdf_detalle,
-                file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf",
-                mime="application/pdf",
-                key="btn_descarga_detalle"
-            )
+            c_det1, c_det2 = st.columns(2)
+            with c_det1:
+                pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}")
+                st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf")
+            with c_det2:
+                excel_detalle = exportar_df_a_excel(df_filtrado)
+                st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
         else:
             st.info("No hay documentos que coincidan con el filtro seleccionado.")
             
     else:
-        # En caso no exista la columna de responsable
         st.dataframe(df_actual, width='stretch', height=400)
         
         if not df_actual.empty:
-            # Botón de exportación a PDF para la tabla detallada sin filtro
-            pdf_detalle = exportar_df_a_pdf(
-                df_actual, 
-                f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}"
-            )
-            st.download_button(
-                label="📄 Exportar Detalle a PDF",
-                data=pdf_detalle,
-                file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf",
-                mime="application/pdf",
-                key="btn_descarga_detalle_alt"
-            )
+            c_det1, c_det2 = st.columns(2)
+            with c_det1:
+                pdf_detalle = exportar_df_a_pdf(df_actual, f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}")
+                st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_alt_pdf")
+            with c_det2:
+                excel_detalle = exportar_df_a_excel(df_actual)
+                st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_alt_excel")
