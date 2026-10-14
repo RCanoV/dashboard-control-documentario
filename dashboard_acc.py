@@ -757,7 +757,7 @@ st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_a
 
 # --- NUEVO: Logo definido y autoría en la barra lateral ---
 # Cambia "URL_DE_TU_LOGO_AQUI.png" por la ruta local de tu imagen o un link web
-url_logo_personal = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" # Ejemplo de logo (cámbialo)
+url_logo_personal = "LOGO OFICIAL SHP (2).bmp" # Ejemplo de logo (cámbialo)
 
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
@@ -901,7 +901,7 @@ else:
 
     st.markdown("---")
 
-    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL, GRÁFICO Y FILTRO ---
+  # --- VISTA DETALLADA POR CARPETA INDIVIDUAL, GRÁFICO Y FILTRO ---
     st.subheader("Detalle por Carpeta / Disciplina")
     nombres_carpetas = list(datos_pestanas.keys())
     pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
@@ -913,32 +913,17 @@ else:
         estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
         
         st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
-        filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
+        
+        # --- NUEVA DISTRIBUCIÓN: Filtros a la izquierda, Gráfico a la derecha ---
+        col_filtros, col_grafico = st.columns([1, 1])
+        
+        with col_filtros:
+            filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
         
         df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
         
-        if not df_filtrado.empty:
-            # Crear columnas para colocar la tabla junto al gráfico
-            col_tabla, col_grafico = st.columns([1.5, 1])
-            
-            with col_tabla:
-                st.dataframe(df_filtrado, width='stretch', height=400)
-                
-                # Botón de exportación a PDF para la tabla detallada filtrada
-                pdf_detalle = exportar_df_a_pdf(
-                    df_filtrado, 
-                    f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}"
-                )
-                st.download_button(
-                    label="📄 Exportar Detalle a PDF",
-                    data=pdf_detalle,
-                    file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf",
-                    mime="application/pdf",
-                    key="btn_descarga_detalle"
-                )
-                
-            with col_grafico:
-                # Generar el gráfico basado en la tabla filtrada
+        with col_grafico:
+            if not df_filtrado.empty:
                 df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
                 df_counts.columns = [col_pendiente, 'Cantidad']
                 
@@ -947,10 +932,28 @@ else:
                     names=col_pendiente, 
                     values='Cantidad', 
                     hole=0.4,
-                    title=f"Distribución de Responsables"
+                    title="Distribución de Responsables"
                 )
-                fig_detalle.update_layout(margin=dict(t=40, b=10, l=10, r=10))
+                # Reducimos la altura para que no empuje la tabla muy abajo
+                fig_detalle.update_layout(height=220, margin=dict(t=30, b=0, l=10, r=10))
                 st.plotly_chart(fig_detalle, use_container_width=True)
+        
+        # --- TABLA A TODO LO ANCHO DEBAJO ---
+        if not df_filtrado.empty:
+            st.dataframe(df_filtrado, width='stretch', height=400)
+            
+            # Botón de exportación a PDF para la tabla detallada filtrada
+            pdf_detalle = exportar_df_a_pdf(
+                df_filtrado, 
+                f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}"
+            )
+            st.download_button(
+                label="📄 Exportar Detalle a PDF",
+                data=pdf_detalle,
+                file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf",
+                mime="application/pdf",
+                key="btn_descarga_detalle"
+            )
         else:
             st.info("No hay documentos que coincidan con el filtro seleccionado.")
             
@@ -971,4 +974,3 @@ else:
                 mime="application/pdf",
                 key="btn_descarga_detalle_alt"
             )
-
