@@ -67,7 +67,7 @@ ESTRUCTURA_MAESTRA = {
                     }
             },
             "Obras Electromecanicas": {
-                "C601 CGI-SHP-001-2025": {
+                "C601 CGI-SHP-001-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -85,6 +85,46 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 }
+
+                "C610 CGI-SHP-010-2026": {
+                    "nombre_proyecto": "994440 Paquete OEM 05B - C610 COVEC BISA",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "A. Nina / J. Salazar",
+                    "administrador_contratos": "Gonzalo Vargas",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.5zGmicrWQv6DSKhv-QGlQA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cx_ccOZRRCGHb3J8EfSl2Q&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.RPXN3sO1QDmvJS-5hn_kBg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.MtSekBToRhGs0xIKfvL9rg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Y31XHPY2Sy265fvyKhPt_g&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                }
+                
+                "C611 CGI-SHP-011-2026": {
+                    "nombre_proyecto": "994440 Paquete OEM 06 - C611 AID BISA",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Mauro Yaranga",
+                    "administrador_contratos": "Gonzalo Vargas",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HH6wISmLSaWAxr-FUw8lBg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.3OYObaXeSvCljs2HQFYaEw&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.AUdUCKq0QFeHxlE-PPTOQQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CKikIYrkSQmMF3wyt62jOw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Zba0ob9tTk6PCFB-k9akUA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                }
+
+                
             }
         },
         "998316 Nuevo Muelle San Nicolas": {
