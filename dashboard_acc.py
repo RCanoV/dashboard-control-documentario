@@ -127,7 +127,7 @@ ESTRUCTURA_MAESTRA = {
                 
             },
             "Obras Electromecanicas": {
-                "CGI-SHP-001-2026": {
+                "Paquete 01 - CGI-SHP-001-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -145,8 +145,63 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
+                "Paquete 02 - CGI-SHP-003-2026": {
+                    "nombre_proyecto": "994440 Paquete OEM 02 - C602 SGMC BISA",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Ronald Valdivia",
+                    "administrador_contratos": "Victor Calvo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hVkYLUDGTBWxaaPw1rDMwA&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XxU1AWhiR2GfKKRlKDC5xw&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.KZ0ThTUiSGaev5XQ8aBmlA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ubR1IJdXQJOxKBgw_MUgRg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9315eaIrR-SN4m22KNQ6WA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P3K04-MYRZ27fNfyl4grnQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ODILcCHhS0qbGcZL7dP8TA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+                 },
+                "Paquete 03 - CGI-SHP-005-2026": {
+                    "nombre_proyecto": "994440 Paquete OEM 03 - C602 SGMC BISA",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Ronald Valdivia",
+                    "administrador_contratos": "Victor Calvo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.5iNN6rXrRG-ZwrgECCcwDQ&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.BvbTrUAfR0i5ZlYplxKUTA&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6ZQfNN_NSlilQsUjxSX-kQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.TojUUNCqQuihYkLFClAAeA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8JZKPjJfQBWZhZC-45fAKg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.DOHVT-hYS9OW-w-oIz7Quw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4Pex6mj3Q2aUH8kNnMVicA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+             "Paquete 04 - CGI-SHP-006-2026": {
+                    "nombre_proyecto": "994440 Paquete OEM 04 - C605 CHEC BISA",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Ronald Valdivia",
+                    "administrador_contratos": "Victor Calvo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.78FSqSiiT2OingJX1Ja9aQ&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZvZsTnO8QlSWDcnjw_H30w&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NWcSlYaQTxeFj0sATS_U-A&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco._kdxfyRsRUGba669vzphTA&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.xlVNeXVnSXe-4O8j0x-PGA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.E0DpZUPrQ9GjyRfP6BjmTA&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zr5NBPPPREegjBM3tgREkw&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
 
-                 "CGI-SHP-004-2026": {
+                 "Paquete 05A - CGI-SHP-004-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 05A - C604 CCCC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -165,7 +220,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
 
-                "CGI-SHP-010-2026": {
+                "Paquete 05B - CGI-SHP-010-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 05B - C610 COVEC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -184,7 +239,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
                 
-                "CGI-SHP-011-2026": {
+                "Paquete 06 - CGI-SHP-011-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 06 - C611 AID BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -200,6 +255,24 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.AUdUCKq0QFeHxlE-PPTOQQ&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CKikIYrkSQmMF3wyt62jOw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Zba0ob9tTk6PCFB-k9akUA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+            "Paquete 07 - CGI-SHP-012-2026": {
+                    "nombre_proyecto": "994440 Paquete OEM 06 - C611 AID BISA",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
+                    "coordinador_shp": "Misael Castillo",
+                    "administrador_contratos": "Ivan Lima",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders",
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.vKhVxRjjQv2LkLLTFfbaEA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1dXsqtcOTPKzK3RKlZv0rg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NPx2OF7SQUemcJj4g-MJ6w&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NJUKhA54SiCmLn2X-xXaqw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 }
 
