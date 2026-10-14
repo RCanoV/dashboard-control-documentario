@@ -27,7 +27,7 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_pendiente": "6011840"
             },
             "Obras Civiles": {
-                "C519 CGI-SHP-019-2025": {
+                "CGI-SHP-019-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 01 - C519 - SGMC",
                     "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                     "nombre_supervisor": "Luis Rojas",
@@ -47,7 +47,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
 
-                 "C519 CGI-SHP-027-2025": {
+                 "CGI-SHP-027-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 02 - C527 - CHEC",
                     "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                     "nombre_supervisor": "Luis Rojas",
@@ -66,7 +66,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Cm_uBP0wRHyvXG3hRMJnGg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
-                "C534 CGI-SHP-034-2025": {
+                "CGI-SHP-034-2025": {
                         "nombre_proyecto": "994440 Paquete CIVIL 05 - C534 - COVEC",
                         "tipo_contrato": "Con Supervisión", # Opciones: "Con Supervisión", "Tripartito", "Contrato Directo"
                         "nombre_supervisor": "Luis Rojas",
@@ -87,7 +87,7 @@ ESTRUCTURA_MAESTRA = {
                     }
             },
             "Obras Electromecanicas": {
-                "C601 CGI-SHP-001-2026": {
+                "CGI-SHP-001-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 01 - C601 CHEC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -106,7 +106,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
 
-                 "C601 CGI-SHP-004-2026": {
+                 "CGI-SHP-004-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 05A - C604 CCCC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -125,7 +125,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
 
-                "C610 CGI-SHP-010-2026": {
+                "CGI-SHP-010-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 05B - C610 COVEC BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
@@ -144,7 +144,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
                 
-                "C611 CGI-SHP-011-2026": {
+                "CGI-SHP-011-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 06 - C611 AID BISA",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Ing. BISA / Supervisor Asignado",
