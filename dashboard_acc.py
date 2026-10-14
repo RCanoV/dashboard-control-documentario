@@ -84,7 +84,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Sgn_HpAZSfK84UcH7Od1Pw&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J8zAgoEdRFOlCo4FwXmVHg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
-                }
+                },
 
                 "C610 CGI-SHP-010-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 05B - C610 COVEC BISA",
@@ -103,7 +103,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.MtSekBToRhGs0xIKfvL9rg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Y31XHPY2Sy265fvyKhPt_g&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
-                }
+                },
                 
                 "C611 CGI-SHP-011-2026": {
                     "nombre_proyecto": "994440 Paquete OEM 06 - C611 AID BISA",
