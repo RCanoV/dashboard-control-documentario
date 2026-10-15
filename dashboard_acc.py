@@ -684,7 +684,7 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
         enlaces = data.get("links", {})
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
-# Ojo: Hemos quitado ttl=3600 porque ahora el parámetro `periodo_cache` es la llave maestra de caducidad.
+
 @st.cache_data(show_spinner=False)
 def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personalizados, id_campo_fecha, id_campo_pendiente, periodo_cache):
     token = obtener_token()
@@ -763,10 +763,16 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
         except Exception as e:
             continue
 
-    return dataframes_por_pestana
+    # Registro del momento exacto de carga en Autodesk para la métrica
+    tz_pe = pytz.timezone('America/Lima')
+    hora_cache = datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M')
+
+    return {
+        "datos": dataframes_por_pestana,
+        "hora_actualizacion": hora_cache
+    }
 
 def precargar_todos_los_contratos(periodo):
-    """Itera sobre toda la estructura maestra y pre-carga la data en la caché de Streamlit."""
     for alcance, sub_dict in ESTRUCTURA_MAESTRA.items():
         for sub_nom, sub_data in sub_dict.items():
             if sub_nom == "config": 
@@ -782,8 +788,6 @@ def precargar_todos_los_contratos(periodo):
                     continue
                     
                 for cont_nom, info_cont in contratos_dict.items():
-                    # Esta llamada carga la información en memoria para cada contrato.
-                    # Si ya está en memoria, la lectura demora menos de 1 segundo.
                     extraer_datos_contrato_completo(cont_nom, info_cont, campos, id_fec, id_pen, periodo)
 
 
@@ -792,7 +796,6 @@ def precargar_todos_los_contratos(periodo):
 # ====================================================================
 st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_icon="📊")
 
-# Periodo actual (Define si estamos en madrugada, mañana o tarde)
 periodo_actual = obtener_periodo_actual()
 
 # --- ENCABEZADO CON LOGO EN LA PARTE SUPERIOR DERECHA ---
@@ -802,10 +805,7 @@ with col_head1:
     st.markdown("**Institución:** Shougang Hierro Perú")
 
 with col_head2:
-    st.image(
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png",
-        width=130
-    )
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=130)
 
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=150)
 st.sidebar.title("Estructura de Proyectos")
@@ -821,12 +821,7 @@ subproyecto_activo = st.sidebar.selectbox("2. Subproyecto:", list(subproyectos_d
 subproyecto_data = subproyectos_dict.get(subproyecto_activo, {})
 
 config_sub = subproyecto_data.get("config", {
-    "campos_personalizados": {
-        "6011837": "REV",
-        "6011840": "PENDIENTE POR",
-        "6011839": "FECHA",
-        "6011838": "ESTADO"
-    },
+    "campos_personalizados": {"6011837": "REV", "6011840": "PENDIENTE POR", "6011839": "FECHA", "6011838": "ESTADO"},
     "id_campo_fecha": "6011839",
     "id_campo_pendiente": "6011840"
 })
@@ -857,13 +852,13 @@ st.sidebar.info(
     f"• {subproyecto_activo}\n"
     f"• {tipo_obra_activo}\n"
     f"• Contrato: **{contrato_activo}**\n\n"
-    f"*(Corte actual: {periodo_actual.split('_')[-1].upper()})*"
+    f"*(Corte activo: {periodo_actual.split('_')[-1].upper()})*"
 )
 
 # --- BOTÓN DE ACTUALIZACIÓN MANUAL GLOBAL ---
 if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=True):
     extraer_datos_contrato_completo.clear()
-    st.sidebar.warning("Descargando absolutamente toda la data desde Autodesk. Esto tomará varios minutos...")
+    st.sidebar.warning("Descargando data global (Autodesk API)... Por favor, espera.")
     with st.spinner("Descargando data global (Autodesk API)... Por favor, espera."):
         precargar_todos_los_contratos(periodo_actual)
     st.sidebar.success("¡Data global actualizada existosamente!")
@@ -880,16 +875,11 @@ with col_firma1:
         pass
 with col_firma2:
     st.markdown(
-        """
-        <div style="font-size: 13px; color: #4A5568; margin-top: 5px;">
-            Desarrollado por<br>
-            <b>Roberto Cano</b>
-        </div>
-        """,
-        unsafe_allow_html=True
+        """<div style="font-size: 13px; color: #4A5568; margin-top: 5px;">
+            Desarrollado por<br><b>Roberto Cano</b>
+        </div>""", unsafe_allow_html=True
     )
 
-# Diccionario de Metadatos para exportación a Excel y PDF
 tz_pe = pytz.timezone('America/Lima')
 metadata_export = {
     "fecha": datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M'),
@@ -900,14 +890,15 @@ metadata_export = {
 }
 
 # --- PRECARGA AUTOMÁTICA SILENCIOSA ---
-# Obliga a cargar TODO en memoria al iniciar la app por primera vez en el turno.
-with st.spinner("Verificando/Cargando caché global de todos los contratos..."):
+with st.spinner("Verificando caché global de todos los contratos..."):
     precargar_todos_los_contratos(periodo_actual)
 
-# Ahora simplemente pedimos el contrato activo (será instantáneo si ya se pre-cargó)
-datos_pestanas = extraer_datos_contrato_completo(
+resultado_cache = extraer_datos_contrato_completo(
     contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
 )
+
+datos_pestanas = resultado_cache.get("datos", {})
+hora_actualizacion = resultado_cache.get("hora_actualizacion", "Desconocida")
 
 if not datos_pestanas:
     st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
@@ -929,11 +920,10 @@ else:
             c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
             
         c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
-        c5.metric("Estado Caché", "En memoria")
+        c5.metric("Última Actualiz.", hora_actualizacion) # Se actualiza a la hora mostrada por Autodesk.
 
     col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
     
-    # --- DETERMINAR ROLES SEGÚN TIPO DE CONTRATO ---
     if tipo_contrato_val == "Tripartito":
         emp1 = info_contrato.get("nombre_empresa_1", "EMPRESA 1")
         emp2 = info_contrato.get("nombre_empresa_2", "EMPRESA 2")
@@ -943,7 +933,6 @@ else:
     else:
         roles_pendientes = ["CONTRATISTA", "SUPERVISION", "SHP"]
 
-    # --- CONSOLIDAR MÉTRICAS PARA RESUMEN Y GRÁFICO ---
     total_cerrados = 0
     total_abiertos = 0
     resumen_lista = []
@@ -963,7 +952,6 @@ else:
                 fila_res[rol.title()] = cant_rol
                 abiertos_carp += cant_rol
             
-            # --- CÁLCULO DEL DOCUMENTO CON MAYOR RETRASO ---
             df_abiertos = df[estados != "CERRADO"].copy()
             if not df_abiertos.empty and 'DIAS' in df_abiertos.columns:
                 df_abiertos['DIAS_NUM'] = pd.to_numeric(df_abiertos['DIAS'], errors='coerce').fillna(0)
@@ -988,21 +976,18 @@ else:
         fila_res["Total"] = cerrados_carp + abiertos_carp
         resumen_lista.append(fila_res)
 
-    # --- MÉTRICAS PRINCIPALES ---
     m1, m2, m3 = st.columns(3)
     m1.metric("Total de Documentos", total_cerrados + total_abiertos)
     m2.metric("Documentos Cerrados", total_cerrados)
     m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención", delta_color="inverse")
     st.markdown("---")
 
-    # --- TABLA RESUMEN GENERAL Y GRÁFICO DE BARRAS ---
     st.subheader(f"Resumen General por Carpeta - Contrato: {contrato_activo}")
     df_resumen = pd.DataFrame(resumen_lista)
     
     col_g1, col_g2 = st.columns([1.3, 1])
     with col_g1:
         st.dataframe(df_resumen, width='stretch', hide_index=True)
-        # Botones de exportación PDF y EXCEL
         if not df_resumen.empty:
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
@@ -1027,7 +1012,6 @@ else:
 
     st.markdown("---")
 
-    # --- VISTA DETALLADA POR CARPETA INDIVIDUAL, GRÁFICO (BARRAS) Y FILTRO ---
     st.subheader("Detalle por Carpeta / Disciplina")
     nombres_carpetas = list(datos_pestanas.keys())
     pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
@@ -1039,8 +1023,6 @@ else:
         estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
         
         st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
-        
-        # Filtros a la izquierda, Gráfico a la derecha (Gráfico de Barras)
         col_filtros, col_grafico = st.columns([1, 1])
         
         with col_filtros:
@@ -1070,7 +1052,6 @@ else:
                 )
                 st.plotly_chart(fig_detalle, use_container_width=True)
         
-        # Tabla detallada y botones debajo a todo lo ancho
         if not df_filtrado.empty:
             st.dataframe(df_filtrado, width='stretch', height=400)
             
