@@ -807,7 +807,7 @@ with col_head1:
 with col_head2:
     st.image("LOGO OFICIAL SHP (2).bmp", width=130)
 
-st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=150)
+st.sidebar.image("LOGO OFICIAL SHP (2).bmp", width=150)
 st.sidebar.title("Estructura de Proyectos")
 
 grupo_activo = st.sidebar.selectbox("1. Tipo de Alcance:", list(ESTRUCTURA_MAESTRA.keys()))
