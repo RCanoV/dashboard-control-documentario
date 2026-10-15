@@ -887,7 +887,7 @@ if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=
     st.sidebar.success("¡Data global actualizada existosamente!")
 
 # --- LOGO Y FIRMA EN BARRA LATERAL ---
-url_logo_personal = "mi_logo.png"
+url_logo_personal = "logoshp.jpeg"
 
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 col_firma1, col_firma2 = st.sidebar.columns([1, 3])
