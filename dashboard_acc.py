@@ -5,15 +5,22 @@ import requests
 import pandas as pd
 import urllib.parse
 from datetime import datetime
+import pytz
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import streamlit as st
 import plotly.express as px
 
-# ReportLab para la exportación de tablas a PDF
+# Librerías para exportación a PDF (ReportLab)
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import Image as RLImage
+
+# Librerías para exportación a Excel (OpenPyXL)
+import openpyxl
+from openpyxl.drawing.image import Image as ExcelImage
+from openpyxl.styles import Font, Alignment
 
 # ====================================================================
 # --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
@@ -389,49 +396,50 @@ except:
 # ====================================================================
 # --- 3. FUNCIONES DE EXPORTACIÓN A PDF Y EXCEL ---
 # ====================================================================
-def exportar_df_a_pdf(df: pd.DataFrame, titulo: str) -> io.BytesIO:
-    """Convierte cualquier DataFrame de pandas a un documento PDF descargable."""
+def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str) -> io.BytesIO:
     buffer = io.BytesIO()
+    
+    def agregar_pie_pagina(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        canvas.setFillColor(colors.HexColor("#4A5568"))
+        canvas.drawString(doc.leftMargin, 15, "Desarrollado por Roberto Cano")
+        canvas.restoreState()
+
     doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(letter),
-        leftMargin=25,
-        rightMargin=25,
-        topMargin=25,
-        bottomMargin=25
+        buffer, pagesize=landscape(letter),
+        leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
     )
     elements = []
     styles = getSampleStyleSheet()
+    
+    if os.path.exists(ruta_logo):
+        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
+        logo.hAlign = 'RIGHT'
+        elements.append(logo)
+        elements.append(Spacer(1, 10))
 
     titulo_style = styles["Heading2"]
     titulo_style.alignment = 0
-
-    cell_style = ParagraphStyle(
-        name="CellText",
-        parent=styles["Normal"],
-        fontSize=7,
-        leading=9
-    )
-    header_style = ParagraphStyle(
-        name="HeaderCellText",
-        parent=styles["Normal"],
-        fontSize=7,
-        leading=9,
-        textColor=colors.whitesmoke,
-        fontName="Helvetica-Bold"
-    )
+    meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
 
     elements.append(Paragraph(titulo, titulo_style))
-    elements.append(Spacer(1, 10))
+    elements.append(Spacer(1, 5))
+    elements.append(Paragraph(f"<b>Fecha de Exportación:</b> {metadatos['fecha']}", meta_style))
+    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
+    elements.append(Paragraph(f"<b>Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
+    elements.append(Paragraph(f"<b>Tipo de Obra:</b> {metadatos['tipo_obra']}", meta_style))
+    elements.append(Paragraph(f"<b>Contrato:</b> {metadatos['contrato']}", meta_style))
+    elements.append(Spacer(1, 15))
+
+    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
+    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
 
     encabezados = [Paragraph(str(col), header_style) for col in df.columns]
     data_matrix = [encabezados]
 
     for _, row in df.iterrows():
-        fila = []
-        for val in row:
-            texto = "" if pd.isna(val) else str(val)
-            fila.append(Paragraph(texto, cell_style))
+        fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
         data_matrix.append(fila)
 
     tabla = Table(data_matrix, repeatRows=1)
@@ -444,23 +452,79 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str) -> io.BytesIO:
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
     ]))
-
     elements.append(tabla)
-    doc.build(elements)
+
+    doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
     buffer.seek(0)
     return buffer
 
-def exportar_df_a_excel(df: pd.DataFrame) -> io.BytesIO:
-    """Convierte un DataFrame a un archivo Excel (.xlsx) usando openpyxl."""
+def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str) -> io.BytesIO:
     buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Documentos')
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Documentos"
+
+    if os.path.exists(ruta_logo):
+        img = ExcelImage(ruta_logo)
+        img.height = 40
+        img.width = 120
+        ws.add_image(img, 'H1')
+
+    ws['A1'] = titulo
+    ws['A1'].font = Font(size=14, bold=True)
+    
+    ws['A3'] = "Fecha de Exportación:"
+    ws['B3'] = metadatos['fecha']
+    ws['A4'] = "Alcance:"
+    ws['B4'] = metadatos['alcance']
+    ws['A5'] = "Subproyecto:"
+    ws['B5'] = metadatos['subproyecto']
+    ws['A6'] = "Tipo de Obra:"
+    ws['B6'] = metadatos['tipo_obra']
+    ws['A7'] = "Contrato:"
+    ws['B7'] = metadatos['contrato']
+
+    for row in range(3, 8):
+        ws[f'A{row}'].font = Font(bold=True)
+
+    fila_inicio = 9
+    for col_num, col_name in enumerate(df.columns, 1):
+        cell = ws.cell(row=fila_inicio, column=col_num, value=col_name)
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = openpyxl.styles.PatternFill(start_color="1A365D", end_color="1A365D", fill_type="solid")
+        ws.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = 20
+
+    for r_idx, row in enumerate(df.values, fila_inicio + 1):
+        for c_idx, value in enumerate(row, 1):
+            ws.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else str(value))
+
+    fila_pie = fila_inicio + len(df) + 2
+    pie_cell = ws.cell(row=fila_pie, column=1, value="Desarrollado por Roberto Cano")
+    pie_cell.font = Font(italic=True, color="4A5568")
+
+    wb.save(buffer)
     buffer.seek(0)
     return buffer
 
 # ====================================================================
-# --- 4. LÓGICA DE API AUTODESK ---
+# --- 4. LÓGICA DE API AUTODESK Y PRE-CARGA GLOBAL ---
 # ====================================================================
+def obtener_periodo_actual():
+    """Define los periodos del día para forzar la actualización a las 6 AM y 2 PM."""
+    tz_peru = pytz.timezone('America/Lima')
+    ahora = datetime.now(tz_peru)
+    fecha_hoy = ahora.strftime("%Y-%m-%d")
+    hora = ahora.hour
+
+    if hora < 6:
+        bloque = "madrugada"
+    elif hora < 14:
+        bloque = "manana"
+    else:
+        bloque = "tarde"
+
+    return f"{fecha_hoy}_{bloque}"
+
 def obtener_ids_excluidos(urls):
     ids = set()
     for url in urls:
@@ -620,8 +684,9 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
         enlaces = data.get("links", {})
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
-@st.cache_data(ttl=3600)
-def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personalizados, id_campo_fecha, id_campo_pendiente):
+# Ojo: Hemos quitado ttl=3600 porque ahora el parámetro `periodo_cache` es la llave maestra de caducidad.
+@st.cache_data(show_spinner=False)
+def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personalizados, id_campo_fecha, id_campo_pendiente, periodo_cache):
     token = obtener_token()
     if not token:
         return {}
@@ -700,20 +765,45 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
 
     return dataframes_por_pestana
 
+def precargar_todos_los_contratos(periodo):
+    """Itera sobre toda la estructura maestra y pre-carga la data en la caché de Streamlit."""
+    for alcance, sub_dict in ESTRUCTURA_MAESTRA.items():
+        for sub_nom, sub_data in sub_dict.items():
+            if sub_nom == "config": 
+                continue
+            
+            config_sub = sub_data.get("config", {})
+            campos = config_sub.get("campos_personalizados", {})
+            id_fec = config_sub.get("id_campo_fecha", "")
+            id_pen = config_sub.get("id_campo_pendiente", "")
+            
+            for tipo_obra, contratos_dict in sub_data.items():
+                if tipo_obra == "config": 
+                    continue
+                    
+                for cont_nom, info_cont in contratos_dict.items():
+                    # Esta llamada carga la información en memoria para cada contrato.
+                    # Si ya está en memoria, la lectura demora menos de 1 segundo.
+                    extraer_datos_contrato_completo(cont_nom, info_cont, campos, id_fec, id_pen, periodo)
+
+
 # ====================================================================
 # --- 5. INTERFAZ WEB STREAMLIT ---
 # ====================================================================
 st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_icon="📊")
 
+# Periodo actual (Define si estamos en madrugada, mañana o tarde)
+periodo_actual = obtener_periodo_actual()
+
 # --- ENCABEZADO CON LOGO EN LA PARTE SUPERIOR DERECHA ---
 col_head1, col_head2 = st.columns([5, 1])
 with col_head1:
     st.title("📊 Dashboard de Control Documentario")
-    st.markdown("**Empresa:** Shougang Hierro Perú")
+    st.markdown("**Institución:** Shougang Hierro Perú")
 
 with col_head2:
     st.image(
-        "LOGO OFICIAL SHP (2).bmp",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png",
         width=130
     )
 
@@ -761,16 +851,29 @@ contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contrat
 info_contrato = contratos_dict[contrato_activo]
 
 st.sidebar.markdown("---")
-st.sidebar.info(f"**Selección Actual:**\n• {grupo_activo}\n• {subproyecto_activo}\n• {tipo_obra_activo}\n• Contrato: **{contrato_activo}**")
+st.sidebar.info(
+    f"**Selección Actual:**\n"
+    f"• {grupo_activo}\n"
+    f"• {subproyecto_activo}\n"
+    f"• {tipo_obra_activo}\n"
+    f"• Contrato: **{contrato_activo}**\n\n"
+    f"*(Corte actual: {periodo_actual.split('_')[-1].upper()})*"
+)
 
-# --- NUEVO: Logo personal y autoría en la barra lateral ---
-# Cambia el nombre de este archivo si es diferente en tu repositorio de GitHub
-url_logo_personal = "rcano.png"
+# --- BOTÓN DE ACTUALIZACIÓN MANUAL GLOBAL ---
+if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=True):
+    extraer_datos_contrato_completo.clear()
+    st.sidebar.warning("Descargando absolutamente toda la data desde Autodesk. Esto tomará varios minutos...")
+    with st.spinner("Descargando data global (Autodesk API)... Por favor, espera."):
+        precargar_todos_los_contratos(periodo_actual)
+    st.sidebar.success("¡Data global actualizada existosamente!")
+
+# --- LOGO Y FIRMA EN BARRA LATERAL ---
+url_logo_personal = "mi_logo.png"
 
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 col_firma1, col_firma2 = st.sidebar.columns([1, 3])
 with col_firma1:
-    # Solo intentará cargar el logo si existe el archivo o es un link válido
     try:
         st.image(url_logo_personal, use_container_width=True)
     except:
@@ -786,9 +889,25 @@ with col_firma2:
         unsafe_allow_html=True
     )
 
-# --- PRECARGA AUTOMÁTICA AL INICIAR ---
-with st.spinner(f'Inicializando y precargando metadatos para {contrato_activo}...'):
-    datos_pestanas = extraer_datos_contrato_completo(contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo)
+# Diccionario de Metadatos para exportación a Excel y PDF
+tz_pe = pytz.timezone('America/Lima')
+metadata_export = {
+    "fecha": datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M'),
+    "alcance": grupo_activo,
+    "subproyecto": subproyecto_activo,
+    "tipo_obra": tipo_obra_activo,
+    "contrato": contrato_activo
+}
+
+# --- PRECARGA AUTOMÁTICA SILENCIOSA ---
+# Obliga a cargar TODO en memoria al iniciar la app por primera vez en el turno.
+with st.spinner("Verificando/Cargando caché global de todos los contratos..."):
+    precargar_todos_los_contratos(periodo_actual)
+
+# Ahora simplemente pedimos el contrato activo (será instantáneo si ya se pre-cargó)
+datos_pestanas = extraer_datos_contrato_completo(
+    contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
+)
 
 if not datos_pestanas:
     st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
@@ -810,7 +929,7 @@ else:
             c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
             
         c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
-        c5.metric("Estado Caché", "Activo (1h)")
+        c5.metric("Estado Caché", "En memoria")
 
     col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
     
@@ -887,10 +1006,10 @@ else:
         if not df_resumen.empty:
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
-                pdf_resumen = exportar_df_a_pdf(df_resumen, f"Resumen General - {contrato_activo} ({datetime.now().strftime('%d/%m/%Y')})")
+                pdf_resumen = exportar_df_a_pdf(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
                 st.download_button(label="📄 Exportar Resumen (PDF)", data=pdf_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_resumen_pdf")
             with c_btn2:
-                excel_resumen = exportar_df_a_excel(df_resumen)
+                excel_resumen = exportar_df_a_excel(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
                 st.download_button(label="📊 Exportar Resumen (Excel)", data=excel_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_resumen_excel")
 
     with col_g2:
@@ -921,7 +1040,7 @@ else:
         
         st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
         
-        # Filtros a la izquierda, Gráfico a la derecha (Ahora Gráfico de Barras)
+        # Filtros a la izquierda, Gráfico a la derecha (Gráfico de Barras)
         col_filtros, col_grafico = st.columns([1, 1])
         
         with col_filtros:
@@ -934,7 +1053,6 @@ else:
                 df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
                 df_counts.columns = [col_pendiente, 'Cantidad']
                 
-                # GRÁFICO DE BARRAS EN LUGAR DE PASTEL
                 fig_detalle = px.bar(
                     df_counts, 
                     x=col_pendiente, 
@@ -958,10 +1076,10 @@ else:
             
             c_det1, c_det2 = st.columns(2)
             with c_det1:
-                pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}")
+                pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
                 st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf")
             with c_det2:
-                excel_detalle = exportar_df_a_excel(df_filtrado)
+                excel_detalle = exportar_df_a_excel(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
                 st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
         else:
             st.info("No hay documentos que coincidan con el filtro seleccionado.")
@@ -972,8 +1090,8 @@ else:
         if not df_actual.empty:
             c_det1, c_det2 = st.columns(2)
             with c_det1:
-                pdf_detalle = exportar_df_a_pdf(df_actual, f"Detalle: {pestana_seleccionada} - Contrato: {contrato_activo}")
+                pdf_detalle = exportar_df_a_pdf(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
                 st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_alt_pdf")
             with c_det2:
-                excel_detalle = exportar_df_a_excel(df_actual)
+                excel_detalle = exportar_df_a_excel(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
                 st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_alt_excel")
