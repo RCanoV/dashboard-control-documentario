@@ -805,7 +805,7 @@ with col_head1:
     st.markdown("**Institución:** Shougang Hierro Perú")
 
 with col_head2:
-    st.image("rcano.png", width=130)
+    st.image("LOGOTIPO OFICIAL SHP (2).bmp", width=130)
 
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=150)
 st.sidebar.title("Estructura de Proyectos")
