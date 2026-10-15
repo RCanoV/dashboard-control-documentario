@@ -889,13 +889,22 @@ metadata_export = {
     "contrato": contrato_activo
 }
 
-# --- PRECARGA AUTOMÁTICA SILENCIOSA ---
-with st.spinner("Verificando caché global de todos los contratos..."):
+# --- RUTINA EXCLUSIVA PARA EL CRON-JOB (PING WEB) ---
+# Si la URL tiene ?preload=true, entra en modo robot
+if "preload" in st.query_params and st.query_params["preload"] == "true":
+    st.title("🤖 Modo Bot: Actualizando Caché Global")
+    st.warning("Descargando absolutamente toda la data de Autodesk en segundo plano. Esto tomará varios minutos...")
     precargar_todos_los_contratos(periodo_actual)
+    st.success("¡Data global precargada exitosamente!")
+    st.stop()  # Detiene la aplicación aquí para el robot, no carga los gráficos.
 
-resultado_cache = extraer_datos_contrato_completo(
-    contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
-)
+# --- CARGA NORMAL PARA USUARIOS ---
+# Solo verifica/carga el contrato que el usuario ha seleccionado en pantalla
+
+with st.spinner(f"Cargando datos para el contrato {contrato_activo}..."):
+    resultado_cache = extraer_datos_contrato_completo(
+        contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
+    )
 
 datos_pestanas = resultado_cache.get("datos", {})
 hora_actualizacion = resultado_cache.get("hora_actualizacion", "Desconocida")
