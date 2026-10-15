@@ -805,7 +805,7 @@ with col_head1:
     st.markdown("**Institución:** Shougang Hierro Perú")
 
 with col_head2:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=130)
+    st.image("logoshp.jpeg", width=130)
 
 
 # --- NUEVO: LOGO CENTRADO Y AUTORÍA EN LA BARRA LATERAL ---
@@ -814,7 +814,7 @@ col_espacio1, col_logo, col_espacio2 = st.sidebar.columns([1, 2.5, 1])
 
 with col_logo:
     # REEMPLAZA ESTO: pon el nombre de tu archivo PNG transparente subido a GitHub (ej: "mi_logo_transparente.png")
-    ruta_logo_sidebar = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png"
+    ruta_logo_sidebar = "logoshp.jpeg"
     try:
         st.image(ruta_logo_sidebar, use_container_width=True)
     except:
