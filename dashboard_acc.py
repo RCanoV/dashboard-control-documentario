@@ -61,7 +61,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
                 "Paquete 02 CIVIL - CGI-SHP-027-2025": {
-                    "nombre_proyecto": "994440 Paquete CIVIL 02 - C527 - CHEC",
+                    "nombre_proyecto": "994440 Paquete 02 - C527 - CHEC",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Luis Rojas",
                     "coordinador_shp": "W. Salas V. Injante",
