@@ -76,7 +76,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O_EGlk_BR3mKQ7iXlFpJHg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HU3HnztHR369GIhLTsDCSA&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.nBwFxIOaSRGRiL9Ka5URxQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Cm_uBP0wRHyvXG3hRMJnGg&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
+                        {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Cm_uBP0wRHyvXG3hRMJnGg&viewModel=detail&moduleId=folders", "longitud_maxima": 50}
                     ]
                 },
                 "Paquete 03 - CGI-SHP-030-2025": {
