@@ -805,9 +805,32 @@ with col_head1:
     st.markdown("**Institución:** Shougang Hierro Perú")
 
 with col_head2:
-    st.image("LOGO OFICIAL SHP (2).bmp", width=130)
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png", width=130)
 
-st.sidebar.image("LOGO OFICIAL SHP (2).bmp", width=100)
+
+# --- NUEVO: LOGO CENTRADO Y AUTORÍA EN LA BARRA LATERAL ---
+# Uso de columnas [1, 2, 1] para forzar que la imagen quede centrada
+col_espacio1, col_logo, col_espacio2 = st.sidebar.columns([1, 2.5, 1])
+
+with col_logo:
+    # REEMPLAZA ESTO: pon el nombre de tu archivo PNG transparente subido a GitHub (ej: "mi_logo_transparente.png")
+    ruta_logo_sidebar = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Shougang_Group_logo.svg/1200px-Shougang_Group_logo.svg.png"
+    try:
+        st.image(ruta_logo_sidebar, use_container_width=True)
+    except:
+        pass
+
+# Texto centrado justo debajo del logo
+st.sidebar.markdown(
+    """
+    <div style="text-align: center; font-size: 13.5px; color: #4A5568; margin-top: -10px; margin-bottom: 25px;">
+        Desarrollado por<br>
+        <b>Roberto Cano</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 st.sidebar.title("Estructura de Proyectos")
 
 grupo_activo = st.sidebar.selectbox("1. Tipo de Alcance:", list(ESTRUCTURA_MAESTRA.keys()))
