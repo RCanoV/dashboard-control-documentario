@@ -1,0 +1,41 @@
+name: Actualizador SHP (Navegador Invisible)
+
+on:
+  schedule:
+    # Los horarios usan la zona horaria universal (UTC). Perú es UTC-5.
+    # 11:01 UTC = 6:01 AM en Perú
+    - cron: '1 11 * * *'
+    # 19:01 UTC = 2:01 PM en Perú
+    - cron: '1 19 * * *'
+  workflow_dispatch: # Te permite ejecutarlo manualmente desde GitHub si quieres probarlo
+
+jobs:
+  precargar_cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instalar Robot de Navegación (Playwright)
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Ejecutar Chrome y entrar al Dashboard
+        run: |
+          python -c "
+          from playwright.sync_api import sync_playwright
+          import time
+
+          with sync_playwright() as p:
+              # Abre un Chrome invisible
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page()
+              
+              print('🤖 Abriendo dashboard en modo Robot...')
+              # Entra a tu URL secreta
+              page.goto('https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/?preload=true', timeout=120000)
+              
+              print('⏳ Esperando 5 minutos a que termine la descarga masiva de Autodesk...')
+              time.sleep(300) # Mantiene la página abierta 5 minutos para asegurar la carga
+              
+              print('✅ Caché global actualizada. Cerrando navegador.')
+              browser.close()
+          "
