@@ -41,6 +41,9 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_pendiente": "6011840"
             },
             "Obras Civiles": {
+                
+             },   
+            "Obras Civiles": {
                 "Paquete 01 - CGI-SHP-019-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 01 - C519 - SGMC",
                     "tipo_contrato": "Con Supervisión",
