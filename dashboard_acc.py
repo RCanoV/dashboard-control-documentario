@@ -637,9 +637,14 @@ def enviar_correo_con_pdf(destinatario, asunto, cuerpo, pdf_bytes, nombre_archiv
             filename=nombre_archivo
         )
         
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        # Conexión configurada para Microsoft 365 / Outlook (Correos Corporativos)
+        with smtplib.SMTP('smtp.office365.com', 587) as smtp:
+            smtp.ehlo()
+            smtp.starttls() # Cifra la conexión (obligatorio para el puerto 587)
+            smtp.ehlo()
             smtp.login(EMAIL_USER, EMAIL_PASS)
             smtp.send_message(msg)
+            
         return True, "¡Correo enviado exitosamente!"
     except Exception as e:
         return False, f"Error al enviar correo: {str(e)}"
