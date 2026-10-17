@@ -77,11 +77,11 @@ ESTRUCTURA_MAESTRA = {
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oruowhl0STa9w2M9Vo3gZQ&viewModel=detail&moduleId=folders",
                     ],
                     "carpetas_config": [
-                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8XNGFh6XTcy8HwGVqgx0tA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.qGCrERygRvWHVF__AF2hzQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UzkUvdTHRAuA78DzJRIb3Q&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9H02MxlNS1-UMkSXObElHQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.dq0X5F6lT-e8xtT57iEn5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.7MdcGeqmSfqPE5jDZxhoSA&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
@@ -425,10 +425,7 @@ except:
 # ====================================================================
 # --- 3. FUNCIONES DE EXPORTACIÓN A PDF, EXCEL Y CORREO ---
 # ====================================================================
-
-# Helper para centralizar la asignación de colores
 def obtener_colores_estado(estado):
-    """Devuelve (Color_Fondo, Color_Texto) en Hexadecimal dependiendo del estado."""
     estado = str(estado).strip().upper()
     if estado == "CERRADO":
         return "#d4edda", "#155724" # Verde
@@ -437,7 +434,6 @@ def obtener_colores_estado(estado):
     elif estado == "SUPERVISION":
         return "#f8d7da", "#721c24" # Rojo claro
     else:
-        # SHP o cualquier otro rol pendiente
         return "#cce5ff", "#004085" # Azul claro
 
 def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
@@ -474,8 +470,12 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
     elements.append(Paragraph(f"<b>Fecha de Exportación:</b> {metadatos['fecha']}", meta_style))
     elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
     elements.append(Paragraph(f"<b>Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
-    elements.append(Paragraph(f"<b>Tipo de Obra:</b> {metadatos['tipo_obra']}", meta_style))
-    elements.append(Paragraph(f"<b>Contrato:</b> {metadatos['contrato']}", meta_style))
+    
+    if "tipo_obra" in metadatos:
+        elements.append(Paragraph(f"<b>Tipo de Obra:</b> {metadatos['tipo_obra']}", meta_style))
+    if "contrato" in metadatos:
+        elements.append(Paragraph(f"<b>Contrato:</b> {metadatos['contrato']}", meta_style))
+        
     elements.append(Spacer(1, 15))
 
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
@@ -513,6 +513,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
             fila.append(Paragraph(text_str, cell_style))
         data_matrix.append(fila)
 
+    # Autocalcular anchos incluyendo nuevas columnas de Subproyecto
     anchos_columnas = []
     for col in df.columns:
         col_u = str(col).upper()
@@ -520,6 +521,10 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         elif col_u == "MAYOR RETRASO": anchos_columnas.append(0.35 * ancho_util)
         elif col_u == "CODIGO": anchos_columnas.append(0.18 * ancho_util)
         elif col_u == "DESCRIPCION": anchos_columnas.append(0.35 * ancho_util)
+        elif col_u == "TIPO DE OBRA": anchos_columnas.append(0.20 * ancho_util)
+        elif col_u == "CONTRATO": anchos_columnas.append(0.25 * ancho_util)
+        elif col_u == "DOCUMENTOS": anchos_columnas.append(0.12 * ancho_util)
+        elif col_u == "AVANCE (%)": anchos_columnas.append(0.10 * ancho_util)
         elif col_u in ["REV", "DIAS"]: anchos_columnas.append(0.06 * ancho_util)
         elif col_u == "FECHA": anchos_columnas.append(0.09 * ancho_util)
         elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
@@ -558,10 +563,13 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
     ws['B4'] = metadatos['alcance']
     ws['A5'] = "Subproyecto:"
     ws['B5'] = metadatos['subproyecto']
-    ws['A6'] = "Tipo de Obra:"
-    ws['B6'] = metadatos['tipo_obra']
-    ws['A7'] = "Contrato:"
-    ws['B7'] = metadatos['contrato']
+    
+    if "tipo_obra" in metadatos:
+        ws['A6'] = "Tipo de Obra:"
+        ws['B6'] = metadatos['tipo_obra']
+    if "contrato" in metadatos:
+        ws['A7'] = "Contrato:"
+        ws['B7'] = metadatos['contrato']
 
     for row in range(3, 8):
         ws[f'A{row}'].font = Font(bold=True)
@@ -783,7 +791,6 @@ def enviar_correo_con_pdf(destinatario, asunto, cuerpo, pdf_bytes, nombre_archiv
             filename=nombre_archivo
         )
         
-        # Conexión configurada para Microsoft 365 / Outlook (Correos Corporativos @shp.pe)
         with smtplib.SMTP('smtp.office365.com', 587) as smtp:
             smtp.ehlo()
             smtp.starttls()
@@ -972,7 +979,6 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
         enlaces = data.get("links", {})
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
-
 @st.cache_data(show_spinner=False)
 def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personalizados, id_campo_fecha, id_campo_pendiente, periodo_cache):
     token = obtener_token()
@@ -1150,7 +1156,12 @@ if not contratos_dict:
 contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
+# --- NUEVO MODO DE VISTA EN LA BARRA LATERAL ---
 st.sidebar.markdown("---")
+st.sidebar.subheader("👁️ Modo de Visualización")
+vista_modo = st.sidebar.radio("Selecciona qué reporte visualizar:", ["Detalle de Contrato", "Consolidado de Subproyecto"])
+st.sidebar.markdown("---")
+
 st.sidebar.info(
     f"**Selección Actual:**\n"
     f"• {grupo_activo}\n"
@@ -1188,8 +1199,6 @@ metadata_export = {
     "fecha": datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M'),
     "alcance": grupo_activo,
     "subproyecto": subproyecto_activo,
-    "tipo_obra": tipo_obra_activo,
-    "contrato": contrato_activo
 }
 
 if "preload" in st.query_params and st.query_params["preload"] == "true":
@@ -1199,231 +1208,306 @@ if "preload" in st.query_params and st.query_params["preload"] == "true":
     st.success("¡Data global precargada exitosamente!")
     st.stop()
 
-with st.spinner(f"Cargando datos para el contrato {contrato_activo}..."):
-    resultado_cache = extraer_datos_contrato_completo(
-        contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
-    )
 
-datos_pestanas = resultado_cache.get("datos", {})
-hora_actualizacion = resultado_cache.get("hora_actualizacion", "Desconocida")
+# ====================================================================
+# --- LÓGICA PRINCIPAL DE VISUALIZACIÓN ---
+# ====================================================================
 
-if not datos_pestanas:
-    st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
-else:
-    tipo_contrato_val = info_contrato.get("tipo_contrato", "Con Supervisión")
+col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
+
+if vista_modo == "Consolidado de Subproyecto":
+    # -------------------------------------------------------------
+    # VISTA 1: REPORTE DEL SUBPROYECTO COMPLETO
+    # -------------------------------------------------------------
+    st.subheader(f"📊 Resumen Consolidado: {subproyecto_activo}")
     
-    with st.expander("📌 Datos Generales del Contrato y Equipo Asignado", expanded=True):
-        c1, c2, c3, c4, c5 = st.columns(5)
-        c1.metric("Modalidad", tipo_contrato_val)
-        
-        if tipo_contrato_val == "Tripartito":
-            emp1 = info_contrato.get("nombre_empresa_1", "Empresa 1")
-            emp2 = info_contrato.get("nombre_empresa_2", "Empresa 2")
-            c2.metric("Empresa 1", emp1)
-            c3.metric("Empresa 2", emp2)
-        else:
-            c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "N/A"))
-            c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
-            
-        c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
-        c5.metric("Última Actualiz.", hora_actualizacion) 
-
-    col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
-    
-    if tipo_contrato_val == "Tripartito":
-        emp1 = info_contrato.get("nombre_empresa_1", "EMPRESA 1")
-        emp2 = info_contrato.get("nombre_empresa_2", "EMPRESA 2")
-        roles_pendientes = [emp1.upper(), emp2.upper(), "SHP"]
-    elif tipo_contrato_val == "Contrato Directo":
-        roles_pendientes = ["CONTRATISTA", "SHP"]
-    else:
-        roles_pendientes = ["CONTRATISTA", "SUPERVISION", "SHP"]
-
-    total_cerrados = 0
-    total_abiertos = 0
-    resumen_lista = []
-
-    for nombre_carpeta, df in datos_pestanas.items():
-        fila_res = {"Carpeta": nombre_carpeta}
-        cerrados_carp = 0
-        abiertos_carp = 0
-        
-        if col_pendiente in df.columns:
-            estados = df[col_pendiente].astype(str).str.strip().str.upper()
-            cerrados_carp = (estados == "CERRADO").sum()
-            fila_res["Cerrados"] = cerrados_carp
-            
-            for rol in roles_pendientes:
-                cant_rol = (estados == rol).sum()
-                fila_res[rol.title()] = cant_rol
-                abiertos_carp += cant_rol
-            
-            df_abiertos = df[estados != "CERRADO"].copy()
-            if not df_abiertos.empty and 'DIAS' in df_abiertos.columns:
-                df_abiertos['DIAS_NUM'] = pd.to_numeric(df_abiertos['DIAS'], errors='coerce').fillna(0)
-                if df_abiertos['DIAS_NUM'].max() > 0:
-                    max_idx = df_abiertos['DIAS_NUM'].idxmax()
-                    doc_codigo = str(df_abiertos.loc[max_idx, COL_CODIGO])
-                    dias_retraso = int(df_abiertos.loc[max_idx, 'DIAS_NUM'])
-                    responsable = str(df_abiertos.loc[max_idx, col_pendiente]).strip()
-                    fila_res["Mayor Retraso"] = f"{doc_codigo} ({dias_retraso} días) [{responsable}]"
-                else:
-                    fila_res["Mayor Retraso"] = "Sin retrasos"
-            else:
-                fila_res["Mayor Retraso"] = "Sin pendientes"
-        else:
-            fila_res["Cerrados"] = 0
-            for rol in roles_pendientes:
-                fila_res[rol.title()] = 0
-            fila_res["Mayor Retraso"] = "N/A"
+    with st.spinner("Procesando todos los contratos del subproyecto..."):
+        datos_subproyecto = []
+        for tipo_obra_nombre, contratos_dict_sub in tipos_obra_dict.items():
+            for contrato_nombre, info_contrato_sub in contratos_dict_sub.items():
+                res_cache = extraer_datos_contrato_completo(
+                    contrato_nombre, info_contrato_sub, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
+                )
+                datos_pestanas_sub = res_cache.get("datos", {})
                 
-        total_cerrados += cerrados_carp
-        total_abiertos += abiertos_carp
-        fila_res["Total"] = cerrados_carp + abiertos_carp
-        resumen_lista.append(fila_res)
-
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Total de Documentos", total_cerrados + total_abiertos)
-    m2.metric("Documentos Cerrados", total_cerrados)
-    m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención", delta_color="inverse")
-    st.markdown("---")
-
-    st.subheader(f"Resumen General por Carpeta - Contrato: {contrato_activo}")
-    df_resumen = pd.DataFrame(resumen_lista)
-    
-    col_g1, col_g2 = st.columns([1.3, 1])
-    with col_g1:
-        st.dataframe(df_resumen, width='stretch', hide_index=True)
-        if not df_resumen.empty:
+                total_docs = 0
+                cerrados_docs = 0
+                
+                for nombre_carpeta, df_sub in datos_pestanas_sub.items():
+                    if col_pendiente in df_sub.columns:
+                        estados_sub = df_sub[col_pendiente].astype(str).str.strip().str.upper()
+                        cerrados_docs += (estados_sub == "CERRADO").sum()
+                    total_docs += len(df_sub)
+                
+                pendientes_docs = total_docs - cerrados_docs
+                avance_pct = (cerrados_docs / total_docs * 100) if total_docs > 0 else 0
+                avance_str = f"{avance_pct:.1f}%"
+                
+                datos_subproyecto.append({
+                    "Tipo de Obra": tipo_obra_nombre,
+                    "Contrato": contrato_nombre,
+                    "Documentos": total_docs,
+                    "Cerrados": cerrados_docs,
+                    "Pendientes": pendientes_docs,
+                    "Avance (%)": avance_str
+                })
+        
+        df_consolidado_sub = pd.DataFrame(datos_subproyecto)
+        
+    col_s1, col_s2 = st.columns([1.3, 1])
+    with col_s1:
+        st.dataframe(df_consolidado_sub, width='stretch', hide_index=True)
+        
+        if not df_consolidado_sub.empty:
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
-                pdf_resumen = exportar_df_a_pdf(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
-                st.download_button(label="📄 Exportar Resumen (PDF)", data=pdf_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_resumen_pdf")
+                pdf_sub = exportar_df_a_pdf(df_consolidado_sub, f"Consolidado de Subproyecto", metadata_export, url_logo_personal)
+                st.download_button("📄 Exportar Consolidado (PDF)", data=pdf_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.pdf", mime="application/pdf")
             with c_btn2:
-                excel_resumen = exportar_df_a_excel(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
-                st.download_button(label="📊 Exportar Resumen (Excel)", data=excel_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_resumen_excel")
-
-    with col_g2:
-        if not df_resumen.empty:
-            columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
-            fig = px.bar(
-                df_resumen, 
-                x="Carpeta", 
-                y=columnas_grafico, 
-                title="Estado Documentario por Carpeta y Responsable",
-                barmode="group"
-            )
-            fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
-            st.plotly_chart(fig, use_container_width=True)
-
-    # --- SECCIÓN: ENVÍO DE REPORTE POR CORREO ---
-    st.markdown("---")
-    with st.expander("📧 Enviar Reporte Consolidado por Correo Electrónico"):
-        st.markdown("**Configura el envío de este resumen y gráficos consolidados directamente desde la aplicación.**")
-        correo_destino = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):")
-        
-        if st.button("🚀 Enviar Reporte Ahora"):
-            if not correo_destino:
-                st.error("Por favor, ingresa al menos un correo electrónico válido.")
-            else:
-                with st.spinner("Generando reporte consolidado con gráficos y enviando correo..."):
-                    pdf_buffer = generar_pdf_consolidado(
-                        contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal, col_pendiente
-                    )
-                    nombre_pdf = f"Reporte_Consolidado_{contrato_activo.replace(' ', '_')}.pdf"
-                    
-                    cuerpo_correo = (
-                        f"Estimado equipo,\n\n"
-                        f"Adjunto encontrará el reporte documentario consolidado actualizado al {metadata_export['fecha']} "
-                        f"para el contrato: {contrato_activo}.\n\n"
-                        f"Resumen de estado:\n"
-                        f"- Total de documentos: {total_cerrados + total_abiertos}\n"
-                        f"- Documentos cerrados: {total_cerrados}\n"
-                        f"- Documentos pendientes: {total_abiertos}\n\n"
-                        f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
-                    )
-                    
-                    exito, mensaje = enviar_correo_con_pdf(
-                        destinatario=correo_destino,
-                        asunto=f"Reporte Consolidado - {contrato_activo} (Shougang)",
-                        cuerpo=cuerpo_correo,
-                        pdf_bytes=pdf_buffer,
-                        nombre_archivo=nombre_pdf
-                    )
-                    
-                    if exito:
-                        st.success(mensaje)
-                    else:
-                        st.error(mensaje)
-    st.markdown("---")
-
-    st.subheader("Detalle por Carpeta / Disciplina")
-    nombres_carpetas = list(datos_pestanas.keys())
-    pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
+                excel_sub = exportar_df_a_excel(df_consolidado_sub, f"Consolidado de Subproyecto", metadata_export, url_logo_personal)
+                st.download_button("📊 Exportar Consolidado (Excel)", data=excel_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     
-    df_actual = datos_pestanas[pestana_seleccionada].copy()
+    with col_s2:
+        if not df_consolidado_sub.empty:
+            fig_sub = px.bar(
+                df_consolidado_sub, 
+                x="Contrato", 
+                y=["Cerrados", "Pendientes"], 
+                title="Estado General por Contrato",
+                barmode="stack",
+                color_discrete_map={"Cerrados": "#1A365D", "Pendientes": "#D69E2E"}
+            )
+            fig_sub.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
+            st.plotly_chart(fig_sub, use_container_width=True)
 
-    if col_pendiente in df_actual.columns:
-        roles_con_cerrado = roles_pendientes + ["CERRADO"]
-        estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
-        
-        st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
-        col_filtros, col_grafico = st.columns([1, 1])
-        
-        with col_filtros:
-            filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
-        
-        df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
-        
-        # --- FUNCIÓN UNIFICADA DE STREAMLIT PARA PINTAR LAS FILAS ---
-        def pintar_filas_streamlit(row):
-            estado = str(row[col_pendiente]).strip().upper()
-            bg_color, text_color = obtener_colores_estado(estado)
-            return [f'background-color: {bg_color}; color: {text_color}'] * len(row)
+else:
+    # -------------------------------------------------------------
+    # VISTA 2: DETALLE DE CONTRATO (Vista Existente)
+    # -------------------------------------------------------------
+    metadata_export["tipo_obra"] = tipo_obra_activo
+    metadata_export["contrato"] = contrato_activo
 
-        with col_grafico:
-            if not df_filtrado.empty:
-                df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
-                df_counts.columns = [col_pendiente, 'Cantidad']
-                
-                fig_detalle = px.bar(
-                    df_counts, 
-                    x=col_pendiente, 
-                    y='Cantidad', 
-                    color=col_pendiente,
-                    title="Distribución de Responsables",
-                    text='Cantidad'
-                )
-                fig_detalle.update_layout(
-                    height=250, 
-                    margin=dict(t=30, b=0, l=10, r=10),
-                    showlegend=False,
-                    xaxis_title="",
-                    yaxis_title="Cantidad"
-                )
-                st.plotly_chart(fig_detalle, use_container_width=True)
-        
-        if not df_filtrado.empty:
-            st.dataframe(df_filtrado.style.apply(pintar_filas_streamlit, axis=1), width='stretch', height=400)
-            
-            c_det1, c_det2 = st.columns(2)
-            with c_det1:
-                pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
-                st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf")
-            with c_det2:
-                excel_detalle = exportar_df_a_excel(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
-                st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
-        else:
-            st.info("No hay documentos que coincidan con el filtro seleccionado.")
-            
+    with st.spinner(f"Cargando datos para el contrato {contrato_activo}..."):
+        resultado_cache = extraer_datos_contrato_completo(
+            contrato_activo, info_contrato, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
+        )
+
+    datos_pestanas = resultado_cache.get("datos", {})
+    hora_actualizacion = resultado_cache.get("hora_actualizacion", "Desconocida")
+
+    if not datos_pestanas:
+        st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
     else:
-        st.dataframe(df_actual, width='stretch', height=400)
+        tipo_contrato_val = info_contrato.get("tipo_contrato", "Con Supervisión")
         
-        if not df_actual.empty:
-            c_det1, c_det2 = st.columns(2)
-            with c_det1:
-                pdf_detalle = exportar_df_a_pdf(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
-                st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_alt_pdf")
-            with c_det2:
-                excel_detalle = exportar_df_a_excel(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
-                st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_alt_excel")
+        with st.expander("📌 Datos Generales del Contrato y Equipo Asignado", expanded=True):
+            c1, c2, c3, c4, c5 = st.columns(5)
+            c1.metric("Modalidad", tipo_contrato_val)
+            
+            if tipo_contrato_val == "Tripartito":
+                emp1 = info_contrato.get("nombre_empresa_1", "Empresa 1")
+                emp2 = info_contrato.get("nombre_empresa_2", "Empresa 2")
+                c2.metric("Empresa 1", emp1)
+                c3.metric("Empresa 2", emp2)
+            else:
+                c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "N/A"))
+                c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
+                
+            c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
+            c5.metric("Última Actualiz.", hora_actualizacion) 
+
+        if tipo_contrato_val == "Tripartito":
+            emp1 = info_contrato.get("nombre_empresa_1", "EMPRESA 1")
+            emp2 = info_contrato.get("nombre_empresa_2", "EMPRESA 2")
+            roles_pendientes = [emp1.upper(), emp2.upper(), "SHP"]
+        elif tipo_contrato_val == "Contrato Directo":
+            roles_pendientes = ["CONTRATISTA", "SHP"]
+        else:
+            roles_pendientes = ["CONTRATISTA", "SUPERVISION", "SHP"]
+
+        total_cerrados = 0
+        total_abiertos = 0
+        resumen_lista = []
+
+        for nombre_carpeta, df in datos_pestanas.items():
+            fila_res = {"Carpeta": nombre_carpeta}
+            cerrados_carp = 0
+            abiertos_carp = 0
+            
+            if col_pendiente in df.columns:
+                estados = df[col_pendiente].astype(str).str.strip().str.upper()
+                cerrados_carp = (estados == "CERRADO").sum()
+                fila_res["Cerrados"] = cerrados_carp
+                
+                for rol in roles_pendientes:
+                    cant_rol = (estados == rol).sum()
+                    fila_res[rol.title()] = cant_rol
+                    abiertos_carp += cant_rol
+                
+                df_abiertos = df[estados != "CERRADO"].copy()
+                if not df_abiertos.empty and 'DIAS' in df_abiertos.columns:
+                    df_abiertos['DIAS_NUM'] = pd.to_numeric(df_abiertos['DIAS'], errors='coerce').fillna(0)
+                    if df_abiertos['DIAS_NUM'].max() > 0:
+                        max_idx = df_abiertos['DIAS_NUM'].idxmax()
+                        doc_codigo = str(df_abiertos.loc[max_idx, COL_CODIGO])
+                        dias_retraso = int(df_abiertos.loc[max_idx, 'DIAS_NUM'])
+                        responsable = str(df_abiertos.loc[max_idx, col_pendiente]).strip()
+                        fila_res["Mayor Retraso"] = f"{doc_codigo} ({dias_retraso} días) [{responsable}]"
+                    else:
+                        fila_res["Mayor Retraso"] = "Sin retrasos"
+                else:
+                    fila_res["Mayor Retraso"] = "Sin pendientes"
+            else:
+                fila_res["Cerrados"] = 0
+                for rol in roles_pendientes:
+                    fila_res[rol.title()] = 0
+                fila_res["Mayor Retraso"] = "N/A"
+                    
+            total_cerrados += cerrados_carp
+            total_abiertos += abiertos_carp
+            fila_res["Total"] = cerrados_carp + abiertos_carp
+            resumen_lista.append(fila_res)
+
+        m1, m2, m3 = st.columns(3)
+        m1.metric("Total de Documentos", total_cerrados + total_abiertos)
+        m2.metric("Documentos Cerrados", total_cerrados)
+        m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención", delta_color="inverse")
+        st.markdown("---")
+
+        st.subheader(f"Resumen General por Carpeta - Contrato: {contrato_activo}")
+        df_resumen = pd.DataFrame(resumen_lista)
+        
+        col_g1, col_g2 = st.columns([1.3, 1])
+        with col_g1:
+            st.dataframe(df_resumen, width='stretch', hide_index=True)
+            if not df_resumen.empty:
+                c_btn1, c_btn2 = st.columns(2)
+                with c_btn1:
+                    pdf_resumen = exportar_df_a_pdf(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
+                    st.download_button(label="📄 Exportar Resumen (PDF)", data=pdf_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_resumen_pdf")
+                with c_btn2:
+                    excel_resumen = exportar_df_a_excel(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
+                    st.download_button(label="📊 Exportar Resumen (Excel)", data=excel_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_resumen_excel")
+
+        with col_g2:
+            if not df_resumen.empty:
+                columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
+                fig = px.bar(
+                    df_resumen, 
+                    x="Carpeta", 
+                    y=columnas_grafico, 
+                    title="Estado Documentario por Carpeta y Responsable",
+                    barmode="group"
+                )
+                fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
+                st.plotly_chart(fig, use_container_width=True)
+
+        st.markdown("---")
+        with st.expander("📧 Enviar Reporte Consolidado por Correo Electrónico"):
+            st.markdown("**Configura el envío de este resumen y gráficos consolidados directamente desde la aplicación.**")
+            correo_destino = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):")
+            
+            if st.button("🚀 Enviar Reporte Ahora"):
+                if not correo_destino:
+                    st.error("Por favor, ingresa al menos un correo electrónico válido.")
+                else:
+                    with st.spinner("Generando reporte consolidado con gráficos y enviando correo..."):
+                        pdf_buffer = generar_pdf_consolidado(
+                            contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal, col_pendiente
+                        )
+                        nombre_pdf = f"Reporte_Consolidado_{contrato_activo.replace(' ', '_')}.pdf"
+                        
+                        cuerpo_correo = (
+                            f"Estimado equipo,\n\n"
+                            f"Adjunto encontrará el reporte documentario consolidado actualizado al {metadata_export['fecha']} "
+                            f"para el contrato: {contrato_activo}.\n\n"
+                            f"Resumen de estado:\n"
+                            f"- Total de documentos: {total_cerrados + total_abiertos}\n"
+                            f"- Documentos cerrados: {total_cerrados}\n"
+                            f"- Documentos pendientes: {total_abiertos}\n\n"
+                            f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
+                        )
+                        
+                        exito, mensaje = enviar_correo_con_pdf(
+                            destinatario=correo_destino,
+                            asunto=f"Reporte Consolidado - {contrato_activo} (Shougang)",
+                            cuerpo=cuerpo_correo,
+                            pdf_bytes=pdf_buffer,
+                            nombre_archivo=nombre_pdf
+                        )
+                        
+                        if exito:
+                            st.success(mensaje)
+                        else:
+                            st.error(mensaje)
+        st.markdown("---")
+
+        st.subheader("Detalle por Carpeta / Disciplina")
+        nombres_carpetas = list(datos_pestanas.keys())
+        pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
+        
+        df_actual = datos_pestanas[pestana_seleccionada].copy()
+
+        if col_pendiente in df_actual.columns:
+            roles_con_cerrado = roles_pendientes + ["CERRADO"]
+            estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
+            
+            st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
+            col_filtros, col_grafico = st.columns([1, 1])
+            
+            with col_filtros:
+                filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
+            
+            df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
+            
+            def pintar_filas_streamlit(row):
+                estado = str(row[col_pendiente]).strip().upper()
+                bg_color, text_color = obtener_colores_estado(estado)
+                return [f'background-color: {bg_color}; color: {text_color}'] * len(row)
+
+            with col_grafico:
+                if not df_filtrado.empty:
+                    df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
+                    df_counts.columns = [col_pendiente, 'Cantidad']
+                    
+                    fig_detalle = px.bar(
+                        df_counts, 
+                        x=col_pendiente, 
+                        y='Cantidad', 
+                        color=col_pendiente,
+                        title="Distribución de Responsables",
+                        text='Cantidad'
+                    )
+                    fig_detalle.update_layout(
+                        height=250, 
+                        margin=dict(t=30, b=0, l=10, r=10),
+                        showlegend=False,
+                        xaxis_title="",
+                        yaxis_title="Cantidad"
+                    )
+                    st.plotly_chart(fig_detalle, use_container_width=True)
+            
+            if not df_filtrado.empty:
+                st.dataframe(df_filtrado.style.apply(pintar_filas_streamlit, axis=1), width='stretch', height=400)
+                
+                c_det1, c_det2 = st.columns(2)
+                with c_det1:
+                    pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
+                    st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf")
+                with c_det2:
+                    excel_detalle = exportar_df_a_excel(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
+                    st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
+            else:
+                st.info("No hay documentos que coincidan con el filtro seleccionado.")
+                
+        else:
+            st.dataframe(df_actual, width='stretch', height=400)
+            
+            if not df_actual.empty:
+                c_det1, c_det2 = st.columns(2)
+                with c_det1:
+                    pdf_detalle = exportar_df_a_pdf(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
+                    st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_alt_pdf")
+                with c_det2:
+                    excel_detalle = exportar_df_a_excel(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
+                    st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_alt_excel")
