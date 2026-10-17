@@ -6,4 +6,4 @@ reportlab
 openpyxl
 Pillow
 pytz
-matplotli
+matplotlib
