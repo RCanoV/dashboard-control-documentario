@@ -429,7 +429,7 @@ def obtener_colores_estado(estado):
     estado = str(estado).strip().upper()
     if estado == "CERRADO":
         return "#d4edda", "#155724" # Verde
-    elif estado == "CONTRATISTA":
+    elif "CONTRATISTA" in estado or "EMPRESA" in estado:
         return "#fff3cd", "#856404" # Amarillo
     elif estado == "SUPERVISION":
         return "#f8d7da", "#721c24" # Rojo claro
@@ -513,7 +513,6 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
             fila.append(Paragraph(text_str, cell_style))
         data_matrix.append(fila)
 
-    # Autocalcular anchos incluyendo nuevas columnas de Subproyecto
     anchos_columnas = []
     for col in df.columns:
         col_u = str(col).upper()
@@ -521,10 +520,10 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         elif col_u == "MAYOR RETRASO": anchos_columnas.append(0.35 * ancho_util)
         elif col_u == "CODIGO": anchos_columnas.append(0.18 * ancho_util)
         elif col_u == "DESCRIPCION": anchos_columnas.append(0.35 * ancho_util)
-        elif col_u == "TIPO DE OBRA": anchos_columnas.append(0.20 * ancho_util)
-        elif col_u == "CONTRATO": anchos_columnas.append(0.25 * ancho_util)
-        elif col_u == "DOCUMENTOS": anchos_columnas.append(0.12 * ancho_util)
-        elif col_u == "AVANCE (%)": anchos_columnas.append(0.10 * ancho_util)
+        elif col_u == "TIPO DE OBRA": anchos_columnas.append(0.15 * ancho_util)
+        elif col_u == "CONTRATO": anchos_columnas.append(0.20 * ancho_util)
+        elif col_u == "DOCUMENTOS": anchos_columnas.append(0.10 * ancho_util)
+        elif col_u == "AVANCE (%)": anchos_columnas.append(0.08 * ancho_util)
         elif col_u in ["REV", "DIAS"]: anchos_columnas.append(0.06 * ancho_util)
         elif col_u == "FECHA": anchos_columnas.append(0.09 * ancho_util)
         elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
@@ -608,7 +607,112 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
     buffer.seek(0)
     return buffer
 
+def generar_pdf_subproyecto(metadatos, df_resumen, ruta_logo):
+    """Generador de PDF exclusivo para el Modo Consolidado (Sin detalle de documentos)"""
+    buffer = io.BytesIO()
+    
+    def agregar_pie_pagina(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        canvas.setFillColor(colors.HexColor("#4A5568"))
+        canvas.drawString(doc.leftMargin, 15, "Desarrollado por Roberto Cano - Shougang Hierro Perú")
+        canvas.restoreState()
+
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(letter),
+        leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
+    )
+    ancho_util = 742 
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    if os.path.exists(ruta_logo):
+        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
+        logo.hAlign = 'RIGHT'
+        elements.append(logo)
+        elements.append(Spacer(1, 10))
+
+    titulo_style = styles["Heading2"]
+    meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
+    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
+    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
+
+    elements.append(Paragraph(f"Reporte Consolidado del Subproyecto", titulo_style))
+    elements.append(Spacer(1, 5))
+    elements.append(Paragraph(f"<b>Fecha de Emisión:</b> {metadatos['fecha']}", meta_style))
+    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
+    elements.append(Paragraph(f"<b>Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
+    elements.append(Spacer(1, 15))
+
+    # --- 1. RESUMEN DE CONTRATOS ---
+    elements.append(Paragraph("<b>Resumen General por Contrato</b>", styles["Heading3"]))
+    elements.append(Spacer(1, 5))
+    
+    if not df_resumen.empty:
+        encabezados = [Paragraph(str(col), header_style) for col in df_resumen.columns]
+        data_matrix = [encabezados]
+        for _, row in df_resumen.iterrows():
+            fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
+            data_matrix.append(fila)
+        
+        anchos_resumen = []
+        for col in df_resumen.columns:
+            if col == "Tipo de Obra": anchos_resumen.append(0.15 * ancho_util)
+            elif col == "Contrato": anchos_resumen.append(0.25 * ancho_util)
+            elif col == "Total": anchos_resumen.append(0.10 * ancho_util)
+            elif col == "Avance (%)": anchos_resumen.append(0.10 * ancho_util)
+            else: anchos_resumen.append((0.40 * ancho_util) / (len(df_resumen.columns) - 4))
+
+        tabla_resumen = Table(data_matrix, repeatRows=1, colWidths=anchos_resumen)
+        tabla_resumen.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
+        ]))
+        elements.append(tabla_resumen)
+    
+    elements.append(Spacer(1, 20))
+
+    # --- 2. GRÁFICO (BARRAS AGRUPADAS POR CONTRATO) ---
+    if not df_resumen.empty and "Contrato" in df_resumen.columns:
+        # Extraer solo las columnas de roles
+        columnas_roles = [c for c in df_resumen.columns if c not in ["Tipo de Obra", "Contrato", "Total", "Avance (%)"]]
+        
+        fig, ax = plt.subplots(figsize=(8, 3.5)) 
+        x = np.arange(len(df_resumen["Contrato"]))
+        ancho_barra = 0.8 / len(columnas_roles)
+        colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
+        
+        for i, col in enumerate(columnas_roles):
+            desplazamiento = x + (i - len(columnas_roles)/2 + 0.5) * ancho_barra
+            ax.bar(desplazamiento, df_resumen[col], ancho_barra, label=col, color=colores[i % len(colores)])
+
+        ax.set_title("Estado Documentario por Contrato y Responsable", fontsize=10, fontweight='bold')
+        ax.set_xticks(x)
+        # Acortar el texto del contrato si es muy largo para que entre en el gráfico
+        etiquetas = [c[:20] + "..." if len(c) > 20 else c for c in df_resumen["Contrato"]]
+        ax.set_xticklabels(etiquetas, rotation=15, ha='right', fontsize=8)
+        ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
+        plt.tight_layout()
+        
+        grafico_path = "temp_chart.png"
+        plt.savefig(grafico_path, dpi=200, bbox_inches='tight')
+        plt.close()
+
+        elements.append(RLImage(grafico_path, width=450, height=180)) 
+
+    doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
+    buffer.seek(0)
+    
+    if os.path.exists("temp_chart.png"):
+        os.remove("temp_chart.png")
+        
+    return buffer
+
 def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestanas, ruta_logo, col_pendiente):
+    """Generador original para la Vista de Contrato (Detallado)"""
     buffer = io.BytesIO()
     
     def agregar_pie_pagina(canvas, doc):
@@ -1156,7 +1260,7 @@ if not contratos_dict:
 contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
-# --- NUEVO MODO DE VISTA EN LA BARRA LATERAL ---
+# --- NUEVO SELECTOR DE MODO DE VISTA ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("👁️ Modo de Visualización")
 vista_modo = st.sidebar.radio("Selecciona qué reporte visualizar:", ["Detalle de Contrato", "Consolidado de Subproyecto"])
@@ -1221,8 +1325,9 @@ if vista_modo == "Consolidado de Subproyecto":
     # -------------------------------------------------------------
     st.subheader(f"📊 Resumen Consolidado: {subproyecto_activo}")
     
-    with st.spinner("Procesando todos los contratos del subproyecto..."):
+    with st.spinner("Procesando y agrupando todos los contratos del subproyecto..."):
         datos_subproyecto = []
+        
         for tipo_obra_nombre, contratos_dict_sub in tipos_obra_dict.items():
             for contrato_nombre, info_contrato_sub in contratos_dict_sub.items():
                 res_cache = extraer_datos_contrato_completo(
@@ -1230,29 +1335,46 @@ if vista_modo == "Consolidado de Subproyecto":
                 )
                 datos_pestanas_sub = res_cache.get("datos", {})
                 
+                conteo_roles = {}
                 total_docs = 0
-                cerrados_docs = 0
                 
-                for nombre_carpeta, df_sub in datos_pestanas_sub.items():
+                for df_sub in datos_pestanas_sub.values():
+                    total_docs += len(df_sub)
                     if col_pendiente in df_sub.columns:
                         estados_sub = df_sub[col_pendiente].astype(str).str.strip().str.upper()
-                        cerrados_docs += (estados_sub == "CERRADO").sum()
-                    total_docs += len(df_sub)
+                        for est in estados_sub:
+                            if est and est not in ["NAN", "NAT", "NONE"]:
+                                conteo_roles[est] = conteo_roles.get(est, 0) + 1
                 
-                pendientes_docs = total_docs - cerrados_docs
-                avance_pct = (cerrados_docs / total_docs * 100) if total_docs > 0 else 0
-                avance_str = f"{avance_pct:.1f}%"
+                cerrados_docs = conteo_roles.get("CERRADO", 0)
                 
-                datos_subproyecto.append({
+                fila_sub = {
                     "Tipo de Obra": tipo_obra_nombre,
                     "Contrato": contrato_nombre,
-                    "Documentos": total_docs,
-                    "Cerrados": cerrados_docs,
-                    "Pendientes": pendientes_docs,
-                    "Avance (%)": avance_str
-                })
+                    "Cerrados": cerrados_docs
+                }
+                
+                # Extraemos los roles específicos pendientes de este contrato
+                for est, count in conteo_roles.items():
+                    if est != "CERRADO":
+                        fila_sub[est.title()] = count
+                
+                fila_sub["Total"] = total_docs
+                avance_pct = (cerrados_docs / total_docs * 100) if total_docs > 0 else 0
+                fila_sub["Avance (%)"] = f"{avance_pct:.1f}%"
+                
+                datos_subproyecto.append(fila_sub)
         
         df_consolidado_sub = pd.DataFrame(datos_subproyecto)
+        
+        # Rellenar con ceros las columnas de roles cruzados donde un contrato no lo tenga
+        cols_numericas = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Avance (%)"]]
+        df_consolidado_sub[cols_numericas] = df_consolidado_sub[cols_numericas].fillna(0).astype(int)
+        
+        # Ordenar columnas estéticamente
+        roles_cols = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Cerrados", "Total", "Avance (%)"]]
+        orden_cols = ["Tipo de Obra", "Contrato", "Cerrados"] + roles_cols + ["Total", "Avance (%)"]
+        df_consolidado_sub = df_consolidado_sub[orden_cols]
         
     col_s1, col_s2 = st.columns([1.3, 1])
     with col_s1:
@@ -1261,7 +1383,7 @@ if vista_modo == "Consolidado de Subproyecto":
         if not df_consolidado_sub.empty:
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
-                pdf_sub = exportar_df_a_pdf(df_consolidado_sub, f"Consolidado de Subproyecto", metadata_export, url_logo_personal)
+                pdf_sub = generar_pdf_subproyecto(metadata_export, df_consolidado_sub, url_logo_personal)
                 st.download_button("📄 Exportar Consolidado (PDF)", data=pdf_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.pdf", mime="application/pdf")
             with c_btn2:
                 excel_sub = exportar_df_a_excel(df_consolidado_sub, f"Consolidado de Subproyecto", metadata_export, url_logo_personal)
@@ -1269,16 +1391,55 @@ if vista_modo == "Consolidado de Subproyecto":
     
     with col_s2:
         if not df_consolidado_sub.empty:
+            # Gráfico Apilado mostrando la composición de cada contrato
+            columnas_graf = ["Cerrados"] + roles_cols
+            
             fig_sub = px.bar(
                 df_consolidado_sub, 
                 x="Contrato", 
-                y=["Cerrados", "Pendientes"], 
-                title="Estado General por Contrato",
+                y=columnas_graf, 
+                title="Estado General por Contrato y Responsable",
                 barmode="stack",
-                color_discrete_map={"Cerrados": "#1A365D", "Pendientes": "#D69E2E"}
             )
             fig_sub.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
             st.plotly_chart(fig_sub, use_container_width=True)
+
+    # --- SECCIÓN: ENVÍO DE REPORTE POR CORREO (VISTA CONSOLIDADOS) ---
+    st.markdown("---")
+    with st.expander("📧 Enviar Consolidado de Subproyecto por Correo Electrónico"):
+        st.markdown("**Configura el envío del resumen global de contratos directamente desde la aplicación.**")
+        correo_destino_sub = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):", key="email_sub")
+        
+        if st.button("🚀 Enviar Consolidado Ahora"):
+            if not correo_destino_sub:
+                st.error("Por favor, ingresa al menos un correo electrónico válido.")
+            else:
+                with st.spinner("Generando reporte consolidado del subproyecto y enviando correo..."):
+                    pdf_buffer_sub = generar_pdf_subproyecto(
+                        metadata_export, df_consolidado_sub, url_logo_personal
+                    )
+                    nombre_pdf_sub = f"Consolidado_Subproyecto_{subproyecto_activo.replace(' ', '_')}.pdf"
+                    
+                    cuerpo_correo_sub = (
+                        f"Estimado equipo,\n\n"
+                        f"Adjunto encontrará el reporte consolidado global actualizado al {metadata_export['fecha']} "
+                        f"correspondiente al subproyecto: {subproyecto_activo}.\n\n"
+                        f"Este documento incluye el estado y avance de todos los contratos y componentes activos asociados.\n\n"
+                        f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
+                    )
+                    
+                    exito, mensaje = enviar_correo_con_pdf(
+                        destinatario=correo_destino_sub,
+                        asunto=f"Reporte Consolidado - {subproyecto_activo} (Shougang)",
+                        cuerpo=cuerpo_correo_sub,
+                        pdf_bytes=pdf_buffer_sub,
+                        nombre_archivo=nombre_pdf_sub
+                    )
+                    
+                    if exito:
+                        st.success(mensaje)
+                    else:
+                        st.error(mensaje)
 
 else:
     # -------------------------------------------------------------
@@ -1402,24 +1563,25 @@ else:
                 fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
                 st.plotly_chart(fig, use_container_width=True)
 
+        # --- SECCIÓN: ENVÍO DE REPORTE POR CORREO (VISTA CONTRATO) ---
         st.markdown("---")
-        with st.expander("📧 Enviar Reporte Consolidado por Correo Electrónico"):
-            st.markdown("**Configura el envío de este resumen y gráficos consolidados directamente desde la aplicación.**")
-            correo_destino = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):")
+        with st.expander("📧 Enviar Reporte de Contrato por Correo Electrónico"):
+            st.markdown("**Configura el envío de este resumen y gráficos detallados directamente desde la aplicación.**")
+            correo_destino = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):", key="email_contrato")
             
             if st.button("🚀 Enviar Reporte Ahora"):
                 if not correo_destino:
                     st.error("Por favor, ingresa al menos un correo electrónico válido.")
                 else:
-                    with st.spinner("Generando reporte consolidado con gráficos y enviando correo..."):
+                    with st.spinner("Generando reporte con detalle y enviando correo..."):
                         pdf_buffer = generar_pdf_consolidado(
                             contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal, col_pendiente
                         )
-                        nombre_pdf = f"Reporte_Consolidado_{contrato_activo.replace(' ', '_')}.pdf"
+                        nombre_pdf = f"Reporte_Contrato_{contrato_activo.replace(' ', '_')}.pdf"
                         
                         cuerpo_correo = (
                             f"Estimado equipo,\n\n"
-                            f"Adjunto encontrará el reporte documentario consolidado actualizado al {metadata_export['fecha']} "
+                            f"Adjunto encontrará el reporte documentario detallado actualizado al {metadata_export['fecha']} "
                             f"para el contrato: {contrato_activo}.\n\n"
                             f"Resumen de estado:\n"
                             f"- Total de documentos: {total_cerrados + total_abiertos}\n"
@@ -1430,7 +1592,7 @@ else:
                         
                         exito, mensaje = enviar_correo_con_pdf(
                             destinatario=correo_destino,
-                            asunto=f"Reporte Consolidado - {contrato_activo} (Shougang)",
+                            asunto=f"Reporte de Contrato - {contrato_activo} (Shougang)",
                             cuerpo=cuerpo_correo,
                             pdf_bytes=pdf_buffer,
                             nombre_archivo=nombre_pdf
