@@ -3,6 +3,7 @@ import time
 import io
 import requests
 import pandas as pd
+import numpy as np
 import urllib.parse
 from datetime import datetime
 import pytz
@@ -17,7 +18,7 @@ from email.message import EmailMessage
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from reportlab.platypus import Image as RLImage
 
 # Librerías para exportación a Excel (OpenPyXL)
@@ -560,15 +561,17 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
     titulo_style = styles["Heading2"]
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
 
-    elements.append(Paragraph(f"Reporte Consolidado - {contrato_nombre}", titulo_style))
+    elements.append(Paragraph(f"Reporte Consolidado Documentario", titulo_style))
     elements.append(Spacer(1, 5))
     elements.append(Paragraph(f"<b>Fecha de Emisión:</b> {metadatos['fecha']}", meta_style))
-    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']} / {metadatos['subproyecto']}", meta_style))
+    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
+    elements.append(Paragraph(f"<b>Proyecto / Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
     elements.append(Paragraph(f"<b>Tipo de Obra:</b> {metadatos['tipo_obra']}", meta_style))
-    elements.append(Spacer(1, 10))
+    elements.append(Paragraph(f"<b>Contrato / Componente:</b> {metadatos['contrato']}", meta_style))
+    elements.append(Spacer(1, 15))
 
-    # 1. Tabla de Resumen General
-    elements.append(Paragraph("<b>Resumen General por Carpeta</b>", styles["Heading3"]))
+    # --- 1. RESUMEN GENERAL ---
+    elements.append(Paragraph("<b>1. Resumen General por Carpeta</b>", styles["Heading3"]))
     elements.append(Spacer(1, 5))
     
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
@@ -593,26 +596,63 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
     
     elements.append(Spacer(1, 15))
 
-    # 2. Generar gráfico en memoria con Matplotlib para el PDF
-    if not df_resumen.empty and "Carpeta" in df_resumen.columns and "Cerrados" in df_resumen.columns:
-        plt.figure(figsize=(8, 3.5))
-        plt.bar(df_resumen["Carpeta"], df_resumen["Cerrados"], color="#1A365D", label="Cerrados")
-        if "Total" in df_resumen.columns:
-            pendientes = df_resumen["Total"] - df_resumen["Cerrados"]
-            plt.bar(df_resumen["Carpeta"], pendientes, bottom=df_resumen["Cerrados"], color="#D69E2E", label="Pendientes")
+    # --- 2. GRÁFICO (BARRAS AGRUPADAS CON MATPLOTLIB) ---
+    if not df_resumen.empty and "Carpeta" in df_resumen.columns:
+        columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
         
-        plt.title("Estado de Documentos por Carpeta", fontsize=10, fontweight='bold')
-        plt.xticks(rotation=15, ha='right', fontsize=8)
-        plt.yticks(fontsize=8)
-        plt.legend(fontsize=8)
+        fig, ax = plt.subplots(figsize=(9, 4))
+        x = np.arange(len(df_resumen["Carpeta"]))
+        ancho_barra = 0.8 / len(columnas_grafico)
+        colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
+        
+        for i, col in enumerate(columnas_grafico):
+            desplazamiento = x + (i - len(columnas_grafico)/2 + 0.5) * ancho_barra
+            ax.bar(desplazamiento, df_resumen[col], ancho_barra, label=col, color=colores[i % len(colores)])
+
+        ax.set_title("Estado Documentario por Carpeta y Responsable", fontsize=11, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels(df_resumen["Carpeta"], rotation=15, ha='right', fontsize=8)
+        ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
         plt.tight_layout()
         
         grafico_path = "temp_chart.png"
-        plt.savefig(grafico_path, dpi=200)
+        plt.savefig(grafico_path, dpi=200, bbox_inches='tight')
         plt.close()
 
-        elements.append(RLImage(grafico_path, width=450, height=180))
-        elements.append(Spacer(1, 10))
+        elements.append(RLImage(grafico_path, width=480, height=200))
+        elements.append(Spacer(1, 15))
+
+    # --- 3. DETALLE POR CARPETA (TABLAS ITERADAS) ---
+    elements.append(PageBreak())
+    elements.append(Paragraph("<b>2. Detalle de Documentos por Carpeta</b>", styles["Heading3"]))
+    elements.append(Spacer(1, 10))
+
+    for nombre_carpeta, df_detalle in datos_pestanas.items():
+        if df_detalle.empty:
+            continue
+
+        elements.append(Paragraph(f"<b>Carpeta: {nombre_carpeta}</b>", styles["Heading4"]))
+        elements.append(Spacer(1, 5))
+
+        encabezados_det = [Paragraph(str(col), header_style) for col in df_detalle.columns]
+        data_matrix_det = [encabezados_det]
+
+        for _, row in df_detalle.iterrows():
+            fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
+            data_matrix_det.append(fila)
+
+        tabla_detalle = Table(data_matrix_det, repeatRows=1)
+        tabla_detalle.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2B6CB0")), 
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        elements.append(tabla_detalle)
+        elements.append(Spacer(1, 15))
 
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
     buffer.seek(0)
@@ -637,10 +677,10 @@ def enviar_correo_con_pdf(destinatario, asunto, cuerpo, pdf_bytes, nombre_archiv
             filename=nombre_archivo
         )
         
-        # Conexión configurada para Microsoft 365 / Outlook (Correos Corporativos)
+        # Conexión configurada para Microsoft 365 / Outlook (Correos Corporativos @shp.pe)
         with smtplib.SMTP('smtp.office365.com', 587) as smtp:
             smtp.ehlo()
-            smtp.starttls() # Cifra la conexión (obligatorio para el puerto 587)
+            smtp.starttls()
             smtp.ehlo()
             smtp.login(EMAIL_USER, EMAIL_PASS)
             smtp.send_message(msg)
@@ -1170,7 +1210,7 @@ else:
             fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
             st.plotly_chart(fig, use_container_width=True)
 
-    # --- NUEVA SECCIÓN: ENVÍO DE REPORTE POR CORREO ---
+    # --- SECCIÓN: ENVÍO DE REPORTE POR CORREO ---
     st.markdown("---")
     with st.expander("📧 Enviar Reporte Consolidado por Correo Electrónico"):
         st.markdown("**Configura el envío de este resumen y gráficos consolidados directamente desde la aplicación.**")
@@ -1181,13 +1221,11 @@ else:
                 st.error("Por favor, ingresa al menos un correo electrónico válido.")
             else:
                 with st.spinner("Generando reporte consolidado con gráficos y enviando correo..."):
-                    # Generar PDF en memoria
                     pdf_buffer = generar_pdf_consolidado(
                         contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal
                     )
                     nombre_pdf = f"Reporte_Consolidado_{contrato_activo.replace(' ', '_')}.pdf"
                     
-                    # Cuerpo del correo
                     cuerpo_correo = (
                         f"Estimado equipo,\n\n"
                         f"Adjunto encontrará el reporte documentario consolidado actualizado al {metadata_export['fecha']} "
@@ -1199,7 +1237,6 @@ else:
                         f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                     )
                     
-                    # Enviar correo
                     exito, mensaje = enviar_correo_con_pdf(
                         destinatario=correo_destino,
                         asunto=f"Reporte Consolidado - {contrato_activo} (Shougang)",
