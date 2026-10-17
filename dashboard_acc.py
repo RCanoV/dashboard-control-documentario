@@ -436,111 +436,6 @@ def obtener_colores_estado(estado):
     else:
         return "#cce5ff", "#004085" # Azul claro
 
-def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
-    buffer = io.BytesIO()
-    
-    def agregar_pie_pagina(canvas, doc):
-        canvas.saveState()
-        canvas.setFont('Helvetica', 9)
-        canvas.setFillColor(colors.HexColor("#4A5568"))
-        canvas.drawString(doc.leftMargin, 15, "Desarrollado por Roberto Cano - Shougang Hierro Perú")
-        canvas.restoreState()
-
-    doc = SimpleDocTemplate(
-        buffer, pagesize=landscape(letter),
-        leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
-    )
-    ancho_util = 742 
-    
-    elements = []
-    styles = getSampleStyleSheet()
-    
-    if os.path.exists(ruta_logo):
-        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
-        logo.hAlign = 'RIGHT'
-        elements.append(logo)
-        elements.append(Spacer(1, 10))
-
-    titulo_style = styles["Heading2"]
-    titulo_style.alignment = 0
-    meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
-
-    elements.append(Paragraph(titulo, titulo_style))
-    elements.append(Spacer(1, 5))
-    elements.append(Paragraph(f"<b>Fecha de Exportación:</b> {metadatos['fecha']}", meta_style))
-    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
-    elements.append(Paragraph(f"<b>Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
-    
-    if "tipo_obra" in metadatos:
-        elements.append(Paragraph(f"<b>Tipo de Obra:</b> {metadatos['tipo_obra']}", meta_style))
-    if "contrato" in metadatos:
-        elements.append(Paragraph(f"<b>Contrato:</b> {metadatos['contrato']}", meta_style))
-        
-    elements.append(Spacer(1, 15))
-
-    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
-    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
-
-    encabezados = [Paragraph(str(col), header_style) for col in df.columns]
-    data_matrix = [encabezados]
-
-    estilos_tabla = [
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
-    ]
-
-    for row_idx, (_, row) in enumerate(df.iterrows(), start=1):
-        fila = []
-        bg_color = "#ffffff"
-        
-        if col_pendiente and col_pendiente in df.columns:
-            bg_color, text_color = obtener_colores_estado(row[col_pendiente])
-        else:
-            bg_color = "#ffffff" if row_idx % 2 != 0 else "#f9fafb"
-            text_color = "#000000"
-
-        estilos_tabla.append(('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor(bg_color)))
-
-        for col_name in df.columns:
-            val = row[col_name]
-            text_str = "" if pd.isna(val) else str(val)
-            if col_pendiente and col_pendiente in df.columns:
-                text_str = f'<font color="{text_color}">{text_str}</font>'
-            fila.append(Paragraph(text_str, cell_style))
-        data_matrix.append(fila)
-
-    anchos_columnas = []
-    for col in df.columns:
-        col_u = str(col).upper()
-        if col_u == "CARPETA": anchos_columnas.append(0.15 * ancho_util)
-        elif col_u == "MAYOR RETRASO": anchos_columnas.append(0.35 * ancho_util)
-        elif col_u == "CODIGO": anchos_columnas.append(0.18 * ancho_util)
-        elif col_u == "DESCRIPCION": anchos_columnas.append(0.35 * ancho_util)
-        elif col_u == "TIPO DE OBRA": anchos_columnas.append(0.15 * ancho_util)
-        elif col_u == "CONTRATO": anchos_columnas.append(0.20 * ancho_util)
-        elif col_u == "DOCUMENTOS": anchos_columnas.append(0.10 * ancho_util)
-        elif col_u == "AVANCE (%)": anchos_columnas.append(0.08 * ancho_util)
-        elif col_u in ["REV", "DIAS"]: anchos_columnas.append(0.06 * ancho_util)
-        elif col_u == "FECHA": anchos_columnas.append(0.09 * ancho_util)
-        elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
-        elif col_u == "PENDIENTE POR": anchos_columnas.append(0.15 * ancho_util)
-        else: anchos_columnas.append(0.10 * ancho_util)
-        
-    factor_norm = ancho_util / sum(anchos_columnas)
-    anchos_columnas = [w * factor_norm for w in anchos_columnas]
-
-    tabla = Table(data_matrix, repeatRows=1, colWidths=anchos_columnas)
-    tabla.setStyle(TableStyle(estilos_tabla))
-    elements.append(tabla)
-
-    doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
-    buffer.seek(0)
-    return buffer
-
 def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
     buffer = io.BytesIO()
     wb = openpyxl.Workbook()
@@ -626,29 +521,38 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     elements = []
     styles = getSampleStyleSheet()
     
-    titulo_style = styles["Heading2"]
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
     header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
+    link_style = ParagraphStyle(name="Link", parent=styles["Normal"], fontSize=8, textColor=colors.blue)
 
     # ===================================================
     # PÁGINA 1: RESUMEN GLOBAL DEL SUBPROYECTO
     # ===================================================
     bloque_global = []
     
+    # 1. Cabecera compacta: Logo izquierda, Datos derecha
     if os.path.exists(ruta_logo):
         logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
-        logo.hAlign = 'RIGHT'
-        bloque_global.append(logo)
-        bloque_global.append(Spacer(1, 10))
-
-    bloque_global.append(Paragraph(f"Reporte Consolidado del Subproyecto", titulo_style))
-    bloque_global.append(Spacer(1, 5))
-    bloque_global.append(Paragraph(f"<b>Fecha de Emisión:</b> {metadatos['fecha']}", meta_style))
-    bloque_global.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
-    bloque_global.append(Paragraph(f"<b>Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
+    else:
+        logo = Paragraph("")
+        
+    meta_text = (f"<b><font size=12>Reporte Consolidado del Subproyecto</font></b><br/><br/>"
+                 f"<b>Fecha de Emisión:</b> {metadatos['fecha']}<br/>"
+                 f"<b>Alcance:</b> {metadatos['alcance']}<br/>"
+                 f"<b>Subproyecto:</b> {metadatos['subproyecto']}")
+                 
+    tabla_cabecera = Table([[logo, Paragraph(meta_text, styles["Normal"])]], colWidths=[120, 600])
+    tabla_cabecera.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'LEFT'),
+    ]))
+    
+    bloque_global.append(tabla_cabecera)
     bloque_global.append(Spacer(1, 15))
 
+    # 2. Tabla del resumen
     bloque_global.append(Paragraph("<b>1. Resumen General por Contrato</b>", styles["Heading3"]))
     bloque_global.append(Spacer(1, 5))
     
@@ -679,10 +583,11 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     
     bloque_global.append(Spacer(1, 15))
 
+    # 3. Gráfico ajustado
     if not df_resumen_global.empty and "Contrato" in df_resumen_global.columns:
         columnas_roles = [c for c in df_resumen_global.columns if c not in ["Tipo de Obra", "Contrato", "Total", "Avance (%)"]]
         
-        fig, ax = plt.subplots(figsize=(8, 3.5)) 
+        fig, ax = plt.subplots(figsize=(8, 2.8)) # Reducido ligeramente en altura
         x = np.arange(len(df_resumen_global["Contrato"]))
         ancho_barra = 0.8 / len(columnas_roles)
         colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
@@ -702,25 +607,33 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
         plt.savefig(img_data_global, format='png', dpi=200, bbox_inches='tight')
         plt.close()
         img_data_global.seek(0)
-        bloque_global.append(RLImage(img_data_global, width=450, height=180)) 
+        bloque_global.append(RLImage(img_data_global, width=450, height=155)) 
 
+    # Forzar en la página 1
     elements.append(KeepTogether(bloque_global))
 
     # ===================================================
     # PÁGINAS SIGUIENTES: RESUMEN DE CARPETAS POR CONTRATO
     # ===================================================
     if resumenes_por_contrato:
-        elements.append(PageBreak())
-        elements.append(Paragraph("<b>2. Resumen Detallado por Contrato</b>", titulo_style))
-        elements.append(Spacer(1, 15))
-
+        
+        nota_enlace = Paragraph(
+            '<i>Nota: Para mayor detalle de la documentación, revisar el dashboard en la web: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" color="blue">https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/</a></i>', 
+            link_style
+        )
+        
         for contrato_nombre, df_res_contrato in resumenes_por_contrato.items():
             if df_res_contrato.empty:
                 continue
                 
+            elements.append(PageBreak())
             bloque_contrato = []
+            
+            # Nota y Título en cada hoja
+            bloque_contrato.append(nota_enlace)
+            bloque_contrato.append(Spacer(1, 15))
             bloque_contrato.append(Paragraph(f"<b>Resumen General por Carpeta - Contrato: {contrato_nombre}</b>", styles["Heading3"]))
-            bloque_contrato.append(Spacer(1, 5))
+            bloque_contrato.append(Spacer(1, 10))
             
             # Tabla del Contrato
             encabezados_c = [Paragraph(str(col), header_style) for col in df_res_contrato.columns]
@@ -744,11 +657,11 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
                 ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
             ]))
             bloque_contrato.append(tabla_c)
-            bloque_contrato.append(Spacer(1, 15))
+            bloque_contrato.append(Spacer(1, 20))
             
             # Gráfico del Contrato
             columnas_grafico_c = ["Cerrados"] + [c for c in df_res_contrato.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
-            fig, ax = plt.subplots(figsize=(8, 3.5)) 
+            fig, ax = plt.subplots(figsize=(8, 3.2)) 
             x = np.arange(len(df_res_contrato["Carpeta"]))
             ancho_barra = 0.8 / len(columnas_grafico_c)
             colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
@@ -767,8 +680,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             plt.savefig(img_data_c, format='png', dpi=200, bbox_inches='tight')
             plt.close()
             img_data_c.seek(0)
-            bloque_contrato.append(RLImage(img_data_c, width=450, height=180)) 
-            bloque_contrato.append(Spacer(1, 20))
+            bloque_contrato.append(RLImage(img_data_c, width=450, height=170)) 
             
             elements.append(KeepTogether(bloque_contrato))
 
@@ -776,8 +688,8 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     buffer.seek(0)
     return buffer
 
-def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestanas, ruta_logo, col_pendiente):
-    """Generador original para la Vista de Contrato (Detallado)"""
+def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
+    """Generador original de PDF para la vista Detallada por Contrato"""
     buffer = io.BytesIO()
     
     def agregar_pie_pagina(canvas, doc):
@@ -792,150 +704,93 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
         leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
     )
     ancho_util = 742 
-
     elements = []
     styles = getSampleStyleSheet()
     
-    if os.path.exists(ruta_logo):
-        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
-        logo.hAlign = 'RIGHT'
-        elements.append(logo)
-        elements.append(Spacer(1, 10))
-
-    titulo_style = styles["Heading2"]
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
     header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
 
-    elements.append(Paragraph(f"Reporte Consolidado Documentario", titulo_style))
-    elements.append(Spacer(1, 5))
-    elements.append(Paragraph(f"<b>Fecha de Emisión:</b> {metadatos['fecha']}", meta_style))
-    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
-    elements.append(Paragraph(f"<b>Proyecto / Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
-    elements.append(Paragraph(f"<b>Tipo de Obra:</b> {metadatos['tipo_obra']}", meta_style))
-    elements.append(Paragraph(f"<b>Contrato / Componente:</b> {metadatos['contrato']}", meta_style))
+    if os.path.exists(ruta_logo):
+        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
+    else:
+        logo = Paragraph("")
+        
+    meta_text = (f"<b><font size=12>{titulo}</font></b><br/><br/>"
+                 f"<b>Fecha de Emisión:</b> {metadatos['fecha']}<br/>"
+                 f"<b>Alcance:</b> {metadatos['alcance']}<br/>"
+                 f"<b>Subproyecto:</b> {metadatos['subproyecto']}")
+                 
+    if "tipo_obra" in metadatos:
+        meta_text += f"<br/><b>Tipo de Obra:</b> {metadatos['tipo_obra']}"
+    if "contrato" in metadatos:
+        meta_text += f"<br/><b>Contrato:</b> {metadatos['contrato']}"
+
+    tabla_cabecera = Table([[logo, Paragraph(meta_text, styles["Normal"])]], colWidths=[120, 600])
+    tabla_cabecera.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'LEFT'),
+    ]))
+    
+    elements.append(tabla_cabecera)
     elements.append(Spacer(1, 15))
 
-    resumen_y_grafico = []
+    encabezados = [Paragraph(str(col), header_style) for col in df.columns]
+    data_matrix = [encabezados]
 
-    # --- 1. RESUMEN GENERAL ---
-    resumen_y_grafico.append(Paragraph("<b>1. Resumen General por Carpeta</b>", styles["Heading3"]))
-    resumen_y_grafico.append(Spacer(1, 5))
-    
-    if not df_resumen.empty:
-        encabezados = [Paragraph(str(col), header_style) for col in df_resumen.columns]
-        data_matrix = [encabezados]
-        for _, row in df_resumen.iterrows():
-            fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
-            data_matrix.append(fila)
+    estilos_tabla = [
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+    ]
+
+    for row_idx, (_, row) in enumerate(df.iterrows(), start=1):
+        fila = []
+        bg_color = "#ffffff"
         
-        anchos_resumen = []
-        for col in df_resumen.columns:
-            if col == "Carpeta": anchos_resumen.append(0.15 * ancho_util)
-            elif col == "Mayor Retraso": anchos_resumen.append(0.35 * ancho_util)
-            else: anchos_resumen.append((0.50 * ancho_util) / (len(df_resumen.columns) - 2))
+        if col_pendiente and col_pendiente in df.columns:
+            bg_color, text_color = obtener_colores_estado(row[col_pendiente])
+        else:
+            bg_color = "#ffffff" if row_idx % 2 != 0 else "#f9fafb"
+            text_color = "#000000"
 
-        tabla_resumen = Table(data_matrix, repeatRows=1, colWidths=anchos_resumen)
-        tabla_resumen.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
-        ]))
-        resumen_y_grafico.append(tabla_resumen)
-    
-    resumen_y_grafico.append(Spacer(1, 15))
+        estilos_tabla.append(('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor(bg_color)))
 
-    # --- 2. GRÁFICO (BARRAS AGRUPADAS) ---
-    if not df_resumen.empty and "Carpeta" in df_resumen.columns:
-        columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
+        for col_name in df.columns:
+            val = row[col_name]
+            text_str = "" if pd.isna(val) else str(val)
+            if col_pendiente and col_pendiente in df.columns:
+                text_str = f'<font color="{text_color}">{text_str}</font>'
+            fila.append(Paragraph(text_str, cell_style))
+        data_matrix.append(fila)
+
+    anchos_columnas = []
+    for col in df.columns:
+        col_u = str(col).upper()
+        if col_u == "CARPETA": anchos_columnas.append(0.15 * ancho_util)
+        elif col_u == "MAYOR RETRASO": anchos_columnas.append(0.35 * ancho_util)
+        elif col_u == "CODIGO": anchos_columnas.append(0.18 * ancho_util)
+        elif col_u == "DESCRIPCION": anchos_columnas.append(0.35 * ancho_util)
+        elif col_u == "TIPO DE OBRA": anchos_columnas.append(0.15 * ancho_util)
+        elif col_u == "CONTRATO": anchos_columnas.append(0.20 * ancho_util)
+        elif col_u == "DOCUMENTOS": anchos_columnas.append(0.10 * ancho_util)
+        elif col_u == "AVANCE (%)": anchos_columnas.append(0.08 * ancho_util)
+        elif col_u in ["REV", "DIAS"]: anchos_columnas.append(0.06 * ancho_util)
+        elif col_u == "FECHA": anchos_columnas.append(0.09 * ancho_util)
+        elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
+        elif col_u == "PENDIENTE POR": anchos_columnas.append(0.15 * ancho_util)
+        else: anchos_columnas.append(0.10 * ancho_util)
         
-        fig, ax = plt.subplots(figsize=(8, 3.5)) 
-        x = np.arange(len(df_resumen["Carpeta"]))
-        ancho_barra = 0.8 / len(columnas_grafico)
-        colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
-        
-        for i, col in enumerate(columnas_grafico):
-            desplazamiento = x + (i - len(columnas_grafico)/2 + 0.5) * ancho_barra
-            ax.bar(desplazamiento, df_resumen[col], ancho_barra, label=col, color=colores[i % len(colores)])
+    factor_norm = ancho_util / sum(anchos_columnas)
+    anchos_columnas = [w * factor_norm for w in anchos_columnas]
 
-        ax.set_title("Estado Documentario por Carpeta y Responsable", fontsize=10, fontweight='bold')
-        ax.set_xticks(x)
-        ax.set_xticklabels(df_resumen["Carpeta"], rotation=15, ha='right', fontsize=8)
-        ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
-        plt.tight_layout()
-        
-        img_data = io.BytesIO()
-        plt.savefig(img_data, format='png', dpi=200, bbox_inches='tight')
-        plt.close()
-        img_data.seek(0)
-        resumen_y_grafico.append(RLImage(img_data, width=450, height=180)) 
-    
-    elements.append(KeepTogether(resumen_y_grafico))
-
-    # --- 3. DETALLE POR CARPETA CON COLORES DE ESTADO ---
-    elements.append(PageBreak())
-    elements.append(Paragraph("<b>2. Detalle de Documentos por Carpeta</b>", styles["Heading3"]))
-    elements.append(Spacer(1, 10))
-
-    for nombre_carpeta, df_detalle in datos_pestanas.items():
-        if df_detalle.empty:
-            continue
-
-        elements.append(Paragraph(f"<b>Carpeta: {nombre_carpeta}</b>", styles["Heading4"]))
-        elements.append(Spacer(1, 5))
-
-        encabezados_det = [Paragraph(str(col), header_style) for col in df_detalle.columns]
-        data_matrix_det = [encabezados_det]
-
-        estilos_detalle = [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2B6CB0")), 
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-            ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ]
-
-        for row_idx, (_, row) in enumerate(df_detalle.iterrows(), start=1):
-            fila = []
-            bg_color = "#ffffff"
-            
-            if col_pendiente and col_pendiente in df_detalle.columns:
-                bg_color, text_color = obtener_colores_estado(row[col_pendiente])
-            else:
-                bg_color = "#ffffff" if row_idx % 2 != 0 else "#f9fafb"
-                text_color = "#000000"
-
-            estilos_detalle.append(('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor(bg_color)))
-
-            for col_name in df_detalle.columns:
-                val = row[col_name]
-                text_str = "" if pd.isna(val) else str(val)
-                if col_pendiente and col_pendiente in df_detalle.columns:
-                    text_str = f'<font color="{text_color}">{text_str}</font>'
-                fila.append(Paragraph(text_str, cell_style))
-            data_matrix_det.append(fila)
-
-        anchos_detalle = []
-        for col in df_detalle.columns:
-            col_u = str(col).upper()
-            if col_u == "CODIGO": anchos_detalle.append(0.18 * ancho_util)
-            elif col_u == "DESCRIPCION": anchos_detalle.append(0.35 * ancho_util)
-            elif col_u in ["REV", "DIAS"]: anchos_detalle.append(0.06 * ancho_util)
-            elif col_u == "FECHA": anchos_detalle.append(0.09 * ancho_util)
-            elif col_u == "ESTADO": anchos_detalle.append(0.11 * ancho_util)
-            elif col_u == "PENDIENTE POR": anchos_detalle.append(0.15 * ancho_util)
-            else: anchos_detalle.append(0.10 * ancho_util)
-
-        factor_norm = ancho_util / sum(anchos_detalle)
-        anchos_detalle = [w * factor_norm for w in anchos_detalle]
-
-        tabla_detalle = Table(data_matrix_det, repeatRows=1, colWidths=anchos_detalle)
-        tabla_detalle.setStyle(TableStyle(estilos_detalle))
-        elements.append(tabla_detalle)
-        elements.append(Spacer(1, 15))
+    tabla = Table(data_matrix, repeatRows=1, colWidths=anchos_columnas)
+    tabla.setStyle(TableStyle(estilos_tabla))
+    elements.append(tabla)
 
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
     buffer.seek(0)
@@ -1321,6 +1176,7 @@ if not contratos_dict:
 contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
+# --- NUEVO SELECTOR DE MODO DE VISTA ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("👁️ Modo de Visualización")
 vista_modo = st.sidebar.radio("Selecciona qué reporte visualizar:", ["Detalle de Contrato", "Consolidado de Subproyecto"])
@@ -1380,7 +1236,7 @@ if vista_modo == "Consolidado de Subproyecto":
     
     with st.spinner("Procesando y agrupando todos los contratos del subproyecto..."):
         datos_subproyecto = []
-        resumenes_por_contrato = {} # Almacena el detalle de carpetas por contrato
+        resumenes_por_contrato = {} 
         
         for tipo_obra_nombre, contratos_dict_sub in tipos_obra_dict.items():
             for contrato_nombre, info_contrato_sub in contratos_dict_sub.items():
@@ -1397,8 +1253,9 @@ if vista_modo == "Consolidado de Subproyecto":
                     if col_pendiente in df_sub.columns:
                         estados_sub = df_sub[col_pendiente].astype(str).str.strip().str.upper()
                         for est in estados_sub:
-                            if est and est not in ["NAN", "NAT", "NONE"]:
-                                conteo_roles[est] = conteo_roles.get(est, 0) + 1
+                            est_clean = str(est).strip().upper()
+                            if est_clean and est_clean not in ["NAN", "NAT", "NONE", "NULL", ""]:
+                                conteo_roles[est_clean] = conteo_roles.get(est_clean, 0) + 1
                 
                 cerrados_docs = conteo_roles.get("CERRADO", 0)
                 fila_sub = {
@@ -1406,10 +1263,9 @@ if vista_modo == "Consolidado de Subproyecto":
                     "Contrato": contrato_nombre,
                     "Cerrados": cerrados_docs
                 }
-                for est, count in conteo_roles.items():
-                    est_str = str(est).strip()
-                    if est_str != "CERRADO" and est_str not in ["NAN", "NAT", "NONE", ""]:
-                        fila_sub[est_str.title()] = count
+                for est_clean, count in conteo_roles.items():
+                    if est_clean != "CERRADO":
+                        fila_sub[est_clean.title()] = count
                 fila_sub["Total"] = total_docs
                 avance_pct = (cerrados_docs / total_docs * 100) if total_docs > 0 else 0
                 fila_sub["Avance (%)"] = f"{avance_pct:.1f}%"
@@ -1519,6 +1375,7 @@ if vista_modo == "Consolidado de Subproyecto":
                         f"Adjunto encontrará el reporte consolidado global actualizado al {metadata_export['fecha']} "
                         f"correspondiente al subproyecto: {subproyecto_activo}.\n\n"
                         f"Este documento incluye el estado y avance de todos los contratos, así como la estructura detallada de las carpetas de cada uno de ellos.\n\n"
+                        f"Para mayor detalle de los documentos, acceda a nuestro dashboard: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
                         f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                     )
                     
@@ -1677,6 +1534,7 @@ else:
                             f"- Total de documentos: {total_cerrados + total_abiertos}\n"
                             f"- Documentos cerrados: {total_cerrados}\n"
                             f"- Documentos pendientes: {total_abiertos}\n\n"
+                            f"Para revisar en línea: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
                             f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                         )
                         
