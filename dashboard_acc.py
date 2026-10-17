@@ -607,8 +607,8 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
     buffer.seek(0)
     return buffer
 
-def generar_pdf_subproyecto(metadatos, df_resumen, ruta_logo):
-    """Generador de PDF exclusivo para el Modo Consolidado (Sin detalle de documentos)"""
+def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_por_contrato):
+    """Generador de PDF para Consolidado (Global en Pag1, Detalles de Carpetas por Contrato en siguientes)"""
     buffer = io.BytesIO()
     
     def agregar_pie_pagina(canvas, doc):
@@ -626,87 +626,154 @@ def generar_pdf_subproyecto(metadatos, df_resumen, ruta_logo):
     elements = []
     styles = getSampleStyleSheet()
     
-    if os.path.exists(ruta_logo):
-        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
-        logo.hAlign = 'RIGHT'
-        elements.append(logo)
-        elements.append(Spacer(1, 10))
-
     titulo_style = styles["Heading2"]
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
     header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
 
-    elements.append(Paragraph(f"Reporte Consolidado del Subproyecto", titulo_style))
-    elements.append(Spacer(1, 5))
-    elements.append(Paragraph(f"<b>Fecha de Emisión:</b> {metadatos['fecha']}", meta_style))
-    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
-    elements.append(Paragraph(f"<b>Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
-    elements.append(Spacer(1, 15))
-
-    # --- 1. RESUMEN DE CONTRATOS ---
-    elements.append(Paragraph("<b>Resumen General por Contrato</b>", styles["Heading3"]))
-    elements.append(Spacer(1, 5))
+    # ===================================================
+    # PÁGINA 1: RESUMEN GLOBAL DEL SUBPROYECTO
+    # ===================================================
+    bloque_global = []
     
-    if not df_resumen.empty:
-        encabezados = [Paragraph(str(col), header_style) for col in df_resumen.columns]
-        data_matrix = [encabezados]
-        for _, row in df_resumen.iterrows():
-            fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
-            data_matrix.append(fila)
-        
-        anchos_resumen = []
-        for col in df_resumen.columns:
-            if col == "Tipo de Obra": anchos_resumen.append(0.15 * ancho_util)
-            elif col == "Contrato": anchos_resumen.append(0.25 * ancho_util)
-            elif col == "Total": anchos_resumen.append(0.10 * ancho_util)
-            elif col == "Avance (%)": anchos_resumen.append(0.10 * ancho_util)
-            else: anchos_resumen.append((0.40 * ancho_util) / (len(df_resumen.columns) - 4))
+    if os.path.exists(ruta_logo):
+        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
+        logo.hAlign = 'RIGHT'
+        bloque_global.append(logo)
+        bloque_global.append(Spacer(1, 10))
 
-        tabla_resumen = Table(data_matrix, repeatRows=1, colWidths=anchos_resumen)
-        tabla_resumen.setStyle(TableStyle([
+    bloque_global.append(Paragraph(f"Reporte Consolidado del Subproyecto", titulo_style))
+    bloque_global.append(Spacer(1, 5))
+    bloque_global.append(Paragraph(f"<b>Fecha de Emisión:</b> {metadatos['fecha']}", meta_style))
+    bloque_global.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']}", meta_style))
+    bloque_global.append(Paragraph(f"<b>Subproyecto:</b> {metadatos['subproyecto']}", meta_style))
+    bloque_global.append(Spacer(1, 15))
+
+    bloque_global.append(Paragraph("<b>1. Resumen General por Contrato</b>", styles["Heading3"]))
+    bloque_global.append(Spacer(1, 5))
+    
+    if not df_resumen_global.empty:
+        encabezados_g = [Paragraph(str(col), header_style) for col in df_resumen_global.columns]
+        data_matrix_g = [encabezados_g]
+        for _, row in df_resumen_global.iterrows():
+            fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
+            data_matrix_g.append(fila)
+        
+        anchos_resumen_g = []
+        for col in df_resumen_global.columns:
+            if col == "Tipo de Obra": anchos_resumen_g.append(0.15 * ancho_util)
+            elif col == "Contrato": anchos_resumen_g.append(0.25 * ancho_util)
+            elif col == "Total": anchos_resumen_g.append(0.10 * ancho_util)
+            elif col == "Avance (%)": anchos_resumen_g.append(0.10 * ancho_util)
+            else: anchos_resumen_g.append((0.40 * ancho_util) / (len(df_resumen_global.columns) - 4))
+
+        tabla_resumen_g = Table(data_matrix_g, repeatRows=1, colWidths=anchos_resumen_g)
+        tabla_resumen_g.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
             ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
         ]))
-        elements.append(tabla_resumen)
+        bloque_global.append(tabla_resumen_g)
     
-    elements.append(Spacer(1, 20))
+    bloque_global.append(Spacer(1, 15))
 
-    # --- 2. GRÁFICO (BARRAS AGRUPADAS POR CONTRATO) ---
-    if not df_resumen.empty and "Contrato" in df_resumen.columns:
-        columnas_roles = [c for c in df_resumen.columns if c not in ["Tipo de Obra", "Contrato", "Total", "Avance (%)"]]
+    if not df_resumen_global.empty and "Contrato" in df_resumen_global.columns:
+        columnas_roles = [c for c in df_resumen_global.columns if c not in ["Tipo de Obra", "Contrato", "Total", "Avance (%)"]]
         
         fig, ax = plt.subplots(figsize=(8, 3.5)) 
-        x = np.arange(len(df_resumen["Contrato"]))
+        x = np.arange(len(df_resumen_global["Contrato"]))
         ancho_barra = 0.8 / len(columnas_roles)
         colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
         
         for i, col in enumerate(columnas_roles):
             desplazamiento = x + (i - len(columnas_roles)/2 + 0.5) * ancho_barra
-            ax.bar(desplazamiento, df_resumen[col], ancho_barra, label=col, color=colores[i % len(colores)])
+            ax.bar(desplazamiento, df_resumen_global[col], ancho_barra, label=col, color=colores[i % len(colores)])
 
         ax.set_title("Estado Documentario por Contrato y Responsable", fontsize=10, fontweight='bold')
         ax.set_xticks(x)
-        etiquetas = [c[:20] + "..." if len(c) > 20 else c for c in df_resumen["Contrato"]]
+        etiquetas = [c[:20] + "..." if len(c) > 20 else c for c in df_resumen_global["Contrato"]]
         ax.set_xticklabels(etiquetas, rotation=15, ha='right', fontsize=8)
         ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
         plt.tight_layout()
         
-        grafico_path = "temp_chart.png"
-        plt.savefig(grafico_path, dpi=200, bbox_inches='tight')
+        img_data_global = io.BytesIO()
+        plt.savefig(img_data_global, format='png', dpi=200, bbox_inches='tight')
         plt.close()
+        img_data_global.seek(0)
+        bloque_global.append(RLImage(img_data_global, width=450, height=180)) 
 
-        elements.append(RLImage(grafico_path, width=450, height=180)) 
+    elements.append(KeepTogether(bloque_global))
+
+    # ===================================================
+    # PÁGINAS SIGUIENTES: RESUMEN DE CARPETAS POR CONTRATO
+    # ===================================================
+    if resumenes_por_contrato:
+        elements.append(PageBreak())
+        elements.append(Paragraph("<b>2. Resumen Detallado por Contrato</b>", titulo_style))
+        elements.append(Spacer(1, 15))
+
+        for contrato_nombre, df_res_contrato in resumenes_por_contrato.items():
+            if df_res_contrato.empty:
+                continue
+                
+            bloque_contrato = []
+            bloque_contrato.append(Paragraph(f"<b>Resumen General por Carpeta - Contrato: {contrato_nombre}</b>", styles["Heading3"]))
+            bloque_contrato.append(Spacer(1, 5))
+            
+            # Tabla del Contrato
+            encabezados_c = [Paragraph(str(col), header_style) for col in df_res_contrato.columns]
+            data_matrix_c = [encabezados_c]
+            for _, row in df_res_contrato.iterrows():
+                fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
+                data_matrix_c.append(fila)
+                
+            anchos_c = []
+            for col in df_res_contrato.columns:
+                if col == "Carpeta": anchos_c.append(0.15 * ancho_util)
+                elif col == "Mayor Retraso": anchos_c.append(0.35 * ancho_util)
+                else: anchos_c.append((0.50 * ancho_util) / (len(df_res_contrato.columns) - 2))
+                
+            tabla_c = Table(data_matrix_c, repeatRows=1, colWidths=anchos_c)
+            tabla_c.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2B6CB0")),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
+            ]))
+            bloque_contrato.append(tabla_c)
+            bloque_contrato.append(Spacer(1, 15))
+            
+            # Gráfico del Contrato
+            columnas_grafico_c = ["Cerrados"] + [c for c in df_res_contrato.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
+            fig, ax = plt.subplots(figsize=(8, 3.5)) 
+            x = np.arange(len(df_res_contrato["Carpeta"]))
+            ancho_barra = 0.8 / len(columnas_grafico_c)
+            colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
+            
+            for i, col in enumerate(columnas_grafico_c):
+                desplazamiento = x + (i - len(columnas_grafico_c)/2 + 0.5) * ancho_barra
+                ax.bar(desplazamiento, df_res_contrato[col], ancho_barra, label=col, color=colores[i % len(colores)])
+
+            ax.set_title(f"Estado Documentario por Carpeta y Responsable", fontsize=10, fontweight='bold')
+            ax.set_xticks(x)
+            ax.set_xticklabels(df_res_contrato["Carpeta"], rotation=15, ha='right', fontsize=8)
+            ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
+            plt.tight_layout()
+            
+            img_data_c = io.BytesIO()
+            plt.savefig(img_data_c, format='png', dpi=200, bbox_inches='tight')
+            plt.close()
+            img_data_c.seek(0)
+            bloque_contrato.append(RLImage(img_data_c, width=450, height=180)) 
+            bloque_contrato.append(Spacer(1, 20))
+            
+            elements.append(KeepTogether(bloque_contrato))
 
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
     buffer.seek(0)
-    
-    if os.path.exists("temp_chart.png"):
-        os.remove("temp_chart.png")
-        
     return buffer
 
 def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestanas, ruta_logo, col_pendiente):
@@ -799,11 +866,11 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
         ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
         plt.tight_layout()
         
-        grafico_path = "temp_chart.png"
-        plt.savefig(grafico_path, dpi=200, bbox_inches='tight')
+        img_data = io.BytesIO()
+        plt.savefig(img_data, format='png', dpi=200, bbox_inches='tight')
         plt.close()
-
-        resumen_y_grafico.append(RLImage(grafico_path, width=450, height=180)) 
+        img_data.seek(0)
+        resumen_y_grafico.append(RLImage(img_data, width=450, height=180)) 
     
     elements.append(KeepTogether(resumen_y_grafico))
 
@@ -872,10 +939,6 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
 
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
     buffer.seek(0)
-    
-    if os.path.exists("temp_chart.png"):
-        os.remove("temp_chart.png")
-        
     return buffer
 
 def enviar_correo_con_pdf(destinatario, asunto, cuerpo, pdf_bytes, nombre_archivo):
@@ -1258,7 +1321,6 @@ if not contratos_dict:
 contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
-# --- NUEVO SELECTOR DE MODO DE VISTA ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("👁️ Modo de Visualización")
 vista_modo = st.sidebar.radio("Selecciona qué reporte visualizar:", ["Detalle de Contrato", "Consolidado de Subproyecto"])
@@ -1311,20 +1373,14 @@ if "preload" in st.query_params and st.query_params["preload"] == "true":
     st.stop()
 
 
-# ====================================================================
-# --- LÓGICA PRINCIPAL DE VISUALIZACIÓN ---
-# ====================================================================
-
 col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
 
 if vista_modo == "Consolidado de Subproyecto":
-    # -------------------------------------------------------------
-    # VISTA 1: REPORTE DEL SUBPROYECTO COMPLETO
-    # -------------------------------------------------------------
     st.subheader(f"📊 Resumen Consolidado: {subproyecto_activo}")
     
     with st.spinner("Procesando y agrupando todos los contratos del subproyecto..."):
         datos_subproyecto = []
+        resumenes_por_contrato = {} # Almacena el detalle de carpetas por contrato
         
         for tipo_obra_nombre, contratos_dict_sub in tipos_obra_dict.items():
             for contrato_nombre, info_contrato_sub in contratos_dict_sub.items():
@@ -1333,9 +1389,9 @@ if vista_modo == "Consolidado de Subproyecto":
                 )
                 datos_pestanas_sub = res_cache.get("datos", {})
                 
+                # --- Procesamiento Global para la Tabla Principal ---
                 conteo_roles = {}
                 total_docs = 0
-                
                 for df_sub in datos_pestanas_sub.values():
                     total_docs += len(df_sub)
                     if col_pendiente in df_sub.columns:
@@ -1345,32 +1401,74 @@ if vista_modo == "Consolidado de Subproyecto":
                                 conteo_roles[est] = conteo_roles.get(est, 0) + 1
                 
                 cerrados_docs = conteo_roles.get("CERRADO", 0)
-                
                 fila_sub = {
                     "Tipo de Obra": tipo_obra_nombre,
                     "Contrato": contrato_nombre,
                     "Cerrados": cerrados_docs
                 }
-                
-                # Extraemos los roles específicos pendientes de este contrato
                 for est, count in conteo_roles.items():
-                    est_str = str(est).strip() # Forzamos que siempre sea texto
+                    est_str = str(est).strip()
                     if est_str != "CERRADO" and est_str not in ["NAN", "NAT", "NONE", ""]:
                         fila_sub[est_str.title()] = count
-                
                 fila_sub["Total"] = total_docs
                 avance_pct = (cerrados_docs / total_docs * 100) if total_docs > 0 else 0
                 fila_sub["Avance (%)"] = f"{avance_pct:.1f}%"
-                
                 datos_subproyecto.append(fila_sub)
+
+                # --- Procesamiento Detallado de Carpetas (Para el PDF del Subproyecto) ---
+                tipo_contrato_val_sub = info_contrato_sub.get("tipo_contrato", "Con Supervisión")
+                if tipo_contrato_val_sub == "Tripartito":
+                    emp1 = info_contrato_sub.get("nombre_empresa_1", "EMPRESA 1")
+                    emp2 = info_contrato_sub.get("nombre_empresa_2", "EMPRESA 2")
+                    roles_pendientes_sub = [emp1.upper(), emp2.upper(), "SHP"]
+                elif tipo_contrato_val_sub == "Contrato Directo":
+                    roles_pendientes_sub = ["CONTRATISTA", "SHP"]
+                else:
+                    roles_pendientes_sub = ["CONTRATISTA", "SUPERVISION", "SHP"]
+
+                resumen_lista_contrato = []
+                for nombre_carpeta, df_sub in datos_pestanas_sub.items():
+                    fila_res_c = {"Carpeta": nombre_carpeta}
+                    cerrados_carp_c = 0
+                    abiertos_carp_c = 0
+                    
+                    if col_pendiente in df_sub.columns:
+                        estados_c = df_sub[col_pendiente].astype(str).str.strip().str.upper()
+                        cerrados_carp_c = (estados_c == "CERRADO").sum()
+                        fila_res_c["Cerrados"] = cerrados_carp_c
+                        for rol in roles_pendientes_sub:
+                            cant_rol = (estados_c == rol).sum()
+                            fila_res_c[rol.title()] = cant_rol
+                            abiertos_carp_c += cant_rol
+                        
+                        df_abiertos_c = df_sub[estados_c != "CERRADO"].copy()
+                        if not df_abiertos_c.empty and 'DIAS' in df_abiertos_c.columns:
+                            df_abiertos_c['DIAS_NUM'] = pd.to_numeric(df_abiertos_c['DIAS'], errors='coerce').fillna(0)
+                            if df_abiertos_c['DIAS_NUM'].max() > 0:
+                                max_idx_c = df_abiertos_c['DIAS_NUM'].idxmax()
+                                doc_codigo_c = str(df_abiertos_c.loc[max_idx_c, COL_CODIGO])
+                                dias_retraso_c = int(df_abiertos_c.loc[max_idx_c, 'DIAS_NUM'])
+                                resp_c = str(df_abiertos_c.loc[max_idx_c, col_pendiente]).strip()
+                                fila_res_c["Mayor Retraso"] = f"{doc_codigo_c} ({dias_retraso_c} días) [{resp_c}]"
+                            else:
+                                fila_res_c["Mayor Retraso"] = "Sin retrasos"
+                        else:
+                            fila_res_c["Mayor Retraso"] = "Sin pendientes"
+                    else:
+                        fila_res_c["Cerrados"] = 0
+                        for rol in roles_pendientes_sub:
+                            fila_res_c[rol.title()] = 0
+                        fila_res_c["Mayor Retraso"] = "N/A"
+                            
+                    fila_res_c["Total"] = cerrados_carp_c + abiertos_carp_c
+                    resumen_lista_contrato.append(fila_res_c)
+                
+                resumenes_por_contrato[contrato_nombre] = pd.DataFrame(resumen_lista_contrato)
         
         df_consolidado_sub = pd.DataFrame(datos_subproyecto)
-        
-        # Rellenar con ceros las columnas de roles cruzados donde un contrato no lo tenga
         cols_numericas = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Avance (%)"]]
         df_consolidado_sub[cols_numericas] = df_consolidado_sub[cols_numericas].fillna(0).astype(int)
         
-        # Ordenar columnas estéticamente
         roles_cols = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Cerrados", "Total", "Avance (%)"]]
         orden_cols = ["Tipo de Obra", "Contrato", "Cerrados"] + roles_cols + ["Total", "Avance (%)"]
         df_consolidado_sub = df_consolidado_sub[orden_cols]
@@ -1382,7 +1480,7 @@ if vista_modo == "Consolidado de Subproyecto":
         if not df_consolidado_sub.empty:
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
-                pdf_sub = generar_pdf_subproyecto(metadata_export, df_consolidado_sub, url_logo_personal)
+                pdf_sub = generar_pdf_subproyecto(metadata_export, df_consolidado_sub, url_logo_personal, resumenes_por_contrato)
                 st.download_button("📄 Exportar Consolidado (PDF)", data=pdf_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.pdf", mime="application/pdf")
             with c_btn2:
                 excel_sub = exportar_df_a_excel(df_consolidado_sub, f"Consolidado de Subproyecto", metadata_export, url_logo_personal)
@@ -1390,9 +1488,7 @@ if vista_modo == "Consolidado de Subproyecto":
     
     with col_s2:
         if not df_consolidado_sub.empty:
-            # Gráfico Apilado mostrando la composición de cada contrato
             columnas_graf = ["Cerrados"] + roles_cols
-            
             fig_sub = px.bar(
                 df_consolidado_sub, 
                 x="Contrato", 
@@ -1403,7 +1499,6 @@ if vista_modo == "Consolidado de Subproyecto":
             fig_sub.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
             st.plotly_chart(fig_sub, use_container_width=True)
 
-    # --- SECCIÓN: ENVÍO DE REPORTE POR CORREO (VISTA CONSOLIDADOS) ---
     st.markdown("---")
     with st.expander("📧 Enviar Consolidado de Subproyecto por Correo Electrónico"):
         st.markdown("**Configura el envío del resumen global de contratos directamente desde la aplicación.**")
@@ -1415,7 +1510,7 @@ if vista_modo == "Consolidado de Subproyecto":
             else:
                 with st.spinner("Generando reporte consolidado del subproyecto y enviando correo..."):
                     pdf_buffer_sub = generar_pdf_subproyecto(
-                        metadata_export, df_consolidado_sub, url_logo_personal
+                        metadata_export, df_consolidado_sub, url_logo_personal, resumenes_por_contrato
                     )
                     nombre_pdf_sub = f"Consolidado_Subproyecto_{subproyecto_activo.replace(' ', '_')}.pdf"
                     
@@ -1423,7 +1518,7 @@ if vista_modo == "Consolidado de Subproyecto":
                         f"Estimado equipo,\n\n"
                         f"Adjunto encontrará el reporte consolidado global actualizado al {metadata_export['fecha']} "
                         f"correspondiente al subproyecto: {subproyecto_activo}.\n\n"
-                        f"Este documento incluye el estado y avance de todos los contratos y componentes activos asociados.\n\n"
+                        f"Este documento incluye el estado y avance de todos los contratos, así como la estructura detallada de las carpetas de cada uno de ellos.\n\n"
                         f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                     )
                     
@@ -1441,9 +1536,6 @@ if vista_modo == "Consolidado de Subproyecto":
                         st.error(mensaje)
 
 else:
-    # -------------------------------------------------------------
-    # VISTA 2: DETALLE DE CONTRATO (Vista Existente)
-    # -------------------------------------------------------------
     metadata_export["tipo_obra"] = tipo_obra_activo
     metadata_export["contrato"] = contrato_activo
 
@@ -1562,7 +1654,6 @@ else:
                 fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
                 st.plotly_chart(fig, use_container_width=True)
 
-        # --- SECCIÓN: ENVÍO DE REPORTE POR CORREO (VISTA CONTRATO) ---
         st.markdown("---")
         with st.expander("📧 Enviar Reporte de Contrato por Correo Electrónico"):
             st.markdown("**Configura el envío de este resumen y gráficos detallados directamente desde la aplicación.**")
