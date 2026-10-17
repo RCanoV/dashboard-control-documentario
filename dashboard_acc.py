@@ -677,7 +677,6 @@ def generar_pdf_subproyecto(metadatos, df_resumen, ruta_logo):
 
     # --- 2. GRÁFICO (BARRAS AGRUPADAS POR CONTRATO) ---
     if not df_resumen.empty and "Contrato" in df_resumen.columns:
-        # Extraer solo las columnas de roles
         columnas_roles = [c for c in df_resumen.columns if c not in ["Tipo de Obra", "Contrato", "Total", "Avance (%)"]]
         
         fig, ax = plt.subplots(figsize=(8, 3.5)) 
@@ -691,7 +690,6 @@ def generar_pdf_subproyecto(metadatos, df_resumen, ruta_logo):
 
         ax.set_title("Estado Documentario por Contrato y Responsable", fontsize=10, fontweight='bold')
         ax.set_xticks(x)
-        # Acortar el texto del contrato si es muy largo para que entre en el gráfico
         etiquetas = [c[:20] + "..." if len(c) > 20 else c for c in df_resumen["Contrato"]]
         ax.set_xticklabels(etiquetas, rotation=15, ha='right', fontsize=8)
         ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
@@ -1356,8 +1354,9 @@ if vista_modo == "Consolidado de Subproyecto":
                 
                 # Extraemos los roles específicos pendientes de este contrato
                 for est, count in conteo_roles.items():
-                    if est != "CERRADO":
-                        fila_sub[est.title()] = count
+                    est_str = str(est).strip() # Forzamos que siempre sea texto
+                    if est_str != "CERRADO" and est_str not in ["NAN", "NAT", "NONE", ""]:
+                        fila_sub[est_str.title()] = count
                 
                 fila_sub["Total"] = total_docs
                 avance_pct = (cerrados_docs / total_docs * 100) if total_docs > 0 else 0
