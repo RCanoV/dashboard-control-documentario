@@ -81,7 +81,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
-                "Paquete 02 CIVIL - CGI-SHP-027-2025": {
+                "Paquete 02 - CGI-SHP-027-2025": {
                     "nombre_proyecto": "994440 Paquete 02 - C527 - CHEC",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Luis Rojas",
