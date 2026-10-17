@@ -1317,6 +1317,18 @@ else:
         
         df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
         
+        # --- NUEVA FUNCIÓN PARA COLOREAR FILAS SEGÚN RESPONSABLE ---
+        def pintar_filas(row):
+            estado = str(row[col_pendiente]).strip().upper()
+            if estado == "CERRADO":
+                return ['background-color: #d4edda; color: #155724'] * len(row) # Verde claro
+            elif estado == "SHP":
+                return ['background-color: #fff3cd; color: #856404'] * len(row) # Amarillo
+            elif estado == "SUPERVISION":
+                return ['background-color: #f8d7da; color: #721c24'] * len(row) # Rojo claro
+            else:
+                return ['background-color: #cce5ff; color: #004085'] * len(row) # Azul claro (Resto/Contratista)
+
         with col_grafico:
             if not df_filtrado.empty:
                 df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
@@ -1340,7 +1352,8 @@ else:
                 st.plotly_chart(fig_detalle, use_container_width=True)
         
         if not df_filtrado.empty:
-            st.dataframe(df_filtrado, width='stretch', height=400)
+            # APLICAMOS LOS COLORES AL DATAFRAME WEB AQUÍ
+            st.dataframe(df_filtrado.style.apply(pintar_filas, axis=1), width='stretch', height=400)
             
             c_det1, c_det2 = st.columns(2)
             with c_det1:
