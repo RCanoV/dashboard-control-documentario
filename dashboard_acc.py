@@ -24,7 +24,7 @@ from reportlab.platypus import Image as RLImage
 # Librerías para exportación a Excel (OpenPyXL)
 import openpyxl
 from openpyxl.drawing.image import Image as ExcelImage
-from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Font, Alignment, PatternFill
 
 # ====================================================================
 # --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
@@ -77,11 +77,11 @@ ESTRUCTURA_MAESTRA = {
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oruowhl0STa9w2M9Vo3gZQ&viewModel=detail&moduleId=folders",
                     ],
                     "carpetas_config": [
-                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UzkUvdTHRAuA78DzJRIb3Q&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9H02MxlNS1-UMkSXObElHQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8XNGFh6XTcy8HwGVqgx0tA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.qGCrERygRvWHVF__AF2hzQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.dq0X5F6lT-e8xtT57iEn5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1mZq3p5tTFmIqwiWR8mk5Q&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.7MdcGeqmSfqPE5jDZxhoSA&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.IgD5_slUQmCzIDI3-N5_ag&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
@@ -425,7 +425,22 @@ except:
 # ====================================================================
 # --- 3. FUNCIONES DE EXPORTACIÓN A PDF, EXCEL Y CORREO ---
 # ====================================================================
-def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str) -> io.BytesIO:
+
+# Helper para centralizar la asignación de colores
+def obtener_colores_estado(estado):
+    """Devuelve (Color_Fondo, Color_Texto) en Hexadecimal dependiendo del estado."""
+    estado = str(estado).strip().upper()
+    if estado == "CERRADO":
+        return "#d4edda", "#155724" # Verde
+    elif estado == "CONTRATISTA":
+        return "#fff3cd", "#856404" # Amarillo
+    elif estado == "SUPERVISION":
+        return "#f8d7da", "#721c24" # Rojo claro
+    else:
+        # SHP o cualquier otro rol pendiente
+        return "#cce5ff", "#004085" # Azul claro
+
+def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
     buffer = io.BytesIO()
     
     def agregar_pie_pagina(canvas, doc):
@@ -439,7 +454,6 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         buffer, pagesize=landscape(letter),
         leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
     )
-    # Ancho total de la hoja horizontal (792) menos los márgenes (50)
     ancho_util = 742 
     
     elements = []
@@ -470,11 +484,35 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
     encabezados = [Paragraph(str(col), header_style) for col in df.columns]
     data_matrix = [encabezados]
 
-    for _, row in df.iterrows():
-        fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
+    estilos_tabla = [
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+    ]
+
+    for row_idx, (_, row) in enumerate(df.iterrows(), start=1):
+        fila = []
+        bg_color = "#ffffff"
+        
+        if col_pendiente and col_pendiente in df.columns:
+            bg_color, text_color = obtener_colores_estado(row[col_pendiente])
+        else:
+            bg_color = "#ffffff" if row_idx % 2 != 0 else "#f9fafb"
+            text_color = "#000000"
+
+        estilos_tabla.append(('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor(bg_color)))
+
+        for col_name in df.columns:
+            val = row[col_name]
+            text_str = "" if pd.isna(val) else str(val)
+            if col_pendiente and col_pendiente in df.columns:
+                text_str = f'<font color="{text_color}">{text_str}</font>'
+            fila.append(Paragraph(text_str, cell_style))
         data_matrix.append(fila)
 
-    # Autocalcular el ancho de las columnas dando prioridad a DESCRIPCION
     anchos_columnas = []
     for col in df.columns:
         col_u = str(col).upper()
@@ -492,22 +530,14 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
     anchos_columnas = [w * factor_norm for w in anchos_columnas]
 
     tabla = Table(data_matrix, repeatRows=1, colWidths=anchos_columnas)
-    tabla.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
-    ]))
+    tabla.setStyle(TableStyle(estilos_tabla))
     elements.append(tabla)
 
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
     buffer.seek(0)
     return buffer
 
-def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str) -> io.BytesIO:
+def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
     buffer = io.BytesIO()
     wb = openpyxl.Workbook()
     ws = wb.active
@@ -543,9 +573,24 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
         cell.fill = openpyxl.styles.PatternFill(start_color="1A365D", end_color="1A365D", fill_type="solid")
         ws.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = 20
 
-    for r_idx, row in enumerate(df.values, fila_inicio + 1):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else str(value))
+    col_idx_pendiente = None
+    if col_pendiente and col_pendiente in df.columns:
+        col_idx_pendiente = df.columns.tolist().index(col_pendiente)
+
+    for r_idx, row_data in enumerate(df.values, fila_inicio + 1):
+        bg_hex, font_hex = "FFFFFF", "000000"
+        
+        if col_idx_pendiente is not None:
+            estado = row_data[col_idx_pendiente]
+            bg, text = obtener_colores_estado(estado)
+            bg_hex = bg.replace("#", "")
+            font_hex = text.replace("#", "")
+
+        for c_idx, value in enumerate(row_data, 1):
+            cell = ws.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else str(value))
+            if col_idx_pendiente is not None:
+                cell.fill = openpyxl.styles.PatternFill(start_color=bg_hex, end_color=bg_hex, fill_type="solid")
+                cell.font = Font(color=font_hex)
 
     fila_pie = fila_inicio + len(df) + 2
     pie_cell = ws.cell(row=fila_pie, column=1, value="Desarrollado por Roberto Cano - Shougang Hierro Perú")
@@ -555,7 +600,7 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
     buffer.seek(0)
     return buffer
 
-def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestanas, ruta_logo):
+def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestanas, ruta_logo, col_pendiente):
     buffer = io.BytesIO()
     
     def agregar_pie_pagina(canvas, doc):
@@ -594,7 +639,6 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
     elements.append(Paragraph(f"<b>Contrato / Componente:</b> {metadatos['contrato']}", meta_style))
     elements.append(Spacer(1, 15))
 
-    # --- CONTENEDOR PARA MANTENER RESUMEN Y GRÁFICO EN UNA SOLA PÁGINA ---
     resumen_y_grafico = []
 
     # --- 1. RESUMEN GENERAL ---
@@ -608,7 +652,6 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
             fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
             data_matrix.append(fila)
         
-        # Ajuste dinámico para el ancho de columnas del resumen
         anchos_resumen = []
         for col in df_resumen.columns:
             if col == "Carpeta": anchos_resumen.append(0.15 * ancho_util)
@@ -652,10 +695,9 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
 
         resumen_y_grafico.append(RLImage(grafico_path, width=450, height=180)) 
     
-    # FORZAR EN UNA SOLA PÁGINA
     elements.append(KeepTogether(resumen_y_grafico))
 
-    # --- 3. DETALLE POR CARPETA ---
+    # --- 3. DETALLE POR CARPETA CON COLORES DE ESTADO ---
     elements.append(PageBreak())
     elements.append(Paragraph("<b>2. Detalle de Documentos por Carpeta</b>", styles["Heading3"]))
     elements.append(Spacer(1, 10))
@@ -670,16 +712,40 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
         encabezados_det = [Paragraph(str(col), header_style) for col in df_detalle.columns]
         data_matrix_det = [encabezados_det]
 
-        for _, row in df_detalle.iterrows():
-            fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
+        estilos_detalle = [
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2B6CB0")), 
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ]
+
+        for row_idx, (_, row) in enumerate(df_detalle.iterrows(), start=1):
+            fila = []
+            bg_color = "#ffffff"
+            
+            if col_pendiente and col_pendiente in df_detalle.columns:
+                bg_color, text_color = obtener_colores_estado(row[col_pendiente])
+            else:
+                bg_color = "#ffffff" if row_idx % 2 != 0 else "#f9fafb"
+                text_color = "#000000"
+
+            estilos_detalle.append(('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor(bg_color)))
+
+            for col_name in df_detalle.columns:
+                val = row[col_name]
+                text_str = "" if pd.isna(val) else str(val)
+                if col_pendiente and col_pendiente in df_detalle.columns:
+                    text_str = f'<font color="{text_color}">{text_str}</font>'
+                fila.append(Paragraph(text_str, cell_style))
             data_matrix_det.append(fila)
 
-        # Ajuste dinámico dando prioridad a DESCRIPCION
         anchos_detalle = []
         for col in df_detalle.columns:
             col_u = str(col).upper()
             if col_u == "CODIGO": anchos_detalle.append(0.18 * ancho_util)
-            elif col_u == "DESCRIPCION": anchos_detalle.append(0.35 * ancho_util) # Mayor anchura a descripción
+            elif col_u == "DESCRIPCION": anchos_detalle.append(0.35 * ancho_util)
             elif col_u in ["REV", "DIAS"]: anchos_detalle.append(0.06 * ancho_util)
             elif col_u == "FECHA": anchos_detalle.append(0.09 * ancho_util)
             elif col_u == "ESTADO": anchos_detalle.append(0.11 * ancho_util)
@@ -690,15 +756,7 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
         anchos_detalle = [w * factor_norm for w in anchos_detalle]
 
         tabla_detalle = Table(data_matrix_det, repeatRows=1, colWidths=anchos_detalle)
-        tabla_detalle.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2B6CB0")), 
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-            ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ]))
+        tabla_detalle.setStyle(TableStyle(estilos_detalle))
         elements.append(tabla_detalle)
         elements.append(Spacer(1, 15))
 
@@ -1270,7 +1328,7 @@ else:
             else:
                 with st.spinner("Generando reporte consolidado con gráficos y enviando correo..."):
                     pdf_buffer = generar_pdf_consolidado(
-                        contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal
+                        contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal, col_pendiente
                     )
                     nombre_pdf = f"Reporte_Consolidado_{contrato_activo.replace(' ', '_')}.pdf"
                     
@@ -1317,17 +1375,11 @@ else:
         
         df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
         
-        # --- NUEVA FUNCIÓN PARA COLOREAR FILAS SEGÚN RESPONSABLE ---
-        def pintar_filas(row):
+        # --- FUNCIÓN UNIFICADA DE STREAMLIT PARA PINTAR LAS FILAS ---
+        def pintar_filas_streamlit(row):
             estado = str(row[col_pendiente]).strip().upper()
-            if estado == "CERRADO":
-                return ['background-color: #d4edda; color: #155724'] * len(row) # Verde claro
-            elif estado == "SHP":
-                return ['background-color: #fff3cd; color: #856404'] * len(row) # Amarillo
-            elif estado == "SUPERVISION":
-                return ['background-color: #f8d7da; color: #721c24'] * len(row) # Rojo claro
-            else:
-                return ['background-color: #cce5ff; color: #004085'] * len(row) # Azul claro (Resto/Contratista)
+            bg_color, text_color = obtener_colores_estado(estado)
+            return [f'background-color: {bg_color}; color: {text_color}'] * len(row)
 
         with col_grafico:
             if not df_filtrado.empty:
@@ -1352,15 +1404,14 @@ else:
                 st.plotly_chart(fig_detalle, use_container_width=True)
         
         if not df_filtrado.empty:
-            # APLICAMOS LOS COLORES AL DATAFRAME WEB AQUÍ
-            st.dataframe(df_filtrado.style.apply(pintar_filas, axis=1), width='stretch', height=400)
+            st.dataframe(df_filtrado.style.apply(pintar_filas_streamlit, axis=1), width='stretch', height=400)
             
             c_det1, c_det2 = st.columns(2)
             with c_det1:
-                pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
+                pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
                 st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf")
             with c_det2:
-                excel_detalle = exportar_df_a_excel(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
+                excel_detalle = exportar_df_a_excel(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
                 st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
         else:
             st.info("No hay documentos que coincidan con el filtro seleccionado.")
