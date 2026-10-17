@@ -9,6 +9,9 @@ import pytz
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import streamlit as st
 import plotly.express as px
+import matplotlib.pyplot as plt
+import smtplib
+from email.message import EmailMessage
 
 # Librerías para exportación a PDF (ReportLab)
 from reportlab.lib.pagesizes import letter, landscape
@@ -410,12 +413,16 @@ COL_DESCRIPCION = "DESCRIPCION"
 try:
     CLIENT_ID = st.secrets["CLIENT_ID"]
     CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+    EMAIL_USER = st.secrets.get("EMAIL_USER", "tu_correo@gmail.com")
+    EMAIL_PASS = st.secrets.get("EMAIL_PASSWORD", "tu_contraseña_aplicacion")
 except:
     CLIENT_ID = "v1qczmMgnll6AUsLAPKuPVC31GaKLNnqmFsVvc6OA2Seqx4H"
     CLIENT_SECRET = "MAKRfMaqiXWBTJiFY5sJP3BLqwcRDWClc0LjFN79HYKBoyOcBfC7ObjCdRkQzebW"
+    EMAIL_USER = "tu_correo@gmail.com"
+    EMAIL_PASS = "tu_contraseña_aplicacion"
 
 # ====================================================================
-# --- 3. FUNCIONES DE EXPORTACIÓN A PDF Y EXCEL ---
+# --- 3. FUNCIONES DE EXPORTACIÓN A PDF, EXCEL Y CORREO ---
 # ====================================================================
 def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str) -> io.BytesIO:
     buffer = io.BytesIO()
@@ -424,7 +431,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
         canvas.setFillColor(colors.HexColor("#4A5568"))
-        canvas.drawString(doc.leftMargin, 15, "Desarrollado por Roberto Cano")
+        canvas.drawString(doc.leftMargin, 15, "Desarrollado por Roberto Cano - Shougang Hierro Perú")
         canvas.restoreState()
 
     doc = SimpleDocTemplate(
@@ -520,18 +527,127 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
             ws.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else str(value))
 
     fila_pie = fila_inicio + len(df) + 2
-    pie_cell = ws.cell(row=fila_pie, column=1, value="Desarrollado por Roberto Cano")
+    pie_cell = ws.cell(row=fila_pie, column=1, value="Desarrollado por Roberto Cano - Shougang Hierro Perú")
     pie_cell.font = Font(italic=True, color="4A5568")
 
     wb.save(buffer)
     buffer.seek(0)
     return buffer
 
+def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestanas, ruta_logo):
+    buffer = io.BytesIO()
+    
+    def agregar_pie_pagina(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        canvas.setFillColor(colors.HexColor("#4A5568"))
+        canvas.drawString(doc.leftMargin, 15, "Desarrollado por Roberto Cano - Shougang Hierro Perú")
+        canvas.restoreState()
+
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(letter),
+        leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
+    )
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    if os.path.exists(ruta_logo):
+        logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
+        logo.hAlign = 'RIGHT'
+        elements.append(logo)
+        elements.append(Spacer(1, 10))
+
+    titulo_style = styles["Heading2"]
+    meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
+
+    elements.append(Paragraph(f"Reporte Consolidado - {contrato_nombre}", titulo_style))
+    elements.append(Spacer(1, 5))
+    elements.append(Paragraph(f"<b>Fecha de Emisión:</b> {metadatos['fecha']}", meta_style))
+    elements.append(Paragraph(f"<b>Alcance:</b> {metadatos['alcance']} / {metadatos['subproyecto']}", meta_style))
+    elements.append(Paragraph(f"<b>Tipo de Obra:</b> {metadatos['tipo_obra']}", meta_style))
+    elements.append(Spacer(1, 10))
+
+    # 1. Tabla de Resumen General
+    elements.append(Paragraph("<b>Resumen General por Carpeta</b>", styles["Heading3"]))
+    elements.append(Spacer(1, 5))
+    
+    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
+    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
+
+    if not df_resumen.empty:
+        encabezados = [Paragraph(str(col), header_style) for col in df_resumen.columns]
+        data_matrix = [encabezados]
+        for _, row in df_resumen.iterrows():
+            fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
+            data_matrix.append(fila)
+        
+        tabla_resumen = Table(data_matrix, repeatRows=1)
+        tabla_resumen.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
+        ]))
+        elements.append(tabla_resumen)
+    
+    elements.append(Spacer(1, 15))
+
+    # 2. Generar gráfico en memoria con Matplotlib para el PDF
+    if not df_resumen.empty and "Carpeta" in df_resumen.columns and "Cerrados" in df_resumen.columns:
+        plt.figure(figsize=(8, 3.5))
+        plt.bar(df_resumen["Carpeta"], df_resumen["Cerrados"], color="#1A365D", label="Cerrados")
+        if "Total" in df_resumen.columns:
+            pendientes = df_resumen["Total"] - df_resumen["Cerrados"]
+            plt.bar(df_resumen["Carpeta"], pendientes, bottom=df_resumen["Cerrados"], color="#D69E2E", label="Pendientes")
+        
+        plt.title("Estado de Documentos por Carpeta", fontsize=10, fontweight='bold')
+        plt.xticks(rotation=15, ha='right', fontsize=8)
+        plt.yticks(fontsize=8)
+        plt.legend(fontsize=8)
+        plt.tight_layout()
+        
+        grafico_path = "temp_chart.png"
+        plt.savefig(grafico_path, dpi=200)
+        plt.close()
+
+        elements.append(RLImage(grafico_path, width=450, height=180))
+        elements.append(Spacer(1, 10))
+
+    doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
+    buffer.seek(0)
+    
+    if os.path.exists("temp_chart.png"):
+        os.remove("temp_chart.png")
+        
+    return buffer
+
+def enviar_correo_con_pdf(destinatario, asunto, cuerpo, pdf_bytes, nombre_archivo):
+    try:
+        msg = EmailMessage()
+        msg['Subject'] = asunto
+        msg['From'] = EMAIL_USER
+        msg['To'] = destinatario
+        msg.set_content(cuerpo)
+        
+        msg.add_attachment(
+            pdf_bytes.getvalue(),
+            maintype='application',
+            subtype='pdf',
+            filename=nombre_archivo
+        )
+        
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(EMAIL_USER, EMAIL_PASS)
+            smtp.send_message(msg)
+        return True, "¡Correo enviado exitosamente!"
+    except Exception as e:
+        return False, f"Error al enviar correo: {str(e)}"
+
 # ====================================================================
 # --- 4. LÓGICA DE API AUTODESK Y PRE-CARGA GLOBAL ---
 # ====================================================================
 def obtener_periodo_actual():
-    """Define los periodos del día para forzar la actualización a las 6 AM y 2 PM."""
     tz_peru = pytz.timezone('America/Lima')
     ahora = datetime.now(tz_peru)
     fecha_hoy = ahora.strftime("%Y-%m-%d")
@@ -784,7 +900,6 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
         except Exception as e:
             continue
 
-    # Registro del momento exacto de carga en Autodesk para la métrica
     tz_pe = pytz.timezone('America/Lima')
     hora_cache = datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M')
 
@@ -819,7 +934,6 @@ st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_ic
 
 periodo_actual = obtener_periodo_actual()
 
-# --- ENCABEZADO CON LOGO EN LA PARTE SUPERIOR DERECHA ---
 col_head1, col_head2 = st.columns([5, 1])
 with col_head1:
     st.title("📊 Dashboard de Control Documentario")
@@ -829,19 +943,15 @@ with col_head2:
     st.image("logoshp.jpeg", width=130)
 
 
-# --- NUEVO: LOGO CENTRADO Y AUTORÍA EN LA BARRA LATERAL ---
-# Uso de columnas [1, 2, 1] para forzar que la imagen quede centrada
 col_espacio1, col_logo, col_espacio2 = st.sidebar.columns([1, 2.5, 1])
 
 with col_logo:
-    # REEMPLAZA ESTO: pon el nombre de tu archivo PNG transparente subido a GitHub (ej: "mi_logo_transparente.png")
     ruta_logo_sidebar = "logoshp.jpeg"
     try:
         st.image(ruta_logo_sidebar, use_container_width=True)
     except:
         pass
 
-# Texto centrado justo debajo del logo
 st.sidebar.markdown(
     """
     <div style="text-align: center; font-size: 13.5px; color: #4A5568; margin-top: -10px; margin-bottom: 25px;">
@@ -899,7 +1009,6 @@ st.sidebar.info(
     f"*(Corte activo: {periodo_actual.split('_')[-1].upper()})*"
 )
 
-# --- BOTÓN DE ACTUALIZACIÓN MANUAL GLOBAL ---
 if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=True):
     extraer_datos_contrato_completo.clear()
     st.sidebar.warning("Descargando data global (Autodesk API)... Por favor, espera.")
@@ -907,7 +1016,6 @@ if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=
         precargar_todos_los_contratos(periodo_actual)
     st.sidebar.success("¡Data global actualizada existosamente!")
 
-# --- LOGO Y FIRMA EN BARRA LATERAL ---
 url_logo_personal = "logoshp.jpeg"
 
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
@@ -933,17 +1041,12 @@ metadata_export = {
     "contrato": contrato_activo
 }
 
-# --- RUTINA EXCLUSIVA PARA EL CRON-JOB (PING WEB) ---
-# Si la URL tiene ?preload=true, entra en modo robot
 if "preload" in st.query_params and st.query_params["preload"] == "true":
     st.title("🤖 Modo Bot: Actualizando Caché Global")
     st.warning("Descargando absolutamente toda la data de Autodesk en segundo plano. Esto tomará varios minutos...")
     precargar_todos_los_contratos(periodo_actual)
     st.success("¡Data global precargada exitosamente!")
-    st.stop()  # Detiene la aplicación aquí para el robot, no carga los gráficos.
-
-# --- CARGA NORMAL PARA USUARIOS ---
-# Solo verifica/carga el contrato que el usuario ha seleccionado en pantalla
+    st.stop()
 
 with st.spinner(f"Cargando datos para el contrato {contrato_activo}..."):
     resultado_cache = extraer_datos_contrato_completo(
@@ -956,7 +1059,6 @@ hora_actualizacion = resultado_cache.get("hora_actualizacion", "Desconocida")
 if not datos_pestanas:
     st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
 else:
-    # --- TARJETA DE DATOS GENERALES Y TIPO DE CONTRATO ---
     tipo_contrato_val = info_contrato.get("tipo_contrato", "Con Supervisión")
     
     with st.expander("📌 Datos Generales del Contrato y Equipo Asignado", expanded=True):
@@ -973,7 +1075,7 @@ else:
             c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
             
         c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
-        c5.metric("Última Actualiz.", hora_actualizacion) # Se actualiza a la hora mostrada por Autodesk.
+        c5.metric("Última Actualiz.", hora_actualizacion) 
 
     col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
     
@@ -1063,6 +1165,48 @@ else:
             fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
             st.plotly_chart(fig, use_container_width=True)
 
+    # --- NUEVA SECCIÓN: ENVÍO DE REPORTE POR CORREO ---
+    st.markdown("---")
+    with st.expander("📧 Enviar Reporte Consolidado por Correo Electrónico"):
+        st.markdown("**Configura el envío de este resumen y gráficos consolidados directamente desde la aplicación.**")
+        correo_destino = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):")
+        
+        if st.button("🚀 Enviar Reporte Ahora"):
+            if not correo_destino:
+                st.error("Por favor, ingresa al menos un correo electrónico válido.")
+            else:
+                with st.spinner("Generando reporte consolidado con gráficos y enviando correo..."):
+                    # Generar PDF en memoria
+                    pdf_buffer = generar_pdf_consolidado(
+                        contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal
+                    )
+                    nombre_pdf = f"Reporte_Consolidado_{contrato_activo.replace(' ', '_')}.pdf"
+                    
+                    # Cuerpo del correo
+                    cuerpo_correo = (
+                        f"Estimado equipo,\n\n"
+                        f"Adjunto encontrará el reporte documentario consolidado actualizado al {metadata_export['fecha']} "
+                        f"para el contrato: {contrato_activo}.\n\n"
+                        f"Resumen de estado:\n"
+                        f"- Total de documentos: {total_cerrados + total_abiertos}\n"
+                        f"- Documentos cerrados: {total_cerrados}\n"
+                        f"- Documentos pendientes: {total_abiertos}\n\n"
+                        f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
+                    )
+                    
+                    # Enviar correo
+                    exito, mensaje = enviar_correo_con_pdf(
+                        destinatario=correo_destino,
+                        asunto=f"Reporte Consolidado - {contrato_activo} (Shougang)",
+                        cuerpo=cuerpo_correo,
+                        pdf_bytes=pdf_buffer,
+                        nombre_archivo=nombre_pdf
+                    )
+                    
+                    if exito:
+                        st.success(mensaje)
+                    else:
+                        st.error(mensaje)
     st.markdown("---")
 
     st.subheader("Detalle por Carpeta / Disciplina")
