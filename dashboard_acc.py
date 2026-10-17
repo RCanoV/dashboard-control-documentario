@@ -18,7 +18,7 @@ from email.message import EmailMessage
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
 from reportlab.platypus import Image as RLImage
 
 # Librerías para exportación a Excel (OpenPyXL)
@@ -439,6 +439,9 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         buffer, pagesize=landscape(letter),
         leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
     )
+    # Ancho total de la hoja horizontal (792) menos los márgenes (50)
+    ancho_util = 742 
+    
     elements = []
     styles = getSampleStyleSheet()
     
@@ -471,7 +474,24 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
         data_matrix.append(fila)
 
-    tabla = Table(data_matrix, repeatRows=1)
+    # Autocalcular el ancho de las columnas dando prioridad a DESCRIPCION
+    anchos_columnas = []
+    for col in df.columns:
+        col_u = str(col).upper()
+        if col_u == "CARPETA": anchos_columnas.append(0.15 * ancho_util)
+        elif col_u == "MAYOR RETRASO": anchos_columnas.append(0.35 * ancho_util)
+        elif col_u == "CODIGO": anchos_columnas.append(0.18 * ancho_util)
+        elif col_u == "DESCRIPCION": anchos_columnas.append(0.35 * ancho_util)
+        elif col_u in ["REV", "DIAS"]: anchos_columnas.append(0.06 * ancho_util)
+        elif col_u == "FECHA": anchos_columnas.append(0.09 * ancho_util)
+        elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
+        elif col_u == "PENDIENTE POR": anchos_columnas.append(0.15 * ancho_util)
+        else: anchos_columnas.append(0.10 * ancho_util)
+        
+    factor_norm = ancho_util / sum(anchos_columnas)
+    anchos_columnas = [w * factor_norm for w in anchos_columnas]
+
+    tabla = Table(data_matrix, repeatRows=1, colWidths=anchos_columnas)
     tabla.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -549,6 +569,8 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
         buffer, pagesize=landscape(letter),
         leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
     )
+    ancho_util = 742 
+
     elements = []
     styles = getSampleStyleSheet()
     
@@ -560,6 +582,8 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
 
     titulo_style = styles["Heading2"]
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
+    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
+    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
 
     elements.append(Paragraph(f"Reporte Consolidado Documentario", titulo_style))
     elements.append(Spacer(1, 5))
@@ -570,13 +594,13 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
     elements.append(Paragraph(f"<b>Contrato / Componente:</b> {metadatos['contrato']}", meta_style))
     elements.append(Spacer(1, 15))
 
-    # --- 1. RESUMEN GENERAL ---
-    elements.append(Paragraph("<b>1. Resumen General por Carpeta</b>", styles["Heading3"]))
-    elements.append(Spacer(1, 5))
-    
-    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
-    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
+    # --- CONTENEDOR PARA MANTENER RESUMEN Y GRÁFICO EN UNA SOLA PÁGINA ---
+    resumen_y_grafico = []
 
+    # --- 1. RESUMEN GENERAL ---
+    resumen_y_grafico.append(Paragraph("<b>1. Resumen General por Carpeta</b>", styles["Heading3"]))
+    resumen_y_grafico.append(Spacer(1, 5))
+    
     if not df_resumen.empty:
         encabezados = [Paragraph(str(col), header_style) for col in df_resumen.columns]
         data_matrix = [encabezados]
@@ -584,7 +608,14 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
             fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
             data_matrix.append(fila)
         
-        tabla_resumen = Table(data_matrix, repeatRows=1)
+        # Ajuste dinámico para el ancho de columnas del resumen
+        anchos_resumen = []
+        for col in df_resumen.columns:
+            if col == "Carpeta": anchos_resumen.append(0.15 * ancho_util)
+            elif col == "Mayor Retraso": anchos_resumen.append(0.35 * ancho_util)
+            else: anchos_resumen.append((0.50 * ancho_util) / (len(df_resumen.columns) - 2))
+
+        tabla_resumen = Table(data_matrix, repeatRows=1, colWidths=anchos_resumen)
         tabla_resumen.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A365D")),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -592,15 +623,15 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
             ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
             ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
         ]))
-        elements.append(tabla_resumen)
+        resumen_y_grafico.append(tabla_resumen)
     
-    elements.append(Spacer(1, 15))
+    resumen_y_grafico.append(Spacer(1, 15))
 
-    # --- 2. GRÁFICO (BARRAS AGRUPADAS CON MATPLOTLIB) ---
+    # --- 2. GRÁFICO (BARRAS AGRUPADAS) ---
     if not df_resumen.empty and "Carpeta" in df_resumen.columns:
         columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
         
-        fig, ax = plt.subplots(figsize=(9, 4))
+        fig, ax = plt.subplots(figsize=(8, 3.5)) 
         x = np.arange(len(df_resumen["Carpeta"]))
         ancho_barra = 0.8 / len(columnas_grafico)
         colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
@@ -609,7 +640,7 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
             desplazamiento = x + (i - len(columnas_grafico)/2 + 0.5) * ancho_barra
             ax.bar(desplazamiento, df_resumen[col], ancho_barra, label=col, color=colores[i % len(colores)])
 
-        ax.set_title("Estado Documentario por Carpeta y Responsable", fontsize=11, fontweight='bold')
+        ax.set_title("Estado Documentario por Carpeta y Responsable", fontsize=10, fontweight='bold')
         ax.set_xticks(x)
         ax.set_xticklabels(df_resumen["Carpeta"], rotation=15, ha='right', fontsize=8)
         ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
@@ -619,10 +650,12 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
         plt.savefig(grafico_path, dpi=200, bbox_inches='tight')
         plt.close()
 
-        elements.append(RLImage(grafico_path, width=480, height=200))
-        elements.append(Spacer(1, 15))
+        resumen_y_grafico.append(RLImage(grafico_path, width=450, height=180)) 
+    
+    # FORZAR EN UNA SOLA PÁGINA
+    elements.append(KeepTogether(resumen_y_grafico))
 
-    # --- 3. DETALLE POR CARPETA (TABLAS ITERADAS) ---
+    # --- 3. DETALLE POR CARPETA ---
     elements.append(PageBreak())
     elements.append(Paragraph("<b>2. Detalle de Documentos por Carpeta</b>", styles["Heading3"]))
     elements.append(Spacer(1, 10))
@@ -641,7 +674,22 @@ def generar_pdf_consolidado(contrato_nombre, metadatos, df_resumen, datos_pestan
             fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
             data_matrix_det.append(fila)
 
-        tabla_detalle = Table(data_matrix_det, repeatRows=1)
+        # Ajuste dinámico dando prioridad a DESCRIPCION
+        anchos_detalle = []
+        for col in df_detalle.columns:
+            col_u = str(col).upper()
+            if col_u == "CODIGO": anchos_detalle.append(0.18 * ancho_util)
+            elif col_u == "DESCRIPCION": anchos_detalle.append(0.35 * ancho_util) # Mayor anchura a descripción
+            elif col_u in ["REV", "DIAS"]: anchos_detalle.append(0.06 * ancho_util)
+            elif col_u == "FECHA": anchos_detalle.append(0.09 * ancho_util)
+            elif col_u == "ESTADO": anchos_detalle.append(0.11 * ancho_util)
+            elif col_u == "PENDIENTE POR": anchos_detalle.append(0.15 * ancho_util)
+            else: anchos_detalle.append(0.10 * ancho_util)
+
+        factor_norm = ancho_util / sum(anchos_detalle)
+        anchos_detalle = [w * factor_norm for w in anchos_detalle]
+
+        tabla_detalle = Table(data_matrix_det, repeatRows=1, colWidths=anchos_detalle)
         tabla_detalle.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2B6CB0")), 
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
