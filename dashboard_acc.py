@@ -428,14 +428,53 @@ except:
 def obtener_colores_estado(estado):
     estado = str(estado).strip().upper()
     if estado == "CERRADO":
-        return "#d4edda", "#155724" # Verde
+        return "#d4edda", "#155724" 
     elif "CONTRATISTA" in estado or "EMPRESA" in estado:
-        return "#fff3cd", "#856404" # Amarillo
+        return "#fff3cd", "#856404" 
     elif estado == "SUPERVISION":
-        return "#f8d7da", "#721c24" # Rojo claro
+        return "#f8d7da", "#721c24" 
     else:
-        return "#cce5ff", "#004085" # Azul claro
+        return "#cce5ff", "#004085" 
 
+def generar_tabla_html(df):
+    """Genera una tabla HTML con estilos en línea a partir de un DataFrame de Pandas"""
+    html = df.to_html(index=False)
+    html = html.replace('<table border="1" class="dataframe">', '<table cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px; text-align: center; border: 1px solid #ddd;">')
+    html = html.replace('<th>', '<th style="background-color: #1A365D; color: white; padding: 8px; border: 1px solid #ddd;">')
+    html = html.replace('<td>', '<td style="padding: 5px; border: 1px solid #ddd;">')
+    html = html.replace('<tr>', '<tr style="border: 1px solid #ddd;">')
+    return html
+
+def enviar_correo_con_pdf(destinatario, asunto, cuerpo_texto, cuerpo_html, pdf_bytes, nombre_archivo):
+    try:
+        msg = EmailMessage()
+        msg['Subject'] = asunto
+        msg['From'] = EMAIL_USER
+        msg['To'] = destinatario
+        
+        # Primero texto plano (fallback) y luego HTML
+        msg.set_content(cuerpo_texto)
+        msg.add_alternative(cuerpo_html, subtype='html')
+        
+        msg.add_attachment(
+            pdf_bytes.getvalue(),
+            maintype='application',
+            subtype='pdf',
+            filename=nombre_archivo
+        )
+        
+        with smtplib.SMTP('smtp.office365.com', 587) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
+            smtp.login(EMAIL_USER, EMAIL_PASS)
+            smtp.send_message(msg)
+            
+        return True, "¡Correo enviado exitosamente!"
+    except Exception as e:
+        return False, f"Error al enviar correo: {str(e)}"
+
+# Funciones PDF y EXCEL originales sin modificar
 def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
     buffer = io.BytesIO()
     wb = openpyxl.Workbook()
@@ -503,7 +542,6 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
     return buffer
 
 def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_por_contrato):
-    """Generador de PDF para Consolidado (Global en Pag1, Detalles de Carpetas por Contrato en siguientes)"""
     buffer = io.BytesIO()
     
     def agregar_pie_pagina(canvas, doc):
@@ -521,17 +559,14 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     elements = []
     styles = getSampleStyleSheet()
     
+    titulo_style = styles["Heading2"]
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
     header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
     link_style = ParagraphStyle(name="Link", parent=styles["Normal"], fontSize=8, textColor=colors.blue)
 
-    # ===================================================
-    # PÁGINA 1: RESUMEN GLOBAL DEL SUBPROYECTO
-    # ===================================================
     bloque_global = []
     
-    # 1. Cabecera compacta: Logo izquierda, Datos derecha
     if os.path.exists(ruta_logo):
         logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
     else:
@@ -552,7 +587,6 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     bloque_global.append(tabla_cabecera)
     bloque_global.append(Spacer(1, 15))
 
-    # 2. Tabla del resumen
     bloque_global.append(Paragraph("<b>1. Resumen General por Contrato</b>", styles["Heading3"]))
     bloque_global.append(Spacer(1, 5))
     
@@ -583,11 +617,10 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     
     bloque_global.append(Spacer(1, 15))
 
-    # 3. Gráfico ajustado
     if not df_resumen_global.empty and "Contrato" in df_resumen_global.columns:
         columnas_roles = [c for c in df_resumen_global.columns if c not in ["Tipo de Obra", "Contrato", "Total", "Avance (%)"]]
         
-        fig, ax = plt.subplots(figsize=(8, 2.8)) # Reducido ligeramente en altura
+        fig, ax = plt.subplots(figsize=(8, 2.8)) 
         x = np.arange(len(df_resumen_global["Contrato"]))
         ancho_barra = 0.8 / len(columnas_roles)
         colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
@@ -609,14 +642,9 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
         img_data_global.seek(0)
         bloque_global.append(RLImage(img_data_global, width=450, height=155)) 
 
-    # Forzar en la página 1
     elements.append(KeepTogether(bloque_global))
 
-    # ===================================================
-    # PÁGINAS SIGUIENTES: RESUMEN DE CARPETAS POR CONTRATO
-    # ===================================================
     if resumenes_por_contrato:
-        
         nota_enlace = Paragraph(
             '<i>Nota: Para mayor detalle de la documentación, revisar el dashboard en la web: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" color="blue">https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/</a></i>', 
             link_style
@@ -629,13 +657,11 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             elements.append(PageBreak())
             bloque_contrato = []
             
-            # Nota y Título en cada hoja
             bloque_contrato.append(nota_enlace)
             bloque_contrato.append(Spacer(1, 15))
             bloque_contrato.append(Paragraph(f"<b>Resumen General por Carpeta - Contrato: {contrato_nombre}</b>", styles["Heading3"]))
             bloque_contrato.append(Spacer(1, 10))
             
-            # Tabla del Contrato
             encabezados_c = [Paragraph(str(col), header_style) for col in df_res_contrato.columns]
             data_matrix_c = [encabezados_c]
             for _, row in df_res_contrato.iterrows():
@@ -659,7 +685,6 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             bloque_contrato.append(tabla_c)
             bloque_contrato.append(Spacer(1, 20))
             
-            # Gráfico del Contrato
             columnas_grafico_c = ["Cerrados"] + [c for c in df_res_contrato.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
             fig, ax = plt.subplots(figsize=(8, 3.2)) 
             x = np.arange(len(df_res_contrato["Carpeta"]))
@@ -689,7 +714,6 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     return buffer
 
 def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
-    """Generador original de PDF para la vista Detallada por Contrato"""
     buffer = io.BytesIO()
     
     def agregar_pie_pagina(canvas, doc):
@@ -796,31 +820,6 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
     buffer.seek(0)
     return buffer
 
-def enviar_correo_con_pdf(destinatario, asunto, cuerpo, pdf_bytes, nombre_archivo):
-    try:
-        msg = EmailMessage()
-        msg['Subject'] = asunto
-        msg['From'] = EMAIL_USER
-        msg['To'] = destinatario
-        msg.set_content(cuerpo)
-        
-        msg.add_attachment(
-            pdf_bytes.getvalue(),
-            maintype='application',
-            subtype='pdf',
-            filename=nombre_archivo
-        )
-        
-        with smtplib.SMTP('smtp.office365.com', 587) as smtp:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.ehlo()
-            smtp.login(EMAIL_USER, EMAIL_PASS)
-            smtp.send_message(msg)
-            
-        return True, "¡Correo enviado exitosamente!"
-    except Exception as e:
-        return False, f"Error al enviar correo: {str(e)}"
 
 # ====================================================================
 # --- 4. LÓGICA DE API AUTODESK Y PRE-CARGA GLOBAL ---
@@ -1370,19 +1369,37 @@ if vista_modo == "Consolidado de Subproyecto":
                     )
                     nombre_pdf_sub = f"Consolidado_Subproyecto_{subproyecto_activo.replace(' ', '_')}.pdf"
                     
-                    cuerpo_correo_sub = (
-                        f"Estimado equipo,\n\n"
+                    cuerpo_texto_sub = (
+                        f"Estimados:\n\n"
                         f"Adjunto encontrará el reporte consolidado global actualizado al {metadata_export['fecha']} "
                         f"correspondiente al subproyecto: {subproyecto_activo}.\n\n"
                         f"Este documento incluye el estado y avance de todos los contratos, así como la estructura detallada de las carpetas de cada uno de ellos.\n\n"
-                        f"Para mayor detalle de los documentos, acceda a nuestro dashboard: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
+                        f"Para mayor detalle de los documentos, acceda a nuestro dashboard interactivo: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
                         f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                     )
+                    
+                    cuerpo_html_sub = f"""
+                    <html>
+                    <body style="font-family: Arial, sans-serif; color: #333;">
+                        <p>Estimados:</p>
+                        <p>Adjunto encontrará el reporte consolidado global actualizado al <b>{metadata_export['fecha']}</b> correspondiente al subproyecto: <b>{subproyecto_activo}</b>.</p>
+                        <p>A continuación, se muestra el resumen general por contrato:</p>
+                        {generar_tabla_html(df_consolidado_sub)}
+                        <p>El documento adjunto (PDF) incluye el estado y avance de todos los contratos, así como la estructura detallada de las carpetas de cada uno de ellos.</p>
+                        <p>Para mayor detalle, acceda a nuestro dashboard interactivo: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a></p>
+                        <br>
+                        <p>Atentamente,<br>
+                        <b>Roberto Cano</b><br>
+                        Control Documentario - Shougang Hierro Perú</p>
+                    </body>
+                    </html>
+                    """
                     
                     exito, mensaje = enviar_correo_con_pdf(
                         destinatario=correo_destino_sub,
                         asunto=f"Reporte Consolidado - {subproyecto_activo} (Shougang)",
-                        cuerpo=cuerpo_correo_sub,
+                        cuerpo_texto=cuerpo_texto_sub,
+                        cuerpo_html=cuerpo_html_sub,
                         pdf_bytes=pdf_buffer_sub,
                         nombre_archivo=nombre_pdf_sub
                     )
@@ -1521,13 +1538,11 @@ else:
                     st.error("Por favor, ingresa al menos un correo electrónico válido.")
                 else:
                     with st.spinner("Generando reporte con detalle y enviando correo..."):
-                        pdf_buffer = generar_pdf_consolidado(
-                            contrato_activo, metadata_export, df_resumen, datos_pestanas, url_logo_personal, col_pendiente
-                        )
+                        pdf_buffer = exportar_df_a_pdf(df_resumen, f"Reporte de Contrato", metadata_export, url_logo_personal, col_pendiente) # Envia el resumen como PDF
                         nombre_pdf = f"Reporte_Contrato_{contrato_activo.replace(' ', '_')}.pdf"
                         
-                        cuerpo_correo = (
-                            f"Estimado equipo,\n\n"
+                        cuerpo_texto = (
+                            f"Estimados:\n\n"
                             f"Adjunto encontrará el reporte documentario detallado actualizado al {metadata_export['fecha']} "
                             f"para el contrato: {contrato_activo}.\n\n"
                             f"Resumen de estado:\n"
@@ -1538,10 +1553,33 @@ else:
                             f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                         )
                         
+                        cuerpo_html = f"""
+                        <html>
+                        <body style="font-family: Arial, sans-serif; color: #333;">
+                            <p>Estimados:</p>
+                            <p>Adjunto encontrará el reporte documentario detallado actualizado al <b>{metadata_export['fecha']}</b> para el contrato: <b>{contrato_activo}</b>.</p>
+                            <p>A continuación, se muestra el resumen general por carpeta:</p>
+                            {generar_tabla_html(df_resumen)}
+                            <p><b>Resumen de estado global:</b></p>
+                            <ul>
+                                <li>Total de documentos: {total_cerrados + total_abiertos}</li>
+                                <li>Documentos cerrados: {total_cerrados}</li>
+                                <li>Documentos pendientes: {total_abiertos}</li>
+                            </ul>
+                            <p>Para revisar en mayor detalle, acceda a nuestro dashboard interactivo: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a></p>
+                            <br>
+                            <p>Atentamente,<br>
+                            <b>Roberto Cano</b><br>
+                            Control Documentario - Shougang Hierro Perú</p>
+                        </body>
+                        </html>
+                        """
+                        
                         exito, mensaje = enviar_correo_con_pdf(
                             destinatario=correo_destino,
                             asunto=f"Reporte de Contrato - {contrato_activo} (Shougang)",
-                            cuerpo=cuerpo_correo,
+                            cuerpo_texto=cuerpo_texto,
+                            cuerpo_html=cuerpo_html,
                             pdf_bytes=pdf_buffer,
                             nombre_archivo=nombre_pdf
                         )
