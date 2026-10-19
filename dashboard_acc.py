@@ -44,6 +44,25 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_fecha": "6011839",
                 "id_campo_pendiente": "6011840"
             },
+            "Ingenieria de detalle": {
+                "10002116": {
+                    "nombre_proyecto": "994440 Ingenieria de Detalle - 10002116 - NETC",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "Javier Brañez",
+                    "coordinador_shp": "Jesus Cornejo",
+                    "administrador_contratos": "Edison Chocce",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P6ERQDdUQ9yDm6BWGwpyZw&viewModel=detail&moduleId=folders",
+                        
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Documentos", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.2uZs4tFoT025Uktc38rzdg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "Planos", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZPFHsRxcR-m5wCEbmqmsLQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.09v5GIhoSZiUPGRJhK7eJQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                        
+                    ]
+                },
+             }, 
             "Movimiento de Tierras": {
                 "MT - CGI-SHP-023-2025": {
                     "nombre_proyecto": "994440 Movimiento de Tierras - C523 - SGMC",
