@@ -52,7 +52,14 @@ ESTRUCTURA_MAESTRA = {
                     "coordinador_shp": "Jesus Cornejo",
                     "administrador_contratos": "Edison Chocce",
                     "urls_excluidas": [
+                        # 03 Sustento Estructural
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P6ERQDdUQ9yDm6BWGwpyZw&viewModel=detail&moduleId=folders",
+                        # OB
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.uqQZrtVbSSGiYEXjWmQGyQ&viewModel=detail&moduleId=folders",
+                        # RCD
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9j3mWJsQTKOewx9UmgEWwA&viewModel=detail&moduleId=folders",
+                        # DG
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NreYzLusR2OWbKVy_jeVOw&viewModel=detail&moduleId=folders",
                         
                     ],
                     "carpetas_config": [
