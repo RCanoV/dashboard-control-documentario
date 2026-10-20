@@ -70,6 +70,34 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 },
              }, 
+
+         "Procura": {
+                "Almacenes - CGI-SHP-036-2025": {
+                    "nombre_proyecto": "994440 Almacenes - C536 - AGNAV",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "",
+                    "coordinador_shp": "Jorcy Aliaga",
+                    "administrador_contratos": "Roger Inga",
+                    "urls_excluidas": [
+                        # Reporte diario
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QZdZPMk-SsaVXq7NY59Izw&viewModel=detail&moduleId=folders",
+                        # Reporte Semanal
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jMQvRbehR96-nwRmxqdevQ&viewModel=detail&moduleId=folders",
+                       
+                        
+                    ],
+                   "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oWWntn6KRbuvoBAfWP8v5g&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.tyQuw6S4RUuHVDyE-xRtyQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.GrNZxGb_TqGiGQswIRLiKA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1Oe1cJhUQbWoA9UUBq7asg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.xUwIJDFKQ3ewMQovEEFHwg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                        
+                    ]
+                },
+             }, 
+
+            
             "Movimiento de Tierras": {
                 "MT - CGI-SHP-023-2025": {
                     "nombre_proyecto": "994440 Movimiento de Tierras - C523 - SGMC",
