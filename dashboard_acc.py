@@ -321,7 +321,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.5zGmicrWQv6DSKhv-QGlQA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cx_ccOZRRCGHb3J8EfSl2Q&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.RPXN3sO1QDmvJS-5hn_kBg&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
-                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.MtSekBToRhGs0xIKfvL9rg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.MtSekBToRhGs0xIKfvL9rg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Y31XHPY2Sy265fvyKhPt_g&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
