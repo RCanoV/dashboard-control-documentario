@@ -335,7 +335,7 @@ ESTRUCTURA_MAESTRA = {
                 }
             },
 
-"Miscelaneos": {
+        "Miscelaneos": {
                 "Miscelaneos - CGI-SHP-018-2026": {
                     "nombre_proyecto": "994440 Miscelaneos - C618 - CVC",
                     "tipo_contrato": "Contrato Directo",
@@ -356,6 +356,27 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yyxKEKG3TGWscWS3MNsGkA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
+            "Miscelaneos - CGI-SHP-026-2026": {
+                    "nombre_proyecto": "994440 Miscelaneos - C626 - TECGU",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "Wilbert Salas",
+                    "coordinador_shp": "Wilbert Salas",
+                    "administrador_contratos": "Ivan Lima",
+                    "urls_excluidas": [
+                        # Reporte Diario
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco._swNh6iESsy6Kp8bCJ7TPA&viewModel=detail&moduleId=folders",
+                        # Reporte Semanal
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SolQ4vcKQfWlsnXhZQH8xg&viewModel=detail&moduleId=folders",
+                        ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wFRHaVIPTYiuRemMpY66MQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.PMa7I9K6Reqctf1IXnLm1A&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.rYpVeh1jTOOHi7CgCENCog&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.FNCcWBXSSBaSobD-y5EV7w&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.JSU9n5b-SduwlhrE00qBJg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+
              }
             
             
