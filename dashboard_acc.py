@@ -426,13 +426,13 @@ ESTRUCTURA_MAESTRA = {
         "I25G50 Subestacion Mina 02": {
             "config": {
                 "campos_personalizados": {
-                    "6011837": "REV",
-                    "6011840": "PENDIENTE POR",
-                    "6011839": "FECHA",
-                    "6011838": "ESTADO"
+                    "6805049": "REV",
+                    "6805036": "PENDIENTE POR",
+                    "6805048": "FECHA",
+                    "6805037": "ESTADO"
                 },
-                "id_campo_fecha": "6011839",
-                "id_campo_pendiente": "6011840"
+                "id_campo_fecha": "6805048",
+                "id_campo_pendiente": "6805036"
             }
 
             "Ingenieria": {
