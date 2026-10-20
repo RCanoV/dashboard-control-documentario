@@ -99,7 +99,7 @@ ESTRUCTURA_MAESTRA = {
 
             
             "Movimiento de Tierras": {
-                "MT - CGI-SHP-023-2025": {
+                "Mov Tierras - CGI-SHP-023-2025": {
                     "nombre_proyecto": "994440 Movimiento de Tierras - C523 - SGMC",
                     "tipo_contrato": "Con Supervisión",
                     "nombre_supervisor": "Luis Rojas",
