@@ -433,7 +433,7 @@ ESTRUCTURA_MAESTRA = {
                 },
                 "id_campo_fecha": "6805048",
                 "id_campo_pendiente": "6805036"
-            }
+            },
 
             "Ingenieria": {
                 "Ing. Detalle CGI-SHP-016-2026": {
