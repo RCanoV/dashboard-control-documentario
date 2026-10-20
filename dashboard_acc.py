@@ -420,6 +420,8 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_fecha": "6011839",
                 "id_campo_pendiente": "6011840"
             }
+
+            
         },
         "I25G50 Subestacion Mina 02": {
             "config": {
@@ -432,6 +434,32 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_fecha": "6011839",
                 "id_campo_pendiente": "6011840"
             }
+
+            "Ingenieria": {
+                "Ing. Detalle CGI-SHP-016-2026": {
+                    "nombre_proyecto": "I25G50 Ingenieria de Detalle - C616 - CESEL",
+                    "tipo_contrato": "Tripartito",
+                    "nombre_supervisor": "",
+                    "coordinador_shp": "M. Yaranga / W. Benites",
+                    "administrador_contratos": "Marco Escobedo",
+                    "urls_excluidas": [
+                        # RS INGENIERIA
+                        "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.kdWoi4hPRVW1MROh01b5dg&viewModel=detail&moduleId=folders",
+                        # RS PROCURA
+                        "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Z6yRZ6zMTyyDSNy6UTk1hg&viewModel=detail&moduleId=folders",
+                       
+                        
+                    ],
+                    "carpetas_config": [
+                        {"nombre": "Ingenieria", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.LCO0kFATToqAkxt0AcK1BQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.6h13bnP8Qx6upoXYPgmA5g&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Procura", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hWIkzFIbTQyvdevWWgu_jA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.pVHQHFJuS62xO1Iv8haaMQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.i94W9j7mS4e57y4YYrmrAg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        
+                    ]
+                },
+             }, 
         }
     },
     "Proyectos Menores": {
