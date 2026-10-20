@@ -333,7 +333,32 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 }
-            }
+            },
+
+"Miscelaneos": {
+                "Miscelaneos - CGI-SHP-018-2026": {
+                    "nombre_proyecto": "994440 Miscelaneos - C618 - CVC",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "Wilbert Salas",
+                    "coordinador_shp": "Wilbert Salas",
+                    "administrador_contratos": "Ivan Lima",
+                    "urls_excluidas": [
+                        # Reporte Diario
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                        # Reporte Semanal
+                        "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders",
+                        ],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HTWXT1_XSh28xnqRAjYE5A&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J92le3HJRHuoQaAuYM-Rfg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1IBRbw97TDqVebH2M2FMLA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8FMvuHB7TlO90XEsZn1S1g&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
+                        {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yyxKEKG3TGWscWS3MNsGkA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                    ]
+                },
+             }
+            
+            
         },
         "998316 Nuevo Muelle San Nicolas": {
             "config": {
