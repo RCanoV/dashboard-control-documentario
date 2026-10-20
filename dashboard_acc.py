@@ -458,7 +458,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.i94W9j7mS4e57y4YYrmrAg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         
                     ]
-                },
+                }
              }, 
         }
     },
