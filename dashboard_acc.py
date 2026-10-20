@@ -45,7 +45,7 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_pendiente": "6011840"
             },
             "Ingenieria de detalle": {
-                "10002116": {
+                "Ing. Detalle 10002116": {
                     "nombre_proyecto": "994440 Ingenieria de Detalle - 10002116 - NETC",
                     "tipo_contrato": "Contrato Directo",
                     "nombre_supervisor": "Javier Brañez",
