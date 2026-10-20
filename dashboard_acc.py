@@ -477,7 +477,9 @@ ESTRUCTURA_MAESTRA = {
             "General": {
                 "C619 CGI-SHP-019-2026": {
                     "nombre_proyecto": "I26R20 Reparacion de Tanque C402-026 - C619 - CHEC",
-                    "tipo_contrato": "Contrato Directo",
+                    "tipo_contrato": "Tripartito",
+                    "nombre_empresa_1": "CESEL",  # Reemplaza con la primera empresa
+                    "nombre_empresa_2": "BSIET",  # Reemplaza con la segunda empresa
                     "nombre_supervisor": "N/A",
                     "coordinador_shp": "Juan Purilla / Erick Mayta",
                     "administrador_contratos": "Hugo Cardenas",
