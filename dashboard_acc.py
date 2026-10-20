@@ -65,7 +65,7 @@ ESTRUCTURA_MAESTRA = {
                     "carpetas_config": [
                         {"nombre": "Documentos", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.2uZs4tFoT025Uktc38rzdg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "Planos", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZPFHsRxcR-m5wCEbmqmsLQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.09v5GIhoSZiUPGRJhK7eJQ&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
+                        
                         
                     ]
                 },
