@@ -13,6 +13,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import smtplib
 from email.message import EmailMessage
+from modulo_formulario_reportes import mostrar_formulario_reportes
 
 # Librerías para exportación a PDF (ReportLab)
 from reportlab.lib.pagesizes import letter, landscape
@@ -60,18 +61,14 @@ ESTRUCTURA_MAESTRA = {
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9j3mWJsQTKOewx9UmgEWwA&viewModel=detail&moduleId=folders",
                         # DG
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NreYzLusR2OWbKVy_jeVOw&viewModel=detail&moduleId=folders",
-                        
                     ],
                     "carpetas_config": [
                         {"nombre": "Documentos", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.2uZs4tFoT025Uktc38rzdg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "Planos", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZPFHsRxcR-m5wCEbmqmsLQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
-                        
-                        
                     ]
                 },
-             }, 
-
-         "Procura": {
+            },
+            "Procura": {
                 "Almacenes - CGI-SHP-036-2025": {
                     "nombre_proyecto": "994440 Almacenes - C536 - AGNAV",
                     "tipo_contrato": "Contrato Directo",
@@ -83,21 +80,16 @@ ESTRUCTURA_MAESTRA = {
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QZdZPMk-SsaVXq7NY59Izw&viewModel=detail&moduleId=folders",
                         # Reporte Semanal
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jMQvRbehR96-nwRmxqdevQ&viewModel=detail&moduleId=folders",
-                       
-                        
                     ],
-                   "carpetas_config": [
+                    "carpetas_config": [
                         {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.oWWntn6KRbuvoBAfWP8v5g&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.tyQuw6S4RUuHVDyE-xRtyQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
                         {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.GrNZxGb_TqGiGQswIRLiKA&viewModel=detail&moduleId=folders", "longitud_maxima": 6},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1Oe1cJhUQbWoA9UUBq7asg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.xUwIJDFKQ3ewMQovEEFHwg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
-                        
                     ]
                 },
-             }, 
-
-            
+            },
             "Movimiento de Tierras": {
                 "Mov Tierras - CGI-SHP-023-2025": {
                     "nombre_proyecto": "994440 Movimiento de Tierras - C523 - SGMC",
@@ -118,7 +110,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "AS BUILT", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Rc9TxyDhQn-TWNhfmSrbXA&viewModel=detail&moduleId=folders", "longitud_maxima": 30}
                     ]
                 },
-             },   
+            },
             "Obras Civiles": {
                 "Paquete 01 - CGI-SHP-019-2025": {
                     "nombre_proyecto": "994440 Paquete CIVIL 01 - C519 - SGMC",
@@ -362,8 +354,7 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 }
             },
-
-        "Miscelaneos": {
+            "Miscelaneos": {
                 "Miscelaneos - CGI-SHP-018-2026": {
                     "nombre_proyecto": "994440 Miscelaneos - C618 - CVC",
                     "tipo_contrato": "Contrato Directo",
@@ -375,7 +366,7 @@ ESTRUCTURA_MAESTRA = {
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
                         # Reporte Semanal
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders",
-                        ],
+                    ],
                     "carpetas_config": [
                         {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HTWXT1_XSh28xnqRAjYE5A&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J92le3HJRHuoQaAuYM-Rfg&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
@@ -384,7 +375,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yyxKEKG3TGWscWS3MNsGkA&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-            "Miscelaneos - CGI-SHP-026-2026": {
+                "Miscelaneos - CGI-SHP-026-2026": {
                     "nombre_proyecto": "994440 Miscelaneos - C626 - TECGU",
                     "tipo_contrato": "Contrato Directo",
                     "nombre_supervisor": "Wilbert Salas",
@@ -395,7 +386,7 @@ ESTRUCTURA_MAESTRA = {
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco._swNh6iESsy6Kp8bCJ7TPA&viewModel=detail&moduleId=folders",
                         # Reporte Semanal
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SolQ4vcKQfWlsnXhZQH8xg&viewModel=detail&moduleId=folders",
-                        ],
+                    ],
                     "carpetas_config": [
                         {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wFRHaVIPTYiuRemMpY66MQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.PMa7I9K6Reqctf1IXnLm1A&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
@@ -404,10 +395,7 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "RNCs", "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.JSU9n5b-SduwlhrE00qBJg&viewModel=detail&moduleId=folders", "longitud_maxima": 7}
                     ]
                 },
-
-             }
-            
-            
+            }
         },
         "998316 Nuevo Muelle San Nicolas": {
             "config": {
@@ -420,8 +408,6 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_fecha": "6011839",
                 "id_campo_pendiente": "6011840"
             }
-
-            
         },
         "I25G50 Subestacion Mina 02": {
             "config": {
@@ -434,13 +420,10 @@ ESTRUCTURA_MAESTRA = {
                 "id_campo_fecha": "6805048",
                 "id_campo_pendiente": "6805036"
             },
-
             "Ingenieria": {
                 "Ing. Detalle CGI-SHP-016-2026": {
                     "nombre_proyecto": "I25G50 Ingenieria de Detalle - C616 - CESEL",
                     "tipo_contrato": "Tripartito",
-                    "nombre_empresa_1": "CESEL",  # Reemplaza con la primera empresa
-                    "nombre_empresa_2": "BSIET",  # Reemplaza con la segunda empresa
                     "nombre_supervisor": "",
                     "coordinador_shp": "M. Yaranga / W. Benites",
                     "administrador_contratos": "Marco Escobedo",
@@ -449,8 +432,6 @@ ESTRUCTURA_MAESTRA = {
                         "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.kdWoi4hPRVW1MROh01b5dg&viewModel=detail&moduleId=folders",
                         # RS PROCURA
                         "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Z6yRZ6zMTyyDSNy6UTk1hg&viewModel=detail&moduleId=folders",
-                       
-                        
                     ],
                     "carpetas_config": [
                         {"nombre": "Ingenieria", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.LCO0kFATToqAkxt0AcK1BQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
@@ -458,10 +439,9 @@ ESTRUCTURA_MAESTRA = {
                         {"nombre": "Procura", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.hWIkzFIbTQyvdevWWgu_jA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
                         {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.pVHQHFJuS62xO1Iv8haaMQ&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
                         {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.i94W9j7mS4e57y4YYrmrAg&viewModel=detail&moduleId=folders", "longitud_maxima": 7},
-                        
                     ]
                 }
-             }, 
+            },
         }
     },
     "Proyectos Menores": {
@@ -558,13 +538,13 @@ except:
 def obtener_colores_estado(estado):
     estado = str(estado).strip().upper()
     if estado == "CERRADO":
-        return "#d4edda", "#155724" 
+        return "#d4edda", "#155724"
     elif "CONTRATISTA" in estado or "EMPRESA" in estado:
-        return "#fff3cd", "#856404" 
+        return "#fff3cd", "#856404"
     elif estado == "SUPERVISION":
-        return "#f8d7da", "#721c24" 
+        return "#f8d7da", "#721c24"
     else:
-        return "#cce5ff", "#004085" 
+        return "#cce5ff", "#004085"
 
 def generar_tabla_html(df):
     """Genera una tabla HTML con estilos en línea a partir de un DataFrame de Pandas"""
@@ -581,30 +561,29 @@ def enviar_correo_con_pdf(destinatario, asunto, cuerpo_texto, cuerpo_html, pdf_b
         msg['Subject'] = asunto
         msg['From'] = EMAIL_USER
         msg['To'] = destinatario
-        
+
         # Primero texto plano (fallback) y luego HTML
         msg.set_content(cuerpo_texto)
         msg.add_alternative(cuerpo_html, subtype='html')
-        
+
         msg.add_attachment(
             pdf_bytes.getvalue(),
             maintype='application',
             subtype='pdf',
             filename=nombre_archivo
         )
-        
+
         with smtplib.SMTP('smtp.office365.com', 587) as smtp:
             smtp.ehlo()
             smtp.starttls()
             smtp.ehlo()
             smtp.login(EMAIL_USER, EMAIL_PASS)
             smtp.send_message(msg)
-            
+
         return True, "¡Correo enviado exitosamente!"
     except Exception as e:
         return False, f"Error al enviar correo: {str(e)}"
 
-# Funciones PDF y EXCEL originales sin modificar
 def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
     buffer = io.BytesIO()
     wb = openpyxl.Workbook()
@@ -619,14 +598,14 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
 
     ws['A1'] = titulo
     ws['A1'].font = Font(size=14, bold=True)
-    
+
     ws['A3'] = "Fecha de Exportación:"
     ws['B3'] = metadatos['fecha']
     ws['A4'] = "Alcance:"
     ws['B4'] = metadatos['alcance']
     ws['A5'] = "Subproyecto:"
     ws['B5'] = metadatos['subproyecto']
-    
+
     if "tipo_obra" in metadatos:
         ws['A6'] = "Tipo de Obra:"
         ws['B6'] = metadatos['tipo_obra']
@@ -650,7 +629,7 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
 
     for r_idx, row_data in enumerate(df.values, fila_inicio + 1):
         bg_hex, font_hex = "FFFFFF", "000000"
-        
+
         if col_idx_pendiente is not None:
             estado = row_data[col_idx_pendiente]
             bg, text = obtener_colores_estado(estado)
@@ -673,7 +652,7 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
 
 def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_por_contrato):
     buffer = io.BytesIO()
-    
+
     def agregar_pie_pagina(canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
@@ -685,10 +664,10 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
         buffer, pagesize=landscape(letter),
         leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
     )
-    ancho_util = 742 
+    ancho_util = 742
     elements = []
     styles = getSampleStyleSheet()
-    
+
     titulo_style = styles["Heading2"]
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
@@ -696,37 +675,37 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     link_style = ParagraphStyle(name="Link", parent=styles["Normal"], fontSize=8, textColor=colors.blue)
 
     bloque_global = []
-    
+
     if os.path.exists(ruta_logo):
         logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
     else:
         logo = Paragraph("")
-        
+
     meta_text = (f"<b><font size=12>Reporte Consolidado del Subproyecto</font></b><br/><br/>"
                  f"<b>Fecha de Emisión:</b> {metadatos['fecha']}<br/>"
                  f"<b>Alcance:</b> {metadatos['alcance']}<br/>"
                  f"<b>Subproyecto:</b> {metadatos['subproyecto']}")
-                 
+
     tabla_cabecera = Table([[logo, Paragraph(meta_text, styles["Normal"])]], colWidths=[120, 600])
     tabla_cabecera.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('ALIGN', (0, 0), (0, 0), 'LEFT'),
         ('ALIGN', (1, 0), (1, 0), 'LEFT'),
     ]))
-    
+
     bloque_global.append(tabla_cabecera)
     bloque_global.append(Spacer(1, 15))
 
     bloque_global.append(Paragraph("<b>1. Resumen General por Contrato</b>", styles["Heading3"]))
     bloque_global.append(Spacer(1, 5))
-    
+
     if not df_resumen_global.empty:
         encabezados_g = [Paragraph(str(col), header_style) for col in df_resumen_global.columns]
         data_matrix_g = [encabezados_g]
         for _, row in df_resumen_global.iterrows():
             fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
             data_matrix_g.append(fila)
-        
+
         anchos_resumen_g = []
         for col in df_resumen_global.columns:
             if col == "Tipo de Obra": anchos_resumen_g.append(0.15 * ancho_util)
@@ -744,17 +723,17 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
         ]))
         bloque_global.append(tabla_resumen_g)
-    
+
     bloque_global.append(Spacer(1, 15))
 
     if not df_resumen_global.empty and "Contrato" in df_resumen_global.columns:
         columnas_roles = [c for c in df_resumen_global.columns if c not in ["Tipo de Obra", "Contrato", "Total", "Avance (%)"]]
-        
-        fig, ax = plt.subplots(figsize=(8, 2.8)) 
+
+        fig, ax = plt.subplots(figsize=(8, 2.8))
         x = np.arange(len(df_resumen_global["Contrato"]))
         ancho_barra = 0.8 / len(columnas_roles)
         colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
-        
+
         for i, col in enumerate(columnas_roles):
             desplazamiento = x + (i - len(columnas_roles)/2 + 0.5) * ancho_barra
             ax.bar(desplazamiento, df_resumen_global[col], ancho_barra, label=col, color=colores[i % len(colores)])
@@ -765,45 +744,45 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
         ax.set_xticklabels(etiquetas, rotation=15, ha='right', fontsize=8)
         ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
         plt.tight_layout()
-        
+
         img_data_global = io.BytesIO()
         plt.savefig(img_data_global, format='png', dpi=200, bbox_inches='tight')
         plt.close()
         img_data_global.seek(0)
-        bloque_global.append(RLImage(img_data_global, width=450, height=155)) 
+        bloque_global.append(RLImage(img_data_global, width=450, height=155))
 
     elements.append(KeepTogether(bloque_global))
 
     if resumenes_por_contrato:
         nota_enlace = Paragraph(
-            '<i>Nota: Para mayor detalle de la documentación, revisar el dashboard en la web: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" color="blue">https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/</a></i>', 
+            '<i>Nota: Para mayor detalle de la documentación, revisar el dashboard en la web: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" color="blue">https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/</a></i>',
             link_style
         )
-        
+
         for contrato_nombre, df_res_contrato in resumenes_por_contrato.items():
             if df_res_contrato.empty:
                 continue
-                
+
             elements.append(PageBreak())
             bloque_contrato = []
-            
+
             bloque_contrato.append(nota_enlace)
             bloque_contrato.append(Spacer(1, 15))
             bloque_contrato.append(Paragraph(f"<b>Resumen General por Carpeta - Contrato: {contrato_nombre}</b>", styles["Heading3"]))
             bloque_contrato.append(Spacer(1, 10))
-            
+
             encabezados_c = [Paragraph(str(col), header_style) for col in df_res_contrato.columns]
             data_matrix_c = [encabezados_c]
             for _, row in df_res_contrato.iterrows():
                 fila = [Paragraph("" if pd.isna(val) else str(val), cell_style) for val in row]
                 data_matrix_c.append(fila)
-                
+
             anchos_c = []
             for col in df_res_contrato.columns:
                 if col == "Carpeta": anchos_c.append(0.15 * ancho_util)
                 elif col == "Mayor Retraso": anchos_c.append(0.35 * ancho_util)
                 else: anchos_c.append((0.50 * ancho_util) / (len(df_res_contrato.columns) - 2))
-                
+
             tabla_c = Table(data_matrix_c, repeatRows=1, colWidths=anchos_c)
             tabla_c.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2B6CB0")),
@@ -814,13 +793,13 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             ]))
             bloque_contrato.append(tabla_c)
             bloque_contrato.append(Spacer(1, 20))
-            
+
             columnas_grafico_c = ["Cerrados"] + [c for c in df_res_contrato.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
-            fig, ax = plt.subplots(figsize=(8, 3.2)) 
+            fig, ax = plt.subplots(figsize=(8, 3.2))
             x = np.arange(len(df_res_contrato["Carpeta"]))
             ancho_barra = 0.8 / len(columnas_grafico_c)
             colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
-            
+
             for i, col in enumerate(columnas_grafico_c):
                 desplazamiento = x + (i - len(columnas_grafico_c)/2 + 0.5) * ancho_barra
                 ax.bar(desplazamiento, df_res_contrato[col], ancho_barra, label=col, color=colores[i % len(colores)])
@@ -830,13 +809,13 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             ax.set_xticklabels(df_res_contrato["Carpeta"], rotation=15, ha='right', fontsize=8)
             ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
             plt.tight_layout()
-            
+
             img_data_c = io.BytesIO()
             plt.savefig(img_data_c, format='png', dpi=200, bbox_inches='tight')
             plt.close()
             img_data_c.seek(0)
-            bloque_contrato.append(RLImage(img_data_c, width=450, height=170)) 
-            
+            bloque_contrato.append(RLImage(img_data_c, width=450, height=170))
+
             elements.append(KeepTogether(bloque_contrato))
 
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
@@ -845,7 +824,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
 
 def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo: str, col_pendiente: str = None) -> io.BytesIO:
     buffer = io.BytesIO()
-    
+
     def agregar_pie_pagina(canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
@@ -857,10 +836,10 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         buffer, pagesize=landscape(letter),
         leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
     )
-    ancho_util = 742 
+    ancho_util = 742
     elements = []
     styles = getSampleStyleSheet()
-    
+
     meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
     header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
@@ -869,12 +848,12 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
     else:
         logo = Paragraph("")
-        
+
     meta_text = (f"<b><font size=12>{titulo}</font></b><br/><br/>"
                  f"<b>Fecha de Emisión:</b> {metadatos['fecha']}<br/>"
                  f"<b>Alcance:</b> {metadatos['alcance']}<br/>"
                  f"<b>Subproyecto:</b> {metadatos['subproyecto']}")
-                 
+
     if "tipo_obra" in metadatos:
         meta_text += f"<br/><b>Tipo de Obra:</b> {metadatos['tipo_obra']}"
     if "contrato" in metadatos:
@@ -886,7 +865,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         ('ALIGN', (0, 0), (0, 0), 'LEFT'),
         ('ALIGN', (1, 0), (1, 0), 'LEFT'),
     ]))
-    
+
     elements.append(tabla_cabecera)
     elements.append(Spacer(1, 15))
 
@@ -905,7 +884,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
     for row_idx, (_, row) in enumerate(df.iterrows(), start=1):
         fila = []
         bg_color = "#ffffff"
-        
+
         if col_pendiente and col_pendiente in df.columns:
             bg_color, text_color = obtener_colores_estado(row[col_pendiente])
         else:
@@ -938,7 +917,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
         elif col_u == "PENDIENTE POR": anchos_columnas.append(0.15 * ancho_util)
         else: anchos_columnas.append(0.10 * ancho_util)
-        
+
     factor_norm = ancho_util / sum(anchos_columnas)
     anchos_columnas = [w * factor_norm for w in anchos_columnas]
 
@@ -1010,9 +989,9 @@ def obtener_tip_version_metadata(token, project_id, item_id):
     clean_item_id = item_id.split("?version=")[0]
     url = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/items/{clean_item_id}/tip"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json", "x-ads-region": "US"}
-    
+
     while True:
-        headers["x-ads-region"] = "US" 
+        headers["x-ads-region"] = "US"
         response = requests.get(url, headers=headers)
         if response.status_code == 429:
             time.sleep(2)
@@ -1034,14 +1013,14 @@ def obtener_tip_version_metadata(token, project_id, item_id):
 def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_personalizados):
     item_id = item.get("id", "")
     token_val = headers["Authorization"].split(" ")[1]
-    
+
     registro_plano = {
         "NOMBRE_DEL_ARCHIVO": name,
         "RUTA_EN_AUTODESK": ruta_actual,
         "ITEM_ID": item_id
     }
     deconstruir_diccionario(item, "ITEM", registro_plano)
-    
+
     tip_version = obtener_tip_version_metadata(token=token_val, project_id=project_id, item_id=item_id)
     if tip_version:
         deconstruir_diccionario(tip_version, "VERSION", registro_plano)
@@ -1050,7 +1029,7 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
     if vid:
         vid_encoded = urllib.parse.quote(vid, safe='')
         url_attr = f"https://developer.api.autodesk.com/bim360/docs/v1/projects/{project_id.replace('b.', '')}/versions/{vid_encoded}/custom-attributes"
-        
+
         while True:
             res_attr = requests.get(url_attr, headers={"Authorization": headers["Authorization"], "Content-Type": "application/json"})
             if res_attr.status_code == 429:
@@ -1062,14 +1041,14 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
                     headers["Authorization"] = f"Bearer {nuevo_token_attr}"
                     continue
             break
-            
+
         if res_attr.status_code == 200:
             campos_objetivo = list(campos_personalizados.keys())
             for attr in res_attr.json():
                 attr_id = str(attr.get("id"))
                 if attr_id in campos_objetivo:
                     registro_plano[f"CAMPO_CUSTOM_{attr_id}"] = str(attr.get("value", "")).strip()
-                    
+
     return registro_plano
 
 def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
@@ -1080,7 +1059,7 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
     while url_api:
         headers["x-ads-region"] = "US"
         res = requests.get(url_api, headers=headers)
-        
+
         if res.status_code == 401:
             nuevo_token = obtener_token()
             if nuevo_token:
@@ -1096,10 +1075,10 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
             res = requests.get(url_api, headers=headers)
             if res.status_code != 200:
                 break
-        
+
         data = res.json()
         items_pdf = []
-        
+
         for item in data.get("data", []):
             tipo = item.get("type")
             attributes = item.get("attributes", {})
@@ -1112,7 +1091,7 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
                 if len(name) <= longitud_maxima:
                     sub_urn = urllib.parse.quote(item["id"], safe='')
                     escanear_recursivo(project_id, sub_urn, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, f"{ruta_actual} > {name}")
-            
+
             elif tipo == "items":
                 if ".pdf" in name.lower():
                     items_pdf.append((item, name))
@@ -1133,12 +1112,12 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     token = obtener_token()
     if not token:
         return {}
-    
+
     headers = {"Authorization": f"Bearer {token}", "x-ads-region": "US"}
     urls_excluidas_raw = info_contrato.get("urls_excluidas", [])
     ids_excluidos = obtener_ids_excluidos(urls_excluidas_raw)
     carpetas_config = info_contrato.get("carpetas_config", [])
-    
+
     dataframes_por_pestana = {}
     col_pendiente = campos_personalizados.get(id_campo_pendiente)
     orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS"]
@@ -1147,29 +1126,29 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
         url_carpeta = config_carpeta.get("url")
         nombre_pestana = config_carpeta.get("nombre", "Sin_Nombre")
         longitud_maxima = config_carpeta.get("longitud_maxima", 10)
-        
+
         if not url_carpeta:
             continue
-            
+
         try:
             project_id_raw = url_carpeta.split("projects/")[1].split("?")[0].split("/")[0]
             project_id = project_id_raw if project_id_raw.startswith("b.") else "b." + project_id_raw
-            
+
             if "folderUrn=" in url_carpeta:
                 folder_id = url_carpeta.split("folderUrn=")[1].split("&")[0].replace("%3A", ":")
             elif "folders/" in url_carpeta:
                 folder_id = url_carpeta.split("folders/")[1].split("/")[0].replace("%3A", ":")
             else:
                 continue
-            
+
             datos_filtrados = []
             escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos, campos_personalizados)
-            
+
             if not datos_filtrados:
                 continue
-                
+
             df_completo = pd.DataFrame(datos_filtrados)
-            
+
             for campo_id in campos_personalizados.keys():
                 col_name = f"CAMPO_CUSTOM_{campo_id}"
                 if col_name not in df_completo.columns:
@@ -1178,7 +1157,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
             fechas_convertidas = pd.to_datetime(df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"], errors='coerce')
             if fechas_convertidas.dt.tz is not None:
                 fechas_convertidas = fechas_convertidas.dt.tz_localize(None)
-            
+
             fecha_hoy = pd.Timestamp.now().normalize()
             df_completo["DIAS"] = (fecha_hoy - fechas_convertidas).dt.days
             df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
@@ -1186,21 +1165,21 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
 
             columnas_finales = ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()] + ["DIAS"]
             df = df_completo[columnas_finales].copy()
-            
+
             diccionario_renombres = {
-                "NOMBRE_DEL_ARCHIVO": COL_CODIGO, 
+                "NOMBRE_DEL_ARCHIVO": COL_CODIGO,
                 "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": COL_DESCRIPCION,
             }
             for campo_id, nombre_columna in campos_personalizados.items():
                 diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
-                
+
             df = df.rename(columns=diccionario_renombres)
             columnas_existentes = [col for col in orden_columnas_deseado if col in df.columns]
             df = df[columnas_existentes]
 
             if col_pendiente in df.columns:
                 df.loc[df[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
-            
+
             dataframes_por_pestana[nombre_pestana] = df
 
         except Exception as e:
@@ -1217,21 +1196,47 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
 def precargar_todos_los_contratos(periodo):
     for alcance, sub_dict in ESTRUCTURA_MAESTRA.items():
         for sub_nom, sub_data in sub_dict.items():
-            if sub_nom == "config": 
+            if sub_nom == "config":
                 continue
-            
+
             config_sub = sub_data.get("config", {})
             campos = config_sub.get("campos_personalizados", {})
             id_fec = config_sub.get("id_campo_fecha", "")
             id_pen = config_sub.get("id_campo_pendiente", "")
-            
+
             for tipo_obra, contratos_dict in sub_data.items():
-                if tipo_obra == "config": 
+                if tipo_obra == "config":
                     continue
-                    
+
                 for cont_nom, info_cont in contratos_dict.items():
                     extraer_datos_contrato_completo(cont_nom, info_cont, campos, id_fec, id_pen, periodo)
 
+def construir_catalogo_desde_estructura(estructura):
+    filas = []
+    for alcance, sub_dict in estructura.items():
+        for sub_nom, sub_data in sub_dict.items():
+            if sub_nom == "config" or not isinstance(sub_data, dict):
+                continue
+            for tipo_obra, contratos_dict in sub_data.items():
+                if tipo_obra == "config" or not isinstance(contratos_dict, dict):
+                    continue
+                for cont_nom, info_cont in contratos_dict.items():
+                    for carp in info_cont.get("carpetas_config", []):
+                        url = carp.get("url", "")
+                        if not url or "projects/" not in url:
+                            continue
+                        pid_raw = url.split("projects/")[1].split("?")[0].split("/")[0]
+                        pid = pid_raw if pid_raw.startswith("b.") else "b." + pid_raw
+                        filas.append({
+                            "ALCANCE": alcance,
+                            "SUBPROYECTO": sub_nom,
+                            "TIPO_OBRA": tipo_obra,
+                            "CONTRATO": cont_nom,
+                            "COMPONENTE": carp.get("nombre", "Sin_Nombre"),
+                            "PROJECT_ID": pid,
+                            "URL": url
+                        })
+    return pd.DataFrame(filas)
 
 # ====================================================================
 # --- 5. INTERFAZ WEB STREAMLIT ---
@@ -1247,7 +1252,6 @@ with col_head1:
 
 with col_head2:
     st.image("logoshp.jpeg", width=130)
-
 
 col_espacio1, col_logo, col_espacio2 = st.sidebar.columns([1, 2.5, 1])
 
@@ -1305,10 +1309,13 @@ if not contratos_dict:
 contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
-# --- NUEVO SELECTOR DE MODO DE VISTA ---
+# --- SELECTOR DE MODO DE VISTA ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("👁️ Modo de Visualización")
-vista_modo = st.sidebar.radio("Selecciona qué reporte visualizar:", ["Detalle de Contrato", "Consolidado de Subproyecto"])
+vista_modo = st.sidebar.radio(
+    "Selecciona qué reporte visualizar:",
+    ["Detalle de Contrato", "Consolidado de Subproyecto", "📝 Programar Reportes Diarios"]
+)
 st.sidebar.markdown("---")
 
 st.sidebar.info(
@@ -1357,23 +1364,26 @@ if "preload" in st.query_params and st.query_params["preload"] == "true":
     st.success("¡Data global precargada exitosamente!")
     st.stop()
 
-
 col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
 
-if vista_modo == "Consolidado de Subproyecto":
+if vista_modo == "📝 Programar Reportes Diarios":
+    df_catalogo = construir_catalogo_desde_estructura(ESTRUCTURA_MAESTRA)
+    mostrar_formulario_reportes(df_catalogo)
+
+elif vista_modo == "Consolidado de Subproyecto":
     st.subheader(f"📊 Resumen Consolidado: {subproyecto_activo}")
-    
+
     with st.spinner("Procesando y agrupando todos los contratos del subproyecto..."):
         datos_subproyecto = []
-        resumenes_por_contrato = {} 
-        
+        resumenes_por_contrato = {}
+
         for tipo_obra_nombre, contratos_dict_sub in tipos_obra_dict.items():
             for contrato_nombre, info_contrato_sub in contratos_dict_sub.items():
                 res_cache = extraer_datos_contrato_completo(
                     contrato_nombre, info_contrato_sub, campos_pers_activos, id_fec_activo, id_pen_activo, periodo_actual
                 )
                 datos_pestanas_sub = res_cache.get("datos", {})
-                
+
                 # --- Procesamiento Global para la Tabla Principal ---
                 conteo_roles = {}
                 total_docs = 0
@@ -1385,7 +1395,7 @@ if vista_modo == "Consolidado de Subproyecto":
                             est_clean = str(est).strip().upper()
                             if est_clean and est_clean not in ["NAN", "NAT", "NONE", "NULL", ""]:
                                 conteo_roles[est_clean] = conteo_roles.get(est_clean, 0) + 1
-                
+
                 cerrados_docs = conteo_roles.get("CERRADO", 0)
                 fila_sub = {
                     "Tipo de Obra": tipo_obra_nombre,
@@ -1416,7 +1426,7 @@ if vista_modo == "Consolidado de Subproyecto":
                     fila_res_c = {"Carpeta": nombre_carpeta}
                     cerrados_carp_c = 0
                     abiertos_carp_c = 0
-                    
+
                     if col_pendiente in df_sub.columns:
                         estados_c = df_sub[col_pendiente].astype(str).str.strip().str.upper()
                         cerrados_carp_c = (estados_c == "CERRADO").sum()
@@ -1425,7 +1435,7 @@ if vista_modo == "Consolidado de Subproyecto":
                             cant_rol = (estados_c == rol).sum()
                             fila_res_c[rol.title()] = cant_rol
                             abiertos_carp_c += cant_rol
-                        
+
                         df_abiertos_c = df_sub[estados_c != "CERRADO"].copy()
                         if not df_abiertos_c.empty and 'DIAS' in df_abiertos_c.columns:
                             df_abiertos_c['DIAS_NUM'] = pd.to_numeric(df_abiertos_c['DIAS'], errors='coerce').fillna(0)
@@ -1444,24 +1454,24 @@ if vista_modo == "Consolidado de Subproyecto":
                         for rol in roles_pendientes_sub:
                             fila_res_c[rol.title()] = 0
                         fila_res_c["Mayor Retraso"] = "N/A"
-                            
+
                     fila_res_c["Total"] = cerrados_carp_c + abiertos_carp_c
                     resumen_lista_contrato.append(fila_res_c)
-                
+
                 resumenes_por_contrato[contrato_nombre] = pd.DataFrame(resumen_lista_contrato)
-        
+
         df_consolidado_sub = pd.DataFrame(datos_subproyecto)
         cols_numericas = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Avance (%)"]]
         df_consolidado_sub[cols_numericas] = df_consolidado_sub[cols_numericas].fillna(0).astype(int)
-        
+
         roles_cols = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Cerrados", "Total", "Avance (%)"]]
         orden_cols = ["Tipo de Obra", "Contrato", "Cerrados"] + roles_cols + ["Total", "Avance (%)"]
         df_consolidado_sub = df_consolidado_sub[orden_cols]
-        
+
     col_s1, col_s2 = st.columns([1.3, 1])
     with col_s1:
         st.dataframe(df_consolidado_sub, width='stretch', hide_index=True)
-        
+
         if not df_consolidado_sub.empty:
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
@@ -1470,14 +1480,14 @@ if vista_modo == "Consolidado de Subproyecto":
             with c_btn2:
                 excel_sub = exportar_df_a_excel(df_consolidado_sub, f"Consolidado de Subproyecto", metadata_export, url_logo_personal)
                 st.download_button("📊 Exportar Consolidado (Excel)", data=excel_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    
+
     with col_s2:
         if not df_consolidado_sub.empty:
             columnas_graf = ["Cerrados"] + roles_cols
             fig_sub = px.bar(
-                df_consolidado_sub, 
-                x="Contrato", 
-                y=columnas_graf, 
+                df_consolidado_sub,
+                x="Contrato",
+                y=columnas_graf,
                 title="Estado General por Contrato y Responsable",
                 barmode="stack",
             )
@@ -1488,7 +1498,7 @@ if vista_modo == "Consolidado de Subproyecto":
     with st.expander("📧 Enviar Consolidado de Subproyecto por Correo Electrónico"):
         st.markdown("**Configura el envío del resumen global de contratos directamente desde la aplicación.**")
         correo_destino_sub = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):", key="email_sub")
-        
+
         if st.button("🚀 Enviar Consolidado Ahora"):
             if not correo_destino_sub:
                 st.error("Por favor, ingresa al menos un correo electrónico válido.")
@@ -1498,7 +1508,7 @@ if vista_modo == "Consolidado de Subproyecto":
                         metadata_export, df_consolidado_sub, url_logo_personal, resumenes_por_contrato
                     )
                     nombre_pdf_sub = f"Consolidado_Subproyecto_{subproyecto_activo.replace(' ', '_')}.pdf"
-                    
+
                     cuerpo_texto_sub = (
                         f"Estimados:\n\n"
                         f"Adjunto encontrará el reporte consolidado global actualizado al {metadata_export['fecha']} "
@@ -1507,7 +1517,7 @@ if vista_modo == "Consolidado de Subproyecto":
                         f"Para mayor detalle de los documentos, acceda a nuestro dashboard interactivo: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
                         f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                     )
-                    
+
                     cuerpo_html_sub = f"""
                     <html>
                     <body style="font-family: Arial, sans-serif; color: #333;">
@@ -1524,7 +1534,7 @@ if vista_modo == "Consolidado de Subproyecto":
                     </body>
                     </html>
                     """
-                    
+
                     exito, mensaje = enviar_correo_con_pdf(
                         destinatario=correo_destino_sub,
                         asunto=f"Reporte Consolidado - {subproyecto_activo} (Shougang)",
@@ -1533,7 +1543,7 @@ if vista_modo == "Consolidado de Subproyecto":
                         pdf_bytes=pdf_buffer_sub,
                         nombre_archivo=nombre_pdf_sub
                     )
-                    
+
                     if exito:
                         st.success(mensaje)
                     else:
@@ -1555,11 +1565,11 @@ else:
         st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
     else:
         tipo_contrato_val = info_contrato.get("tipo_contrato", "Con Supervisión")
-        
+
         with st.expander("📌 Datos Generales del Contrato y Equipo Asignado", expanded=True):
             c1, c2, c3, c4, c5 = st.columns(5)
             c1.metric("Modalidad", tipo_contrato_val)
-            
+
             if tipo_contrato_val == "Tripartito":
                 emp1 = info_contrato.get("nombre_empresa_1", "Empresa 1")
                 emp2 = info_contrato.get("nombre_empresa_2", "Empresa 2")
@@ -1568,9 +1578,9 @@ else:
             else:
                 c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "N/A"))
                 c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
-                
+
             c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
-            c5.metric("Última Actualiz.", hora_actualizacion) 
+            c5.metric("Última Actualiz.", hora_actualizacion)
 
         if tipo_contrato_val == "Tripartito":
             emp1 = info_contrato.get("nombre_empresa_1", "EMPRESA 1")
@@ -1589,17 +1599,17 @@ else:
             fila_res = {"Carpeta": nombre_carpeta}
             cerrados_carp = 0
             abiertos_carp = 0
-            
+
             if col_pendiente in df.columns:
                 estados = df[col_pendiente].astype(str).str.strip().str.upper()
                 cerrados_carp = (estados == "CERRADO").sum()
                 fila_res["Cerrados"] = cerrados_carp
-                
+
                 for rol in roles_pendientes:
                     cant_rol = (estados == rol).sum()
                     fila_res[rol.title()] = cant_rol
                     abiertos_carp += cant_rol
-                
+
                 df_abiertos = df[estados != "CERRADO"].copy()
                 if not df_abiertos.empty and 'DIAS' in df_abiertos.columns:
                     df_abiertos['DIAS_NUM'] = pd.to_numeric(df_abiertos['DIAS'], errors='coerce').fillna(0)
@@ -1618,7 +1628,7 @@ else:
                 for rol in roles_pendientes:
                     fila_res[rol.title()] = 0
                 fila_res["Mayor Retraso"] = "N/A"
-                    
+
             total_cerrados += cerrados_carp
             total_abiertos += abiertos_carp
             fila_res["Total"] = cerrados_carp + abiertos_carp
@@ -1632,7 +1642,7 @@ else:
 
         st.subheader(f"Resumen General por Carpeta - Contrato: {contrato_activo}")
         df_resumen = pd.DataFrame(resumen_lista)
-        
+
         col_g1, col_g2 = st.columns([1.3, 1])
         with col_g1:
             st.dataframe(df_resumen, width='stretch', hide_index=True)
@@ -1649,9 +1659,9 @@ else:
             if not df_resumen.empty:
                 columnas_grafico = ["Cerrados"] + [c for c in df_resumen.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
                 fig = px.bar(
-                    df_resumen, 
-                    x="Carpeta", 
-                    y=columnas_grafico, 
+                    df_resumen,
+                    x="Carpeta",
+                    y=columnas_grafico,
                     title="Estado Documentario por Carpeta y Responsable",
                     barmode="group"
                 )
@@ -1662,15 +1672,15 @@ else:
         with st.expander("📧 Enviar Reporte de Contrato por Correo Electrónico"):
             st.markdown("**Configura el envío de este resumen y gráficos detallados directamente desde la aplicación.**")
             correo_destino = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):", key="email_contrato")
-            
+
             if st.button("🚀 Enviar Reporte Ahora"):
                 if not correo_destino:
                     st.error("Por favor, ingresa al menos un correo electrónico válido.")
                 else:
                     with st.spinner("Generando reporte con detalle y enviando correo..."):
-                        pdf_buffer = exportar_df_a_pdf(df_resumen, f"Reporte de Contrato", metadata_export, url_logo_personal, col_pendiente) # Envia el resumen como PDF
+                        pdf_buffer = exportar_df_a_pdf(df_resumen, f"Reporte de Contrato", metadata_export, url_logo_personal, col_pendiente)
                         nombre_pdf = f"Reporte_Contrato_{contrato_activo.replace(' ', '_')}.pdf"
-                        
+
                         cuerpo_texto = (
                             f"Estimados:\n\n"
                             f"Adjunto encontrará el reporte documentario detallado actualizado al {metadata_export['fecha']} "
@@ -1682,7 +1692,7 @@ else:
                             f"Para revisar en línea: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
                             f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                         )
-                        
+
                         cuerpo_html = f"""
                         <html>
                         <body style="font-family: Arial, sans-serif; color: #333;">
@@ -1704,7 +1714,7 @@ else:
                         </body>
                         </html>
                         """
-                        
+
                         exito, mensaje = enviar_correo_con_pdf(
                             destinatario=correo_destino,
                             asunto=f"Reporte de Contrato - {contrato_activo} (Shougang)",
@@ -1713,7 +1723,7 @@ else:
                             pdf_bytes=pdf_buffer,
                             nombre_archivo=nombre_pdf
                         )
-                        
+
                         if exito:
                             st.success(mensaje)
                         else:
@@ -1723,21 +1733,21 @@ else:
         st.subheader("Detalle por Carpeta / Disciplina")
         nombres_carpetas = list(datos_pestanas.keys())
         pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
-        
+
         df_actual = datos_pestanas[pestana_seleccionada].copy()
 
         if col_pendiente in df_actual.columns:
             roles_con_cerrado = roles_pendientes + ["CERRADO"]
             estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
-            
+
             st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
             col_filtros, col_grafico = st.columns([1, 1])
-            
+
             with col_filtros:
                 filtro_estado = st.multiselect("Filtrar por Responsable:", estados_disponibles, default=estados_disponibles)
-            
+
             df_filtrado = df_actual[df_actual[col_pendiente].isin(filtro_estado)]
-            
+
             def pintar_filas_streamlit(row):
                 estado = str(row[col_pendiente]).strip().upper()
                 bg_color, text_color = obtener_colores_estado(estado)
@@ -1747,27 +1757,27 @@ else:
                 if not df_filtrado.empty:
                     df_counts = df_filtrado[col_pendiente].value_counts().reset_index()
                     df_counts.columns = [col_pendiente, 'Cantidad']
-                    
+
                     fig_detalle = px.bar(
-                        df_counts, 
-                        x=col_pendiente, 
-                        y='Cantidad', 
+                        df_counts,
+                        x=col_pendiente,
+                        y='Cantidad',
                         color=col_pendiente,
                         title="Distribución de Responsables",
                         text='Cantidad'
                     )
                     fig_detalle.update_layout(
-                        height=250, 
+                        height=250,
                         margin=dict(t=30, b=0, l=10, r=10),
                         showlegend=False,
                         xaxis_title="",
                         yaxis_title="Cantidad"
                     )
                     st.plotly_chart(fig_detalle, use_container_width=True)
-            
+
             if not df_filtrado.empty:
                 st.dataframe(df_filtrado.style.apply(pintar_filas_streamlit, axis=1), width='stretch', height=400)
-                
+
                 c_det1, c_det2 = st.columns(2)
                 with c_det1:
                     pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
@@ -1777,10 +1787,10 @@ else:
                     st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
             else:
                 st.info("No hay documentos que coincidan con el filtro seleccionado.")
-                
+
         else:
             st.dataframe(df_actual, width='stretch', height=400)
-            
+
             if not df_actual.empty:
                 c_det1, c_det2 = st.columns(2)
                 with c_det1:
