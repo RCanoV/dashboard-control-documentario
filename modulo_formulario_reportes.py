@@ -18,8 +18,13 @@ def cargar_config_github():
     r = requests.get(url, headers=_get_headers())
     if r.status_code == 200:
         data = r.json()
-        contenido = base64.b64decode(data["content"]).decode("utf-8")
-        return json.loads(contenido), data["sha"]
+        contenido = base64.b64decode(data["content"]).decode("utf-8").strip()
+        if not contenido:
+            return {}, data["sha"]
+        try:
+            return json.loads(contenido), data["sha"]
+        except json.JSONDecodeError:
+            return {}, data["sha"]
     return {}, None
 
 def guardar_config_github(config_dict, sha=None):
