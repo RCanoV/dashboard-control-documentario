@@ -1379,8 +1379,7 @@ if "preload" in st.query_params and st.query_params["preload"] == "true":
 col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
 
 if vista_modo == "📝 Programar Reportes Diarios":
-    df_catalogo = construir_catalogo_desde_estructura(ESTRUCTURA_MAESTRA)
-    mostrar_formulario_reportes(df_catalogo)
+    mostrar_formulario_reportes(ESTRUCTURA_MAESTRA)
 
 elif vista_modo == "🏗️ Administrar Estructura":
     mostrar_editor_estructura(ESTRUCTURA_MAESTRA, SHA_ESTRUCTURA)
