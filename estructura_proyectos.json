@@ -877,7 +877,11 @@
                     "5737743": "REV",
                     "5737740": "PENDIENTE POR",
                     "5737741": "FECHA",
-                    "5737742": "ESTADO"
+                    "5737742": "ESTADO",
+                    "5737729": "DISCIPLINA",
+                    "5737728": "TIPO DOC",
+                    "5737738": "AREA",
+                    "5737737": "FASE"
                 },
                 "id_campo_fecha": "5737741",
                 "id_campo_pendiente": "5737740"
@@ -889,7 +893,6 @@
                     "nombre_supervisor": "",
                     "coordinador_shp": "Victor Injante",
                     "administrador_contratos": "Hugo Cardenas",
-                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
                     "urls_excluidas": [
                         "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.L17F4gQ5QeeRgtrsF6oQTg&viewModel=detail&moduleId=folders",
                         "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.DH6CRKemTJqfDz2Je3zE9g&viewModel=detail&moduleId=folders"
