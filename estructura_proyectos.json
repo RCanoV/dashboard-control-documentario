@@ -934,14 +934,15 @@
         "Paquete 07 Lima": {
             "config": {
                 "campos_personalizados": {
-                    "5737729": "FECHA",
+                    "5737741": "FECHA",
                     "5737740": "PENDIENTE POR",
                     "5737742": "ESTADO",
                     "5737728": "TIPO DOC",
                     "5737738": "AREA",
-                    "5737737": "FASE"
+                    "5737737": "FASE",
+                    "5737729": "DISCIPLINA"
                 },
-                "id_campo_fecha": "5737729",
+                "id_campo_fecha": "5737741",
                 "id_campo_pendiente": "5737740"
             },
             "Lima": {
