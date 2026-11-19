@@ -734,12 +734,13 @@
             "config": {
                 "campos_personalizados": {
                     "10295605": "REV",
-                    "10295608": "ESTADO",
+                    "10295608": "PENDIENTE POR",
                     "10295607": "FECHA",
                     "10295613": "TIPO DOC",
                     "10295610": "AREA",
                     "10295611": "FASE",
-                    "10295612": "DISCIPLINA"
+                    "10295612": "DISCIPLINA",
+                    "10295606": "ESTADO"
                 },
                 "id_campo_fecha": "10295607",
                 "id_campo_pendiente": "10295608"
