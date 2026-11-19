@@ -26,7 +26,7 @@ jobs:
       - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install requests pandas openpyxl
+          pip install requests pandas openpyxl reportlab pillow
 
       - name: Ejecutar reportes diarios
         env:
@@ -38,8 +38,3 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           REPORTE_OBJETIVO: ${{ github.event.inputs.reporte_objetivo }}
         run: python ejecutar_reportes_diarios.py
-        
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests pandas openpyxl reportlab pillow
