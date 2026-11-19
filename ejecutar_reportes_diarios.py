@@ -720,9 +720,35 @@ def escanear_recursivo(project_id, folder_id, lista_datos, longitud_maxima, ids_
 
 
 # ====================================================================
-# --- 5. ENVÍO DE CORREO (EXCEL + PDF) ---
 # ====================================================================
-def enviar_correo(cfg: dict, ruta_excel: str, ruta_pdf: str, variables: dict):
+# --- 5. ENVÍO DE CORREO (RESUMEN EN CUERPO + EXCEL + PDF) ---
+# ====================================================================
+def generar_tabla_html(df: pd.DataFrame) -> str:
+    html = df.to_html(index=False)
+    html = html.replace(
+        '<table border="1" class="dataframe">',
+        '<table cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px; text-align: center; border: 1px solid #ddd;">'
+    )
+    html = html.replace(
+        '<th>',
+        '<th style="background-color: #1A365D; color: #ffffff; padding: 8px; border: 1px solid #ddd;">'
+    )
+    html = html.replace(
+        '<td>',
+        '<td style="padding: 6px; border: 1px solid #ddd;">'
+    )
+    return html
+
+
+def enviar_correo(
+    cfg: dict,
+    ruta_excel: str,
+    ruta_pdf: str,
+    variables: dict,
+    df_resumen: pd.DataFrame,
+    kpis: dict,
+    ruta_grafico: str = None
+):
     para_lista = cfg.get("para", [])
     cc_lista = cfg.get("cc", [])
 
@@ -735,6 +761,64 @@ def enviar_correo(cfg: dict, ruta_excel: str, ruta_pdf: str, variables: dict):
 
     asunto_tpl = cfg.get("asunto", "Reporte Control Documentario - {nombre_reporte} ({fecha})")
     cuerpo_tpl = cfg.get("cuerpo", "Adjunto el reporte {nombre_reporte} al {fecha} ({total_registros} registros).")
+    cuerpo_texto = cuerpo_tpl.format(**variables)
+    cuerpo_intro_html = cuerpo_texto.replace("\n", "<br>")
+
+    bloque_grafico_html = ""
+    if ruta_grafico and os.path.exists(ruta_grafico):
+        bloque_grafico_html = """
+        <div style="margin-top: 16px; text-align: center;">
+            <img src="cid:grafico_resumen" style="max-width: 100%; height: auto; border: 1px solid #e2e8f0; border-radius: 4px;" />
+        </div>
+        """
+
+    cuerpo_html = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; color: #2d3748; font-size: 13px; line-height: 1.5;">
+        <p>{cuerpo_intro_html}</p>
+
+        <h3 style="color: #1A365D; border-bottom: 2px solid #1A365D; padding-bottom: 4px;">
+            Resumen Ejecutivo - {variables['nombre_reporte']} ({variables['fecha']})
+        </h3>
+
+        <table cellpadding="10" cellspacing="6" style="width: 100%; border-collapse: separate; margin-bottom: 14px; text-align: center;">
+            <tr>
+                <td style="background-color: #E2E8F0; color: #1A365D; border-radius: 6px; width: 25%;">
+                    <div style="font-size: 10px; font-weight: bold;">TOTAL DOCUMENTOS</div>
+                    <div style="font-size: 20px; font-weight: bold;">{kpis['total']}</div>
+                </td>
+                <td style="background-color: #D4EDDA; color: #155724; border-radius: 6px; width: 25%;">
+                    <div style="font-size: 10px; font-weight: bold;">CERRADOS</div>
+                    <div style="font-size: 20px; font-weight: bold;">{kpis['cerrados']}</div>
+                </td>
+                <td style="background-color: #FFF3CD; color: #856404; border-radius: 6px; width: 25%;">
+                    <div style="font-size: 10px; font-weight: bold;">PENDIENTES</div>
+                    <div style="font-size: 20px; font-weight: bold;">{kpis['pendientes']}</div>
+                </td>
+                <td style="background-color: #CCE5FF; color: #004085; border-radius: 6px; width: 25%;">
+                    <div style="font-size: 10px; font-weight: bold;">AVANCE GLOBAL</div>
+                    <div style="font-size: 20px; font-weight: bold;">{kpis['avance']}</div>
+                </td>
+            </tr>
+        </table>
+
+        {generar_tabla_html(df_resumen)}
+
+        {bloque_grafico_html}
+
+        <p style="margin-top: 18px; font-size: 12px; color: #4A5568;">
+            Para mayor detalle, revise los archivos <b>Excel</b> y <b>PDF</b> adjuntos o acceda al dashboard interactivo:
+            <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a>.
+        </p>
+
+        <p style="font-size: 12px; color: #4A5568; margin-top: 14px;">
+            Saludos,<br>
+            <b>Roberto Cano Vílchez</b><br>
+            Control Documentario - Shougang Hierro Perú
+        </p>
+    </body>
+    </html>
+    """
 
     msg = EmailMessage()
     msg["Subject"] = asunto_tpl.format(**variables)
@@ -742,8 +826,21 @@ def enviar_correo(cfg: dict, ruta_excel: str, ruta_pdf: str, variables: dict):
     msg["To"] = para_str
     if cc_str:
         msg["Cc"] = cc_str
-    msg.set_content(cuerpo_tpl.format(**variables))
 
+    msg.set_content(cuerpo_texto)
+    msg.add_alternative(cuerpo_html, subtype="html")
+
+    # Incrustar el gráfico dentro del cuerpo HTML
+    if ruta_grafico and os.path.exists(ruta_grafico):
+        with open(ruta_grafico, "rb") as img_f:
+            msg.get_payload()[1].add_related(
+                img_f.read(),
+                maintype="image",
+                subtype="png",
+                cid="<grafico_resumen>"
+            )
+
+    # Adjuntar Excel
     with open(ruta_excel, "rb") as f:
         msg.add_attachment(
             f.read(),
@@ -752,6 +849,7 @@ def enviar_correo(cfg: dict, ruta_excel: str, ruta_pdf: str, variables: dict):
             filename=os.path.basename(ruta_excel)
         )
 
+    # Adjuntar PDF
     with open(ruta_pdf, "rb") as f:
         msg.add_attachment(
             f.read(),
@@ -764,7 +862,7 @@ def enviar_correo(cfg: dict, ruta_excel: str, ruta_pdf: str, variables: dict):
         server.starttls()
         server.login(SMTP_USER, SMTP_PASS)
         server.send_message(msg)
-    print(f"✅ Correo enviado (Excel + PDF con Resumen) a: {para_str}")
+    print(f"✅ Correo enviado (Resumen en cuerpo + Excel + PDF) a: {para_str}")
 
 
 # ====================================================================
