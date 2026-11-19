@@ -256,12 +256,7 @@ def enviar_correo(cfg: dict, ruta_excel: str, variables: dict):
     para_lista = cfg.get("para", [])
     cc_lista = cfg.get("cc", [])
 
-    # Compatibilidad con formato anterior por si queda algún reporte viejo
-    if isinstance(para_lista, list):
-        para_str = ", ".join(para_lista)
-    else:
-        para_str = str(para_lista)
-
+    para_str = ", ".join(para_lista) if isinstance(para_lista, list) else str(para_lista)
     cc_str = ", ".join(cc_lista) if isinstance(cc_lista, list) else str(cc_lista)
 
     if not para_str or not SMTP_USER:
@@ -317,8 +312,13 @@ def main():
     fecha_str = hora_peru.strftime("%d/%m/%Y")
     fecha_archivo = hora_peru.strftime("%Y%m%d")
 
+    reporte_objetivo = os.getenv("REPORTE_OBJETIVO", "").strip()
+
     for nombre_rep, cfg in plantillas.items():
-        if not corresponde_ejecutar_ahora(cfg):
+        if reporte_objetivo and nombre_rep != reporte_objetivo:
+            continue
+
+        if not reporte_objetivo and not corresponde_ejecutar_ahora(cfg):
             print(f"⏭️ Omitido '{nombre_rep}' (inactivo o fuera de su día/horario configurado).")
             continue
 
