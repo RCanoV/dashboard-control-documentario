@@ -62,39 +62,60 @@ def corresponde_ejecutar_ahora(reporte: dict) -> bool:
 
 
 def aplicar_condiciones_filtro(df: pd.DataFrame, condiciones: list) -> pd.DataFrame:
-    """Aplica dinámicamente las reglas configuradas en el formulario."""
+    """Aplica dinámicamente reglas AND / OR y listas separadas por coma."""
     if df.empty or not condiciones:
         return df
 
-    df_res = df.copy()
+    mask_final = None
+
     for cond in condiciones:
+        logica = str(cond.get("logica", "Y (AND)")).strip().upper()
         campo = cond.get("campo")
         op = cond.get("operador")
         val = str(cond.get("valor", "")).strip()
 
-        if campo == "DIAS_TRANSCURRIDOS" and "DIAS_TRANSCURRIDOS" not in df_res.columns and "DIAS" in df_res.columns:
+        if campo == "DIAS_TRANSCURRIDOS" and "DIAS_TRANSCURRIDOS" not in df.columns and "DIAS" in df.columns:
             campo = "DIAS"
 
-        if campo not in df_res.columns:
+        if campo not in df.columns:
             continue
 
-        serie_str = df_res[campo].astype(str).str.strip()
+        serie_str = df[campo].astype(str).str.strip()
+        mask_actual = None
+
         if op == "igual a":
-            df_res = df_res[serie_str.str.lower() == val.lower()]
+            mask_actual = serie_str.str.lower() == val.lower()
         elif op == "diferente de":
-            df_res = df_res[serie_str.str.lower() != val.lower()]
+            mask_actual = serie_str.str.lower() != val.lower()
+        elif op == "está en (lista)":
+            lista_vals = [v.strip().lower() for v in val.split(",") if v.strip()]
+            mask_actual = serie_str.str.lower().isin(lista_vals)
+        elif op == "no está en (lista)":
+            lista_vals = [v.strip().lower() for v in val.split(",") if v.strip()]
+            mask_actual = ~serie_str.str.lower().isin(lista_vals)
         elif op == "contiene":
-            df_res = df_res[serie_str.str.lower().str.contains(val.lower(), na=False)]
+            mask_actual = serie_str.str.lower().str.contains(val.lower(), na=False)
         elif op == "no contiene":
-            df_res = df_res[~serie_str.str.lower().str.contains(val.lower(), na=False)]
+            mask_actual = ~serie_str.str.lower().str.contains(val.lower(), na=False)
         elif op in ["mayor que", "menor que"]:
-            serie_num = pd.to_numeric(df_res[campo], errors="coerce")
+            serie_num = pd.to_numeric(df[campo], errors="coerce")
             try:
                 val_num = float(val)
-                df_res = df_res[serie_num > val_num] if op == "mayor que" else df_res[serie_num < val_num]
+                mask_actual = (serie_num > val_num) if op == "mayor que" else (serie_num < val_num)
             except ValueError:
-                pass
-    return df_res
+                continue
+
+        if mask_actual is None:
+            continue
+
+        if mask_final is None:
+            mask_final = mask_actual
+        elif "OR" in logica or logica.startswith("O "):
+            mask_final = mask_final | mask_actual
+        else:
+            mask_final = mask_final & mask_actual
+
+    return df[mask_final].copy() if mask_final is not None else df
 
 
 # ====================================================================
