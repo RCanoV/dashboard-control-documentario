@@ -1260,9 +1260,11 @@
             "10:00"
         ],
         "para": [
+            "controldocumentcvc@gmail.com"
+        ],
+        "cc": [
             "rcano@shp.pe"
         ],
-        "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Patricia:\n\nSe adjunta Reporte PENDIENTES POR CVC",
         "columnas_excel": [
