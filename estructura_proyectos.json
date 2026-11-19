@@ -728,13 +728,33 @@
         "998316 Nuevo Muelle San Nicolas": {
             "config": {
                 "campos_personalizados": {
-                    "6011837": "REV",
-                    "6011840": "PENDIENTE POR",
-                    "6011839": "FECHA",
-                    "6011838": "ESTADO"
+                    "10295605": "REV",
+                    "10295608": "PENDIENTE POR",
+                    "10295607": "FECHA",
+                    "10295613": "TIPO DOC",
+                    "10295610": "AREA",
+                    "10295611": "FASE",
+                    "10295612": "DISCIPLINA"
                 },
-                "id_campo_fecha": "6011839",
-                "id_campo_pendiente": "6011840"
+                "id_campo_fecha": "10295607",
+                "id_campo_pendiente": "10295608"
+            },
+            "EPC Nuevo Muelle": {
+                "CGI-SHP-066-2025 Construccion Nuevo Muelle SN": {
+                    "nombre_proyecto": "EPC Nuevo Muelle SN",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Sergio Saenz",
+                    "coordinador_shp": "Melchor Almeyda / Jose Herrera",
+                    "administrador_contratos": "Sergio Casado",
+                    "urls_excluidas": [],
+                    "carpetas_config": [
+                        {
+                            "nombre": "Planos As Built",
+                            "url": "https://acc.autodesk.com/docs/files/projects/3fe40740-4483-4ed9-895b-9cb579cd7b1d?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.JYeXkA13Quiif-P-f5Ea5g&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 30
+                        }
+                    ]
+                }
             }
         },
         "I25G50 Subestacion Mina 02": {
