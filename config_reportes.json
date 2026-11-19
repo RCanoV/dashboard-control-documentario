@@ -948,6 +948,29 @@
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
                 ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "carpeta": "AS BUILT",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.60E9T9u1QN-YlV5uHuwNMw&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 30,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                ]
             }
         ],
         "condiciones_filtro": [
