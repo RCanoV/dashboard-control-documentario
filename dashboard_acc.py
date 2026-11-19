@@ -1356,8 +1356,8 @@ else:
             btn_login = st.form_submit_button("Ingresar", use_container_width=True)
 
             if btn_login:
-                admin_user = st.secrets.get("ADMIN_USER", "admin")
-                admin_pass = st.secrets.get("ADMIN_PASS", "shp2026")
+                admin_user = st.secrets.get("ADMIN_USER", "rcano")
+                admin_pass = st.secrets.get("ADMIN_PASS", "7789Control*")
                 if usuario_ing.strip() == admin_user and clave_ing == admin_pass:
                     st.session_state["es_admin"] = True
                     st.rerun()
