@@ -296,11 +296,17 @@ def mostrar_formulario_reportes(estructura_maestra):
 
                 condiciones_guardar = []
                 for _, f in df_filtros_edit.iterrows():
+                    logica = str(f.get("logica", "Y (AND)")).strip() or "Y (AND)"
                     campo = str(f.get("campo", "")).strip()
                     op = str(f.get("operador", "")).strip()
                     val = str(f.get("valor", "")).strip()
                     if campo and op and val and campo.lower() != "nan":
-                        condiciones_guardar.append({"campo": campo, "operador": op, "valor": val})
+                        condiciones_guardar.append({
+                            "logica": logica,
+                            "campo": campo,
+                            "operador": op,
+                            "valor": val
+                        })
 
                 config_actual[nombre_reporte.strip()] = {
                     "activo": activo,
