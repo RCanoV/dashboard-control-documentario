@@ -1555,9 +1555,7 @@
         "para": [
             "rcano@shp.pe"
         ],
-        "cc": [
-            "rcano@shp.pe"
-        ],
+        "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Enrique:\n\nSe adjunta Reporte PENDIENTES POR SGMC",
         "columnas_excel": [
