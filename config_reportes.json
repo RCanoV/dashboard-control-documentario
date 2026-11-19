@@ -688,7 +688,11 @@
                         "6011837": "REV",
                         "6011840": "PENDIENTE POR",
                         "6011839": "FECHA",
-                        "6011838": "ESTADO"
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
                     },
                     "id_campo_fecha": "6011839",
                     "id_campo_pendiente": "6011840"
@@ -711,7 +715,11 @@
                         "6011837": "REV",
                         "6011840": "PENDIENTE POR",
                         "6011839": "FECHA",
-                        "6011838": "ESTADO"
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
                     },
                     "id_campo_fecha": "6011839",
                     "id_campo_pendiente": "6011840"
@@ -734,7 +742,11 @@
                         "6011837": "REV",
                         "6011840": "PENDIENTE POR",
                         "6011839": "FECHA",
-                        "6011838": "ESTADO"
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
                     },
                     "id_campo_fecha": "6011839",
                     "id_campo_pendiente": "6011840"
@@ -757,7 +769,11 @@
                         "6011837": "REV",
                         "6011840": "PENDIENTE POR",
                         "6011839": "FECHA",
-                        "6011838": "ESTADO"
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
                     },
                     "id_campo_fecha": "6011839",
                     "id_campo_pendiente": "6011840"
@@ -780,7 +796,11 @@
                         "6011837": "REV",
                         "6011840": "PENDIENTE POR",
                         "6011839": "FECHA",
-                        "6011838": "ESTADO"
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
                     },
                     "id_campo_fecha": "6011839",
                     "id_campo_pendiente": "6011840"
@@ -803,7 +823,11 @@
                         "6011837": "REV",
                         "6011840": "PENDIENTE POR",
                         "6011839": "FECHA",
-                        "6011838": "ESTADO"
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
                     },
                     "id_campo_fecha": "6011839",
                     "id_campo_pendiente": "6011840"
@@ -816,6 +840,7 @@
         ],
         "condiciones_filtro": [
             {
+                "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
                 "valor": "SHP"
@@ -841,7 +866,9 @@
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Mauro:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
-            "CODIGO",
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
             "DESCRIPCION",
             "REV",
             "FECHA",
