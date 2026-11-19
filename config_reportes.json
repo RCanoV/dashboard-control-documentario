@@ -114,5 +114,121 @@
             "PENDIENTE POR",
             "DIAS_TRANSCURRIDOS"
         ]
+    },
+    "I-26A40 -SISTEMA COMPENSACION MEDIANTE TOLVA, CAPACIDAD 4,500 TPH CONVEYOR 2 MN": {
+        "activo": true,
+        "filtro_alcance": [
+            "Proyecto con Operaciones"
+        ],
+        "filtro_subproyecto": [
+            "Sistema de Compensacion"
+        ],
+        "filtro_contrato": [
+            "CGI-SHP-039-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyecto con Operaciones",
+                "subproyecto": "Sistema de Compensacion",
+                "tipo_obra": "EPC",
+                "contrato": "CGI-SHP-039-2026",
+                "carpeta": "Ing Basica",
+                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zjxfTbUhRxG-yQ7Qa46MgQ&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12102611": "REV",
+                        "12102609": "PENDIENTE POR",
+                        "12102610": "FECHA",
+                        "12102612": "ESTADO"
+                    },
+                    "id_campo_fecha": "12102610",
+                    "id_campo_pendiente": "12102609"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyecto con Operaciones",
+                "subproyecto": "Sistema de Compensacion",
+                "tipo_obra": "EPC",
+                "contrato": "CGI-SHP-039-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8uO3tWdkT8u_K9Aj_VNCIg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12102611": "REV",
+                        "12102609": "PENDIENTE POR",
+                        "12102610": "FECHA",
+                        "12102612": "ESTADO"
+                    },
+                    "id_campo_fecha": "12102610",
+                    "id_campo_pendiente": "12102609"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyecto con Operaciones",
+                "subproyecto": "Sistema de Compensacion",
+                "tipo_obra": "EPC",
+                "contrato": "CGI-SHP-039-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.87jPmfFASbeZHlDGpTpx4w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12102611": "REV",
+                        "12102609": "PENDIENTE POR",
+                        "12102610": "FECHA",
+                        "12102612": "ESTADO"
+                    },
+                    "id_campo_fecha": "12102610",
+                    "id_campo_pendiente": "12102609"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
+                ]
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "06:00",
+            "14:00"
+        ],
+        "para": [
+            "rcano@shp.pe"
+        ],
+        "cc": [],
+        "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimados Sres MUTUDA,\n\nSe adjunta el reporte {nombre_reporte} \n\nActualizado al {fecha} ({total_registros} registros).\n\nPor favor, subsanar a la brevedad.\n\nSaludos.\n\nRoberto Cano \nControl Documentario SHP",
+        "columnas_excel": [
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
     }
 }
