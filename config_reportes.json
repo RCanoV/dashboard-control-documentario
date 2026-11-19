@@ -597,7 +597,7 @@
         ],
         "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado Treyci:\n\nSe adjunta Reporte PENDIENTES POR SHP",
+        "cuerpo": "Estimado Treyci:\n\nSe adjunta Reporte PENDIENTES POR AID",
         "columnas_excel": [
             "CODIGO",
             "DESCRIPCION",
