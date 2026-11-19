@@ -1260,16 +1260,15 @@
             "10:00"
         ],
         "para": [
-            "wsalas@shp.pe",
-            "aescobedo@shp.pe"
-        ],
-        "cc": [
             "rcano@shp.pe"
         ],
+        "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado Wilbert:\n\nSe adjunta Reporte PENDIENTES POR SHP",
+        "cuerpo": "Estimada Patricia:\n\nSe adjunta Reporte PENDIENTES POR CVC",
         "columnas_excel": [
-            "CODIGO",
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
             "DESCRIPCION",
             "REV",
             "FECHA",
