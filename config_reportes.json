@@ -1726,6 +1726,9 @@
         "asunto": "994440- PENDIENTES CVC - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimados Sres CVC:\n\nSe adjunta Reporte PENDIENTES POR CVC",
         "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
             "CODIGO",
             "DESCRIPCION",
             "REV",
