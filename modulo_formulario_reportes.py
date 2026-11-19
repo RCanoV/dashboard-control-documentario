@@ -15,11 +15,13 @@ COLUMNAS_BASE = [
     "CODIGO", "DESCRIPCION", "DIAS_TRANSCURRIDOS"
 ]
 
+
 def _get_headers():
     return {
         "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
         "Accept": "application/vnd.github.v3+json"
     }
+
 
 def cargar_config_github():
     if "GITHUB_TOKEN" not in st.secrets:
@@ -37,6 +39,7 @@ def cargar_config_github():
             return {}, data["sha"]
     return {}, None
 
+
 def guardar_config_github(config_dict, sha=None):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_JSON}"
     contenido_b64 = base64.b64encode(
@@ -50,9 +53,17 @@ def guardar_config_github(config_dict, sha=None):
         payload["sha"] = sha
     return requests.put(url, headers=_get_headers(), json=payload)
 
-def disparar_test_github_actions(rama="main"):
+
+def disparar_envio_github_actions(reporte_objetivo="", rama="main"):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows/{ARCHIVO_WORKFLOW}/dispatches"
-    return requests.post(url, headers=_get_headers(), json={"ref": rama})
+    payload = {
+        "ref": rama,
+        "inputs": {
+            "reporte_objetivo": reporte_objetivo
+        }
+    }
+    return requests.post(url, headers=_get_headers(), json=payload)
+
 
 def _extraer_catalogo_completo(estructura_maestra):
     """Extrae contratos, carpetas configuradas y campos personalizados disponibles."""
@@ -86,6 +97,7 @@ def _extraer_catalogo_completo(estructura_maestra):
                             "URLS_EXCLUIDAS": info.get("urls_excluidas", [])
                         })
     return pd.DataFrame(registros)
+
 
 def mostrar_formulario_reportes(estructura_maestra):
     st.header("📝 Programar Reportes Automáticos")
@@ -230,8 +242,8 @@ def mostrar_formulario_reportes(estructura_maestra):
         height=100
     )
 
-    # 6. Guardar, Enviar Test o Eliminar
-    b1, b2, b3 = st.columns([2, 1.3, 1])
+    # 6. Guardar, Enviar Ahora o Eliminar
+    b1, b2, b3 = st.columns([2, 1.5, 1])
     with b1:
         if st.button("💾 Guardar Reporte en GitHub", type="primary", use_container_width=True):
             if not nombre_reporte.strip():
@@ -288,12 +300,16 @@ def mostrar_formulario_reportes(estructura_maestra):
                     st.error(f"Error al guardar en GitHub: {res.text}")
 
     with b2:
-        if st.button("🚀 Enviar Test", use_container_width=True):
-            res_test = disparar_test_github_actions()
-            if res_test.status_code == 204:
-                st.success("✅ Test disparado. En 1 a 2 minutos recibirás el correo con el Excel.")
+        if st.button("📤 Enviar ahora", use_container_width=True):
+            nombre_limpio = nombre_reporte.strip()
+            if not nombre_limpio or nombre_limpio not in config_actual:
+                st.warning("Primero haz clic en '💾 Guardar Reporte en GitHub' para poder enviarlo.")
             else:
-                st.error(f"No se pudo disparar el test ({res_test.status_code}): {res_test.text}")
+                res_envio = disparar_envio_github_actions(reporte_objetivo=nombre_limpio)
+                if res_envio.status_code == 204:
+                    st.success(f"✅ Envío inmediato disparado para '{nombre_limpio}'. Llegará en 1 a 2 minutos.")
+                else:
+                    st.error(f"No se pudo disparar el envío ({res_envio.status_code}): {res_envio.text}")
 
     with b3:
         if rep_sel != "➕ Nuevo Reporte" and rep_sel in config_actual:
