@@ -2,7 +2,7 @@ name: Reportes Diarios ACC
 
 on:
   schedule:
-    - cron: '0 * * * *'   # Se ejecuta cada hora; Python valida los días y horarios de Perú (UTC-5)
+    - cron: '5 * * * *'   # Corre al minuto 05 de cada hora (menos congestión en GitHub)
   workflow_dispatch:
     inputs:
       reporte_objetivo:
