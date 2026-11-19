@@ -1318,15 +1318,22 @@ info_contrato = contratos_dict[contrato_activo]
 # --- SELECTOR DE MODO DE VISTA ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("👁️ Modo de Visualización")
-vista_modo = st.sidebar.radio(
-    "Selecciona qué reporte visualizar:",
-    [
-        "Detalle de Contrato",
-        "Consolidado de Subproyecto",
-        "📝 Programar Reportes Diarios",
-        "🏗️ Administrar Estructura"
-    ]
+st.sidebar.markdown("### 🧭 Navegación")
+
+seccion = st.sidebar.radio(
+    "Selecciona una sección:",
+    ["📊 Reportes", "🛠️ Herramientas", "⚙️ Configuración"]
 )
+
+if seccion == "📊 Reportes":
+    vista_modo = st.sidebar.radio(
+        "Tipo de reporte:",
+        ["Detalle de Contrato", "Consolidado de Subproyecto"]
+    )
+elif seccion == "🛠️ Herramientas":
+    vista_modo = "📝 Programar Reportes Diarios"
+elif seccion == "⚙️ Configuración":
+    vista_modo = "🏗️ Administrar Estructura"
     
 st.sidebar.markdown("---")
 
