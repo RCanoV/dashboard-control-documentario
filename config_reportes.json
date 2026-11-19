@@ -100,11 +100,15 @@
             "14:00"
         ],
         "para": [
+            "controldocumentario.marcona@mutudametal.com",
+            "residentepaq5bm@covecperu.com"
+        ],
+        "cc": [
+            "jbeltran@shp.pe",
             "rcano@shp.pe"
         ],
-        "cc": [],
         "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimados Sres MUTUDA,\n\nSe adjunta el reporte {nombre_reporte} \n\nActualizado al {fecha} ({total_registros} registros).\n\nPor favor, subsanar a la brevedad.\n\nSaludos.\n\nRoberto Cano \nControl Documentario SHP",
+        "cuerpo": "Estimados Sres MUTUDA,\n\nSe adjunta el reporte PENDIENTES POR MUTDA\n\n {nombre_reporte} \n\nActualizado al {fecha} ({total_registros} registros).\n\nPor favor, subsanar a la brevedad.\n\nSaludos.\n\nRoberto Cano \nControl Documentario SHP",
         "columnas_excel": [
             "CODIGO",
             "DESCRIPCION",
