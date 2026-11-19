@@ -106,18 +106,13 @@
         "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimados,\n\nSe adjunta el reporte {nombre_reporte} actualizado al {fecha} ({total_registros} registros).\n\nSaludos.",
         "columnas_excel": [
-            "ALCANCE",
-            "CARPETA",
             "CODIGO",
-            "CONTRATO",
             "DESCRIPCION",
-            "DIAS_TRANSCURRIDOS",
-            "ESTADO",
-            "FECHA",
-            "PENDIENTE POR",
             "REV",
-            "SUBPROYECTO",
-            "TIPO_OBRA"
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
         ]
     }
 }
