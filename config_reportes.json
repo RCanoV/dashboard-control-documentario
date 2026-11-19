@@ -1032,7 +1032,7 @@
                 "config_sub": {
                     "campos_personalizados": {
                         "10295605": "REV",
-                        "10295608": "PENDIENTE POR",
+                        "10295608": "ESTADO",
                         "10295607": "FECHA",
                         "10295613": "TIPO DOC",
                         "10295610": "AREA",
@@ -1069,6 +1069,14 @@
         "cc": [],
         "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimados,\n\nSe adjunta el reporte Seguimiento AS BUILT\nSaludos.",
-        "columnas_excel": []
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO"
+        ]
     }
 }
