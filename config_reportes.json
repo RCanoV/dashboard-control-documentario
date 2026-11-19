@@ -1553,9 +1553,14 @@
             "10:00"
         ],
         "para": [
+            "sgmccontroldoc@gmail.com",
+            "carlos.abarca03@hotmail.com",
+            "edwin.intvsat@gmail.com",
+            "cmendoza.contratos-sgmc@outlook.com"
+        ],
+        "cc": [
             "rcano@shp.pe"
         ],
-        "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Enrique:\n\nSe adjunta Reporte PENDIENTES POR SGMC",
         "columnas_excel": [
