@@ -6,6 +6,7 @@ import json
 
 GITHUB_REPO = "rcanov/dashboard-control-documentario"
 RUTA_JSON = "config_reportes.json"
+ARCHIVO_WORKFLOW = "reportes_diarios.yml"  # Verifica que coincida con tu archivo en .github/workflows/
 
 DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 HORARIOS_PERU = [f"{h:02d}:00" for h in range(5, 23)]  # De 05:00 a 22:00 (Hora Perú)
@@ -48,6 +49,10 @@ def guardar_config_github(config_dict, sha=None):
     if sha:
         payload["sha"] = sha
     return requests.put(url, headers=_get_headers(), json=payload)
+
+def disparar_test_github_actions(rama="main"):
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows/{ARCHIVO_WORKFLOW}/dispatches"
+    return requests.post(url, headers=_get_headers(), json={"ref": rama})
 
 def _extraer_catalogo_completo(estructura_maestra):
     """Extrae contratos, carpetas configuradas y campos personalizados disponibles."""
@@ -110,7 +115,7 @@ def mostrar_formulario_reportes(estructura_maestra):
 
     st.markdown("---")
 
-    # 2. Selección de Contratos y Carpetas dinámicas (fuera de form para actualizar en vivo)
+    # 2. Selección de Contratos y Carpetas dinámicas
     st.subheader("1. Alcance y Carpetas a Escanear")
     c1, c2 = st.columns(2)
     with c1:
@@ -225,8 +230,8 @@ def mostrar_formulario_reportes(estructura_maestra):
         height=100
     )
 
-    # 6. Guardar o Eliminar
-    b1, b2 = st.columns([2, 1])
+    # 6. Guardar, Enviar Test o Eliminar
+    b1, b2, b3 = st.columns([2, 1.3, 1])
     with b1:
         if st.button("💾 Guardar Reporte en GitHub", type="primary", use_container_width=True):
             if not nombre_reporte.strip():
@@ -283,8 +288,16 @@ def mostrar_formulario_reportes(estructura_maestra):
                     st.error(f"Error al guardar en GitHub: {res.text}")
 
     with b2:
+        if st.button("🚀 Enviar Test", use_container_width=True):
+            res_test = disparar_test_github_actions()
+            if res_test.status_code == 204:
+                st.success("✅ Test disparado. En 1 a 2 minutos recibirás el correo con el Excel.")
+            else:
+                st.error(f"No se pudo disparar el test ({res_test.status_code}): {res_test.text}")
+
+    with b3:
         if rep_sel != "➕ Nuevo Reporte" and rep_sel in config_actual:
-            if st.button("🗑️ Eliminar Reporte", use_container_width=True):
+            if st.button("🗑️ Eliminar", use_container_width=True):
                 del config_actual[rep_sel]
                 res = guardar_config_github(config_actual, sha_actual)
                 if res.status_code in [200, 201]:
