@@ -486,7 +486,10 @@ def exportar_hojas_a_pdf(
     mat_res = [enc_res]
     for _, row in df_resumen.iterrows():
         mat_res.append([
-            Paragraph(str("" if pd.isna(v) else v).replace("&", "&amp;").replace("<", "&lt;"), cell_style)
+            Paragraph(
+                str("" if pd.isna(v) else v).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"),
+                cell_style
+            )
             for v in row
         ])
 
@@ -740,7 +743,6 @@ def escanear_recursivo(project_id, folder_id, lista_datos, longitud_maxima, ids_
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
 
-# ====================================================================
 # ====================================================================
 # --- 5. ENVÍO DE CORREO (RESUMEN EN CUERPO + EXCEL + PDF) ---
 # ====================================================================
