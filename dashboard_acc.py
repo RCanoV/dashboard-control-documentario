@@ -1315,25 +1315,54 @@ if not contratos_dict:
 contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
-# --- SELECTOR DE MODO DE VISTA ---
+# --- SELECTOR DE MODO DE VISTA Y ACCESO ADMINISTRADOR ---
 st.sidebar.markdown("---")
-st.sidebar.subheader("👁️ Modo de Visualización")
-st.sidebar.markdown("### 🧭 Navegación")
+st.sidebar.subheader("🧭 Navegación")
 
-seccion = st.sidebar.radio(
-    "Selecciona una sección:",
-    ["📊 Reportes", "🛠️ Herramientas", "⚙️ Configuración"]
-)
+if "es_admin" not in st.session_state:
+    st.session_state["es_admin"] = False
 
-if seccion == "📊 Reportes":
+if st.session_state["es_admin"]:
+    st.sidebar.success("🔓 Modo Administrador activo")
+    seccion = st.sidebar.radio(
+        "Selecciona una sección:",
+        ["📊 Reportes", "🛠️ Herramientas", "⚙️ Configuración"]
+    )
+
+    if seccion == "📊 Reportes":
+        vista_modo = st.sidebar.radio(
+            "Tipo de reporte:",
+            ["Detalle de Contrato", "Consolidado de Subproyecto"]
+        )
+    elif seccion == "🛠️ Herramientas":
+        vista_modo = "📝 Programar Reportes Diarios"
+    elif seccion == "⚙️ Configuración":
+        vista_modo = "🏗️ Administrar Estructura"
+
+    if st.sidebar.button("🔒 Cerrar Sesión Admin", use_container_width=True):
+        st.session_state["es_admin"] = False
+        st.rerun()
+else:
+    # Vista por defecto: solo Reportes
     vista_modo = st.sidebar.radio(
-        "Tipo de reporte:",
+        "📊 Reportes:",
         ["Detalle de Contrato", "Consolidado de Subproyecto"]
     )
-elif seccion == "🛠️ Herramientas":
-    vista_modo = "📝 Programar Reportes Diarios"
-elif seccion == "⚙️ Configuración":
-    vista_modo = "🏗️ Administrar Estructura"
+
+    with st.sidebar.expander("🔐 Acceso Administrador"):
+        with st.form("form_login_admin"):
+            usuario_ing = st.text_input("Usuario:")
+            clave_ing = st.text_input("Contraseña:", type="password")
+            btn_login = st.form_submit_button("Ingresar", use_container_width=True)
+
+            if btn_login:
+                admin_user = st.secrets.get("ADMIN_USER", "admin")
+                admin_pass = st.secrets.get("ADMIN_PASS", "shp2026")
+                if usuario_ing.strip() == admin_user and clave_ing == admin_pass:
+                    st.session_state["es_admin"] = True
+                    st.rerun()
+                else:
+                    st.error("Usuario o contraseña incorrectos.")
     
 st.sidebar.markdown("---")
 
