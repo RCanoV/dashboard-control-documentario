@@ -38,7 +38,7 @@ from modulo_estructura_proyectos import cargar_estructura_github, mostrar_editor
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
 ESTRUCTURA_MAESTRA = {
-    ESTRUCTURA_MAESTRA, SHA_ESTRUCTURA = cargar_estructura_github(ESTRUCTURA_MAESTRA)
+    
     "Proyectos Mayores": {
         "994440 - Tercera Línea": {
             "config": {
@@ -520,7 +520,7 @@ ESTRUCTURA_MAESTRA = {
         }
     }
 }
-
+ESTRUCTURA_MAESTRA, SHA_ESTRUCTURA = cargar_estructura_github(ESTRUCTURA_MAESTRA)
 COL_CODIGO = "CODIGO"
 COL_DESCRIPCION = "DESCRIPCION"
 
