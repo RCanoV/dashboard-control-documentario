@@ -434,7 +434,7 @@
         "cc": [
             "rcano@shp.pe"
         ],
-        "asunto": "994440- PENDIENTES CVC - {nombre_reporte} ({fecha})",
+        "asunto": "994440- PENDIENTES SHP - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Wilbert:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
             "CODIGO",
