@@ -1559,7 +1559,7 @@
             "rcano@shp.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado Enrique:\n\nSe adjunta Reporte PENDIENTES POR AID",
+        "cuerpo": "Estimado Enrique:\n\nSe adjunta Reporte PENDIENTES POR SGMC",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
