@@ -2,19 +2,32 @@ name: Reportes Diarios ACC
 
 on:
   schedule:
-    # 6:00 AM y 2:00 PM hora Perú (UTC-5) de lunes a sábado
-    - cron: '0 11,19 * * 1-6'
+    - cron: '0 * * * *'   # Se ejecuta cada hora; Python valida los días y horarios de Perú (UTC-5)
   workflow_dispatch:
+    inputs:
+      reporte_objetivo:
+        description: 'Nombre exacto del reporte a enviar (vacío = todos los activos)'
+        required: false
+        default: ''
 
 jobs:
-  enviar-reportes:
+  generar_y_enviar:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests pandas openpyxl
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas openpyxl
+
       - name: Ejecutar reportes diarios
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
@@ -23,4 +36,5 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          REPORTE_OBJETIVO: ${{ github.event.inputs.reporte_objetivo }}
         run: python ejecutar_reportes_diarios.py
