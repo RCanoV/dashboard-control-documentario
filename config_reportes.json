@@ -593,9 +593,13 @@
             "10:00"
         ],
         "para": [
-            "rcano@shp.pe"
+            "tcastro@aidingenieros.pe",
+            "cvaldivia@aidingenieros.com.pe"
         ],
-        "cc": [],
+        "cc": [
+            "rcano@shp.pe",
+            "jmolina@bisa.com.pe"
+        ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Treyci:\n\nSe adjunta Reporte PENDIENTES POR AID",
         "columnas_excel": [
