@@ -1020,7 +1020,7 @@ def main():
             "FECHA": fecha_str,
             "TOTAL": total_registros
         }
-        enviar_correo(cfg, ruta_excel, ruta_pdf, variables)
+        enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico)
 
 
 if __name__ == "__main__":
