@@ -1069,7 +1069,7 @@
         ],
         "cc": [],
         "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimados,\n\nSe adjunta el reporte Seguimiento AS BUILT\nSaludos.",
+        "cuerpo": "Estimados,\n\nSe adjunta el reporte Seguimiento AS BUILT",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
