@@ -1065,10 +1065,20 @@
             "14:00"
         ],
         "para": [
-            "rcano@shp.pe"
+            "contdocmentsupmsn@covecperu.com",
+            "cdoc@chec-nmmsg.com"
         ],
-        "cc": [],
-        "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
+        "cc": [
+            "rcano@shp.pe",
+            "jherrera@shp.pe",
+            "jalvarez@shp.pe",
+            "amalaga@shp.pe",
+            "malmeyda@shp.pe",
+            "ingcalidadsupmsn@covecperu.com",
+            "gerproyectossupmsn@covecperu.com",
+            "chenhao@covecperu.com"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimados,\n\nSe adjunta el reporte Seguimiento AS BUILT",
         "columnas_excel": [
             "AREA",
