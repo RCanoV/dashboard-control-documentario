@@ -758,9 +758,12 @@
             "10:00"
         ],
         "para": [
+            "myaranga@shp.pe",
+            "gvargas@shp.pe"
+        ],
+        "cc": [
             "rcano@shp.pe"
         ],
-        "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Mauro:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
