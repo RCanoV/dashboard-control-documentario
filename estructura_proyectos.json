@@ -930,6 +930,60 @@
                     ]
                 }
             }
+        },
+        "Paquete 07 Lima": {
+            "config": {
+                "campos_personalizados": {
+                    "5737729": "FECHA",
+                    "5737740": "PENDIENTE POR",
+                    "5737742": "ESTADO",
+                    "5737728": "TIPO DOC",
+                    "5737738": "AREA",
+                    "5737737": "FASE"
+                },
+                "id_campo_fecha": "5737729",
+                "id_campo_pendiente": "5737740"
+            },
+            "Lima": {
+                "CGI-SHP-013-2026": {
+                    "nombre_proyecto": "Plan de Conservacion PQ07",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "",
+                    "coordinador_shp": "R. Gamarra M. Wang",
+                    "administrador_contratos": "Marco Escobedo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.xPWwVkldRSyFNOixpNwRvg&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zq2uTvmnTPCi7rmADMeZ6Q&viewModel=detail&moduleId=folders"
+                    ],
+                    "carpetas_config": [
+                        {
+                            "nombre": "Construccion",
+                            "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XLSVu_D3QlSU-lV6QdJ5Gg&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        },
+                        {
+                            "nombre": "RFI",
+                            "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.effHI1b5QICsDAQBcUrS9Q&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 3
+                        },
+                        {
+                            "nombre": "RNC",
+                            "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8DIKwX-bTyq0l2pX9a4_Fg&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        },
+                        {
+                            "nombre": "VALORIZACIONES",
+                            "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Wk_us_7_TtCP1-kNSPpXTA&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        },
+                        {
+                            "nombre": "CARTAS",
+                            "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.czQUOAzcTgS5APfjX_oUlg&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        }
+                    ]
+                }
+            }
         }
     },
     "Proyecto con Operaciones": {
