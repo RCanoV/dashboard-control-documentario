@@ -296,7 +296,8 @@ def mostrar_formulario_reportes(estructura_maestra):
 
                 condiciones_guardar = []
                 for _, f in df_filtros_edit.iterrows():
-                    logica = str(f.get("logica", "Y (AND)")).strip() or "Y (AND)"
+                    logica_raw = f.get("logica")
+                    logica = "Y (AND)" if pd.isna(logica_raw) or not str(logica_raw).strip() else str(logica_raw).strip()
                     campo = str(f.get("campo", "")).strip()
                     op = str(f.get("operador", "")).strip()
                     val = str(f.get("valor", "")).strip()
