@@ -271,7 +271,7 @@
         ],
         "cc": [],
         "asunto": "994440- PENDIENTES CVC - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimados Sres CVC:\n\nSe adjunta Reporte PENDIENTES POR CVC\n\n{nombre_reporte}\n\nActualizado al {fecha} ({total_registros} registros).\n\nPor favor, Subsanar a la brevedad.\n\nSaludos.\n\nRoberto Cano \nControl Documentario SHP",
+        "cuerpo": "Estimados Sres CVC:\n\nSe adjunta Reporte PENDIENTES POR CVC",
         "columnas_excel": [
             "CODIGO",
             "DESCRIPCION",
