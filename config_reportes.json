@@ -1047,19 +1047,10 @@
         ],
         "condiciones_filtro": [
             {
+                "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "SHP"
-            },
-            {
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "SUPERVISION"
-            },
-            {
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "CONTRATISTA"
+                "operador": "está en (lista)",
+                "valor": "SHP, SUPERVISION, CONTRATISTA"
             }
         ],
         "dias_semana": [
