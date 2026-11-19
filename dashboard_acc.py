@@ -13,6 +13,8 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import smtplib
 from email.message import EmailMessage
+
+#conexion al modulo de reportes
 from modulo_formulario_reportes import mostrar_formulario_reportes
 
 # Librerías para exportación a PDF (ReportLab)
@@ -27,12 +29,16 @@ import openpyxl
 from openpyxl.drawing.image import Image as ExcelImage
 from openpyxl.styles import Font, Alignment, PatternFill
 
+#conexion al editor de estructura
+from modulo_estructura_proyectos import cargar_estructura_github, mostrar_editor_estructura
+
 # ====================================================================
 # --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
 # ====================================================================
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
 ESTRUCTURA_MAESTRA = {
+    ESTRUCTURA_MAESTRA, SHA_ESTRUCTURA = cargar_estructura_github(ESTRUCTURA_MAESTRA)
     "Proyectos Mayores": {
         "994440 - Tercera Línea": {
             "config": {
@@ -1313,9 +1319,11 @@ info_contrato = contratos_dict[contrato_activo]
 st.sidebar.markdown("---")
 st.sidebar.subheader("👁️ Modo de Visualización")
 vista_modo = st.sidebar.radio(
+    vista_modo = st.sidebar.radio(
     "Selecciona qué reporte visualizar:",
-    ["Detalle de Contrato", "Consolidado de Subproyecto", "📝 Programar Reportes Diarios"]
+    ["Detalle de Contrato", "Consolidado de Subproyecto", "📝 Programar Reportes Diarios", "🏗️ Administrar Estructura"]
 )
+    
 st.sidebar.markdown("---")
 
 st.sidebar.info(
@@ -1369,6 +1377,9 @@ col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
 if vista_modo == "📝 Programar Reportes Diarios":
     df_catalogo = construir_catalogo_desde_estructura(ESTRUCTURA_MAESTRA)
     mostrar_formulario_reportes(df_catalogo)
+
+elif vista_modo == "🏗️ Administrar Estructura":
+    mostrar_editor_estructura(ESTRUCTURA_MAESTRA, SHA_ESTRUCTURA)
 
 elif vista_modo == "Consolidado de Subproyecto":
     st.subheader(f"📊 Resumen Consolidado: {subproyecto_activo}")
