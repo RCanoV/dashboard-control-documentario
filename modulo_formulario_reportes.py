@@ -7,6 +7,13 @@ import json
 GITHUB_REPO = "rcanov/dashboard-control-documentario"
 RUTA_JSON = "config_reportes.json"
 
+DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+HORARIOS_PERU = [f"{h:02d}:00" for h in range(5, 23)]  # De 05:00 a 22:00 (Hora Perú)
+COLUMNAS_BASE = [
+    "ALCANCE", "SUBPROYECTO", "TIPO_OBRA", "CONTRATO", "CARPETA",
+    "CODIGO", "DESCRIPCION", "DIAS_TRANSCURRIDOS"
+]
+
 def _get_headers():
     return {
         "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
@@ -14,6 +21,8 @@ def _get_headers():
     }
 
 def cargar_config_github():
+    if "GITHUB_TOKEN" not in st.secrets:
+        return {}, None
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_JSON}"
     r = requests.get(url, headers=_get_headers())
     if r.status_code == 200:
@@ -33,162 +42,253 @@ def guardar_config_github(config_dict, sha=None):
         json.dumps(config_dict, indent=4, ensure_ascii=False).encode("utf-8")
     ).decode("utf-8")
     payload = {
-        "message": "Actualización de reportes jerárquicos desde Streamlit",
+        "message": "Actualización de reportes programados desde Streamlit",
         "content": contenido_b64
     }
     if sha:
         payload["sha"] = sha
     return requests.put(url, headers=_get_headers(), json=payload)
 
-def mostrar_formulario_reportes(df_catalogo: pd.DataFrame):
-    """
-    df_catalogo debe contener las columnas:
-    ['ALCANCE', 'SUBPROYECTO', 'TIPO_OBRA', 'CONTRATO', 'COMPONENTE', 'PROJECT_ID', 'URL']
-    """
-    st.header("📝 Programador de Reportes Diarios por Jerarquía")
+def _extraer_catalogo_completo(estructura_maestra):
+    """Extrae contratos, carpetas configuradas y campos personalizados disponibles."""
+    registros = []
+    for alcance, subs in estructura_maestra.items():
+        if not isinstance(subs, dict):
+            continue
+        for sub, obras in subs.items():
+            if sub == "config" or not isinstance(obras, dict):
+                continue
+            cfg_sub = obras.get("config", {})
+            campos_pers = list(cfg_sub.get("campos_personalizados", {}).values())
+            for obra, contratos in obras.items():
+                if obra == "config" or not isinstance(contratos, dict):
+                    continue
+                for contrato, info in contratos.items():
+                    if not isinstance(info, dict):
+                        continue
+                    carpetas = info.get("carpetas_config", [])
+                    for carp in carpetas:
+                        registros.append({
+                            "ALCANCE": alcance,
+                            "SUBPROYECTO": sub,
+                            "TIPO_OBRA": obra,
+                            "CONTRATO": contrato,
+                            "CARPETA": carp.get("nombre", ""),
+                            "URL": carp.get("url", ""),
+                            "LONGITUD_MAX": carp.get("longitud_maxima", 10),
+                            "CAMPOS_PERS": campos_pers,
+                            "CONFIG_SUB": cfg_sub,
+                            "URLS_EXCLUIDAS": info.get("urls_excluidas", [])
+                        })
+    return pd.DataFrame(registros)
+
+def mostrar_formulario_reportes(estructura_maestra):
+    st.header("📝 Programar Reportes Automáticos")
 
     if "GITHUB_TOKEN" not in st.secrets:
         st.error("Falta configurar `GITHUB_TOKEN` en los Secrets de Streamlit.")
         return
 
     config_actual, sha_actual = cargar_config_github()
-    opciones_rep = ["-- Crear Nuevo Reporte --"] + list(config_actual.keys())
-    seleccion_rep = st.selectbox("Selecciona un reporte guardado o crea uno nuevo:", opciones_rep)
+    df_cat = _extraer_catalogo_completo(estructura_maestra)
 
-    datos = config_actual.get(seleccion_rep, {}) if seleccion_rep != "-- Crear Nuevo Reporte --" else {}
-    cfg_mail = datos.get("correo", {})
+    if df_cat.empty:
+        st.warning("No hay carpetas configuradas en la Estructura de Proyectos.")
+        return
 
-    # --- SELECTOR JERÁRQUICO DINÁMICO (fuera del form para actualización en vivo) ---
-    st.subheader("1. Alcance del Reporte")
-    niveles = {
-        "Alcance": "ALCANCE",
-        "Subproyecto": "SUBPROYECTO",
-        "Tipo de Obra": "TIPO_OBRA",
-        "Contrato": "CONTRATO",
-        "Componente": "COMPONENTE"
-    }
+    # 1. Elegir reporte existente o crear uno nuevo
+    opciones_rep = ["➕ Nuevo Reporte"] + list(config_actual.keys())
+    rep_sel = st.selectbox("Selecciona un reporte para editar o crea uno nuevo:", opciones_rep)
+    datos_prev = config_actual.get(rep_sel, {}) if rep_sel != "➕ Nuevo Reporte" else {}
 
-    col_n1, col_n2 = st.columns([1, 2])
-    with col_n1:
-        nivel_default = datos.get("nivel", "Contrato")
-        idx_nivel = list(niveles.keys()).index(nivel_default) if nivel_default in niveles else 3
-        nivel_elegido = st.selectbox("Programar reporte por:", list(niveles.keys()), index=idx_nivel)
-        col_filtro = niveles[nivel_elegido]
+    nombre_reporte = st.text_input(
+        "Nombre identificador del Reporte:",
+        value="" if rep_sel == "➕ Nuevo Reporte" else rep_sel,
+        placeholder="Ej: Reporte Diario Tercera Linea - Ingenieria"
+    )
+    activo = st.checkbox("Reporte Activo", value=datos_prev.get("activo", True))
 
-    with col_n2:
-        valores_disponibles = sorted(df_catalogo[col_filtro].dropna().unique().tolist())
-        valores_previos = [v for v in datos.get("valores_nivel", []) if v in valores_disponibles]
-        valores_elegidos = st.multiselect(f"Selecciona {nivel_elegido}(s):", valores_disponibles, default=valores_previos)
+    st.markdown("---")
 
-    # Filtro secundario opcional por Componente (si no se eligió Componente como nivel principal)
-    df_filtrado = df_catalogo[df_catalogo[col_filtro].isin(valores_elegidos)] if valores_elegidos else pd.DataFrame()
-    
-    componentes_elegidos = []
-    if nivel_elegido != "Componente" and not df_filtrado.empty:
-        comps_disp = sorted(df_filtrado["COMPONENTE"].dropna().unique().tolist())
-        comps_prev = [c for c in datos.get("componentes_filtro", []) if c in comps_disp]
-        componentes_elegidos = st.multiselect(
-            "Filtrar por Componente(s) específico(s) (vacío = todos):",
-            comps_disp,
-            default=comps_prev
+    # 2. Selección de Contratos y Carpetas dinámicas (fuera de form para actualizar en vivo)
+    st.subheader("1. Alcance y Carpetas a Escanear")
+    c1, c2 = st.columns(2)
+    with c1:
+        alc_disp = sorted(df_cat["ALCANCE"].unique().tolist())
+        alc_sel = st.multiselect("Alcance:", alc_disp, default=datos_prev.get("filtro_alcance", alc_disp))
+        df_f1 = df_cat[df_cat["ALCANCE"].isin(alc_sel)] if alc_sel else df_cat
+
+        sub_disp = sorted(df_f1["SUBPROYECTO"].unique().tolist())
+        sub_prev = [s for s in datos_prev.get("filtro_subproyecto", sub_disp) if s in sub_disp]
+        sub_sel = st.multiselect("Subproyecto:", sub_disp, default=sub_prev or sub_disp)
+        df_f2 = df_f1[df_f1["SUBPROYECTO"].isin(sub_sel)] if sub_sel else df_f1
+
+    with c2:
+        cont_disp = sorted(df_f2["CONTRATO"].unique().tolist())
+        cont_prev = [c for c in datos_prev.get("filtro_contrato", []) if c in cont_disp]
+        cont_sel = st.multiselect("Contrato / Componente:", cont_disp, default=cont_prev)
+        df_f3 = df_f2[df_f2["CONTRATO"].isin(cont_sel)] if cont_sel else df_f2
+
+    # Mostrar carpetas exactas configuradas para los contratos elegidos
+    df_f3 = df_f3.copy()
+    df_f3["ETIQUETA_CARPETA"] = df_f3["CONTRATO"] + "  ➤  " + df_f3["CARPETA"]
+    carpetas_disp = df_f3["ETIQUETA_CARPETA"].tolist()
+    carpetas_prev = [
+        f"{c['contrato']}  ➤  {c['carpeta']}"
+        for c in datos_prev.get("carpetas_seleccionadas", [])
+        if f"{c['contrato']}  ➤  {c['carpeta']}" in carpetas_disp
+    ]
+    carpetas_sel = st.multiselect(
+        "Carpetas configuradas a incluir en este reporte:",
+        carpetas_disp,
+        default=carpetas_prev if carpetas_prev else carpetas_disp
+    )
+
+    df_final_carp = df_f3[df_f3["ETIQUETA_CARPETA"].isin(carpetas_sel)]
+
+    # Calcular dinámicamente los campos disponibles para filtrar
+    campos_dinamicos = set(COLUMNAS_BASE)
+    for lista_c in df_final_carp["CAMPOS_PERS"]:
+        campos_dinamicos.update(lista_c)
+    lista_campos_filtro = sorted(list(campos_dinamicos))
+
+    st.markdown("---")
+
+    # 3. Condiciones de Filtro dinámicas
+    st.subheader("2. Condiciones de Filtro (Campos Disponibles)")
+    st.caption("Elige cualquier campo de los contratos seleccionados. Todas las reglas se aplican en conjunto (AND).")
+
+    filtros_prev = datos_prev.get("condiciones_filtro", [])
+    df_filtros_init = pd.DataFrame(filtros_prev) if filtros_prev else pd.DataFrame(
+        columns=["campo", "operador", "valor"]
+    )
+    for col in ["campo", "operador", "valor"]:
+        if col not in df_filtros_init.columns:
+            df_filtros_init[col] = ""
+
+    df_filtros_edit = st.data_editor(
+        df_filtros_init[["campo", "operador", "valor"]],
+        num_rows="dynamic",
+        use_container_width=True,
+        column_config={
+            "campo": st.column_config.SelectboxColumn("Campo a Filtrar", options=lista_campos_filtro, required=True),
+            "operador": st.column_config.SelectboxColumn(
+                "Condición",
+                options=["igual a", "diferente de", "contiene", "no contiene", "mayor que", "menor que"],
+                required=True
+            ),
+            "valor": st.column_config.TextColumn("Valor", required=True)
+        },
+        key=f"filtros_{rep_sel}"
+    )
+
+    st.markdown("---")
+
+    # 4. Programación de Días y Horarios
+    st.subheader("3. Programación de Envío (Hora Perú)")
+    h1, h2 = st.columns(2)
+    with h1:
+        dias_sel = st.multiselect(
+            "Días de la semana:",
+            DIAS_SEMANA,
+            default=datos_prev.get("dias_semana", ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"])
         )
-        if componentes_elegidos:
-            df_filtrado = df_filtrado[df_filtrado["COMPONENTE"].isin(componentes_elegidos)]
+    with h2:
+        horarios_sel = st.multiselect(
+            "Horarios de envío:",
+            HORARIOS_PERU,
+            default=datos_prev.get("horarios", ["06:00", "14:00"])
+        )
 
-    if not df_filtrado.empty:
-        st.info(f"📂 Este reporte escaneará **{len(df_filtrado)} carpeta(s)** de **{df_filtrado['CONTRATO'].nunique()} contrato(s)**.")
+    st.markdown("---")
 
-    # --- FORMULARIO DE CONDICIONES, FORMATO Y CORREO ---
-    with st.form("form_reporte_jerarquico"):
-        st.subheader("2. Reglas, Formato y Envío")
-        c1, c2 = st.columns(2)
-        with c1:
-            nombre = st.text_input(
-                "Nombre del Reporte*",
-                value="" if seleccion_rep == "-- Crear Nuevo Reporte --" else seleccion_rep,
-                placeholder="Ej: Diario_Obras_Civiles_RFIs"
-            )
-            es_diario = st.checkbox("Activar en ejecución diaria automática", value=datos.get("es_diario", True))
-        with c2:
-            separar_hojas = st.checkbox("Separar en pestañas de Excel por Contrato/Componente", value=datos.get("separar_hojas", True))
-
-        col_c1, col_c2 = st.columns(2)
-        with col_c1:
-            columnas_txt = st.text_input(
-                "Columnas a exportar (separadas por coma; vacío = todas)",
-                value=", ".join(datos.get("columnas", []))
-            )
-        with col_c2:
-            condiciones_txt = st.text_area(
-                "Condiciones de filtro (1 por línea: ==, !=, contiene)",
-                value="\n".join(datos.get("condiciones", [])),
-                height=80,
-                placeholder="CAMPO_CUSTOM_6011838 == ABIERTO\nCAMPO_CUSTOM_6011840 == SHP"
-            )
-
-        st.markdown("---")
-        activar_mail = st.checkbox("Enviar Excel por correo al finalizar", value=cfg_mail.get("activar", True))
-        m1, m2 = st.columns(2)
-        with m1:
-            para = st.text_input("Para (separados por coma)", value=cfg_mail.get("para", ""))
-        with m2:
-            cc = st.text_input("CC (opcional)", value=cfg_mail.get("cc", ""))
-
+    # 5. Correo y Columnas del Excel
+    st.subheader("4. Destinatarios y Formato de Correo")
+    e1, e2 = st.columns(2)
+    with e1:
+        para = st.text_input("Para (separar con comas):", value=", ".join(datos_prev.get("para", ["rcano@shp.pe"])))
+        cc = st.text_input("CC (opcional, separar con comas):", value=", ".join(datos_prev.get("cc", [])))
+    with e2:
         asunto = st.text_input(
-            "Asunto (variables: {REPORTE}, {NIVEL}, {SELECCION}, {FECHA}, {TOTAL})",
-            value=cfg_mail.get("asunto", "⚠️ {REPORTE} | {NIVEL}: {SELECCION} ({FECHA}) - {TOTAL} registros")
+            "Asunto del correo:",
+            value=datos_prev.get("asunto", "Reporte Control Documentario - {nombre_reporte} ({fecha})")
         )
-        cuerpo = st.text_area(
-            "Cuerpo del correo",
-            value=cfg_mail.get("cuerpo", "Estimados,\n\nSe adjunta el {REPORTE} ({NIVEL}: {SELECCION}) actualizado al {FECHA}.\nTotal de registros filtrados: {TOTAL}.\n\nSaludos,\nRoberto Cano Vilchez\nControl Documentario SHP"),
-            height=110
+        cols_excel = st.multiselect(
+            "Columnas a incluir en el Excel (vacío = todas):",
+            lista_campos_filtro,
+            default=[c for c in datos_prev.get("columnas_excel", []) if c in lista_campos_filtro]
         )
 
-        if st.form_submit_button("💾 Guardar Reporte en GitHub", type="primary"):
-            if not nombre.strip() or df_filtrado.empty:
-                st.warning("Ingresa un nombre y selecciona al menos un elemento de la jerarquía.")
+    cuerpo = st.text_area(
+        "Cuerpo del correo (variables: {nombre_reporte}, {fecha}, {total_registros}):",
+        value=datos_prev.get("cuerpo", "Estimados,\n\nSe adjunta el reporte {nombre_reporte} actualizado al {fecha} ({total_registros} registros).\n\nSaludos."),
+        height=100
+    )
+
+    # 6. Guardar o Eliminar
+    b1, b2 = st.columns([2, 1])
+    with b1:
+        if st.button("💾 Guardar Reporte en GitHub", type="primary", use_container_width=True):
+            if not nombre_reporte.strip():
+                st.warning("Ingresa un nombre para el reporte.")
+            elif df_final_carp.empty:
+                st.warning("Selecciona al menos una carpeta para escanear.")
+            elif not dias_sel or not horarios_sel:
+                st.warning("Selecciona al menos un día de la semana y un horario.")
             else:
-                # Resolvemos las carpetas exactas para que GitHub Actions las ejecute directo
-                objetivos = []
-                for _, row in df_filtrado.iterrows():
-                    objetivos.append({
-                        "alcance": str(row["ALCANCE"]),
-                        "subproyecto": str(row["SUBPROYECTO"]),
-                        "tipo_obra": str(row["TIPO_OBRA"]),
-                        "contrato": str(row["CONTRATO"]),
-                        "componente": str(row["COMPONENTE"]),
-                        "project_id": str(row["PROJECT_ID"]),
-                        "url": str(row["URL"])
-                    })
-
-                config_actual[nombre.strip()] = {
-                    "nivel": nivel_elegido,
-                    "valores_nivel": valores_elegidos,
-                    "componentes_filtro": componentes_elegidos,
-                    "es_diario": es_diario,
-                    "separar_hojas": separar_hojas,
-                    "columnas": [c.strip() for c in columnas_txt.split(",") if c.strip()],
-                    "condiciones": [c.strip() for c in condiciones_txt.splitlines() if c.strip()],
-                    "objetivos": objetivos,
-                    "correo": {
-                        "activar": activar_mail,
-                        "para": para.strip(),
-                        "cc": cc.strip(),
-                        "asunto": asunto,
-                        "cuerpo": cuerpo
+                carpetas_guardar = [
+                    {
+                        "alcance": r["ALCANCE"],
+                        "subproyecto": r["SUBPROYECTO"],
+                        "tipo_obra": r["TIPO_OBRA"],
+                        "contrato": r["CONTRATO"],
+                        "carpeta": r["CARPETA"],
+                        "url": r["URL"],
+                        "longitud_maxima": int(r["LONGITUD_MAX"]),
+                        "config_sub": r["CONFIG_SUB"],
+                        "urls_excluidas": r["URLS_EXCLUIDAS"]
                     }
+                    for _, r in df_final_carp.iterrows()
+                ]
+
+                condiciones_guardar = []
+                for _, f in df_filtros_edit.iterrows():
+                    campo = str(f.get("campo", "")).strip()
+                    op = str(f.get("operador", "")).strip()
+                    val = str(f.get("valor", "")).strip()
+                    if campo and op and val and campo.lower() != "nan":
+                        condiciones_guardar.append({"campo": campo, "operador": op, "valor": val})
+
+                config_actual[nombre_reporte.strip()] = {
+                    "activo": activo,
+                    "filtro_alcance": alc_sel,
+                    "filtro_subproyecto": sub_sel,
+                    "filtro_contrato": cont_sel,
+                    "carpetas_seleccionadas": carpetas_guardar,
+                    "condiciones_filtro": condiciones_guardar,
+                    "dias_semana": dias_sel,
+                    "horarios": horarios_sel,
+                    "para": [x.strip() for x in para.split(",") if x.strip()],
+                    "cc": [x.strip() for x in cc.split(",") if x.strip()],
+                    "asunto": asunto.strip(),
+                    "cuerpo": cuerpo,
+                    "columnas_excel": cols_excel
                 }
+
                 res = guardar_config_github(config_actual, sha_actual)
                 if res.status_code in [200, 201]:
-                    st.success(f"✅ Reporte '{nombre.strip()}' guardado con {len(objetivos)} carpeta(s).")
+                    st.success(f"✅ Reporte '{nombre_reporte.strip()}' guardado en GitHub.")
                     st.rerun()
                 else:
                     st.error(f"Error al guardar en GitHub: {res.text}")
 
-    if seleccion_rep != "-- Crear Nuevo Reporte --":
-        if st.button(f"🗑️ Eliminar reporte '{seleccion_rep}'"):
-            del config_actual[seleccion_rep]
-            res = guardar_config_github(config_actual, sha_actual)
-            if res.status_code in [200, 201]:
-                st.success(f"Reporte '{seleccion_rep}' eliminado.")
-                st.rerun()
+    with b2:
+        if rep_sel != "➕ Nuevo Reporte" and rep_sel in config_actual:
+            if st.button("🗑️ Eliminar Reporte", use_container_width=True):
+                del config_actual[rep_sel]
+                res = guardar_config_github(config_actual, sha_actual)
+                if res.status_code in [200, 201]:
+                    st.success(f"Reporte '{rep_sel}' eliminado.")
+                    st.rerun()
+                else:
+                    st.error(f"Error al eliminar: {res.text}")
