@@ -1008,5 +1008,76 @@
             "PENDIENTE POR",
             "DIAS_TRANSCURRIDOS"
         ]
+    },
+    "998316 Nuevo Muelle SN - C466 - AS BUILT": {
+        "activo": true,
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "998316 Nuevo Muelle San Nicolas"
+        ],
+        "filtro_contrato": [
+            "CGI-SHP-066-2025 Construccion Nuevo Muelle SN"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "998316 Nuevo Muelle San Nicolas",
+                "tipo_obra": "EPC Nuevo Muelle",
+                "contrato": "CGI-SHP-066-2025 Construccion Nuevo Muelle SN",
+                "carpeta": "Planos As Built",
+                "url": "https://acc.autodesk.com/docs/files/projects/3fe40740-4483-4ed9-895b-9cb579cd7b1d?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.JYeXkA13Quiif-P-f5Ea5g&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 30,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "10295605": "REV",
+                        "10295608": "PENDIENTE POR",
+                        "10295607": "FECHA",
+                        "10295613": "TIPO DOC",
+                        "10295610": "AREA",
+                        "10295611": "FASE",
+                        "10295612": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "10295607",
+                    "id_campo_pendiente": "10295608"
+                },
+                "urls_excluidas": []
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "SHP"
+            },
+            {
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "SUPERVISION"
+            },
+            {
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "14:00"
+        ],
+        "para": [
+            "rcano@shp.pe"
+        ],
+        "cc": [],
+        "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimados,\n\nSe adjunta el reporte Seguimiento AS BUILT\nSaludos.",
+        "columnas_excel": []
     }
 }
