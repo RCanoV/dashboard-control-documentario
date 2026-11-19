@@ -1931,9 +1931,12 @@
             "10:00"
         ],
         "para": [
-            "rcano@shp.pe"
+            "jmolina@bisa.com.pe"
         ],
-        "cc": [],
+        "cc": [
+            "rcano@shp.pe",
+            "sgmccontroldoc@gmail.com"
+        ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Jenny:\n\nSe adjunta Reporte PENDIENTES POR BISA",
         "columnas_excel": [
