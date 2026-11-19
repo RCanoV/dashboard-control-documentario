@@ -173,28 +173,54 @@ def mostrar_formulario_reportes(estructura_maestra):
 
     # 3. Condiciones de Filtro dinámicas
     st.subheader("2. Condiciones de Filtro (Campos Disponibles)")
-    st.caption("Elige cualquier campo de los contratos seleccionados. Todas las reglas se aplican en conjunto (AND).")
+    st.caption(
+        "Usa **'está en (lista)'** para varios valores en un mismo campo separados por coma (ej: `SHP, SUPERVISION`). "
+        "Usa **Conector** (`Y (AND)` / `O (OR)`) para combinar filas distintas."
+    )
 
     filtros_prev = datos_prev.get("condiciones_filtro", [])
     df_filtros_init = pd.DataFrame(filtros_prev) if filtros_prev else pd.DataFrame(
-        columns=["campo", "operador", "valor"]
+        columns=["logica", "campo", "operador", "valor"]
     )
+    if "logica" not in df_filtros_init.columns:
+        df_filtros_init.insert(0, "logica", "Y (AND)")
     for col in ["campo", "operador", "valor"]:
         if col not in df_filtros_init.columns:
             df_filtros_init[col] = ""
+    df_filtros_init["logica"] = df_filtros_init["logica"].replace("", "Y (AND)").fillna("Y (AND)")
 
     df_filtros_edit = st.data_editor(
-        df_filtros_init[["campo", "operador", "valor"]],
+        df_filtros_init[["logica", "campo", "operador", "valor"]],
         num_rows="dynamic",
         use_container_width=True,
         column_config={
+            "logica": st.column_config.SelectboxColumn(
+                "Conector",
+                options=["Y (AND)", "O (OR)"],
+                default="Y (AND)",
+                required=True,
+                help="Cómo se une esta regla con la fila anterior (en la primera fila se ignora)."
+            ),
             "campo": st.column_config.SelectboxColumn("Campo a Filtrar", options=lista_campos_filtro, required=True),
             "operador": st.column_config.SelectboxColumn(
                 "Condición",
-                options=["igual a", "diferente de", "contiene", "no contiene", "mayor que", "menor que"],
+                options=[
+                    "igual a",
+                    "diferente de",
+                    "está en (lista)",
+                    "no está en (lista)",
+                    "contiene",
+                    "no contiene",
+                    "mayor que",
+                    "menor que"
+                ],
                 required=True
             ),
-            "valor": st.column_config.TextColumn("Valor", required=True)
+            "valor": st.column_config.TextColumn(
+                "Valor(es)",
+                required=True,
+                help="Para 'está en (lista)' separa los valores con coma. Ej: SHP, SUPERVISION"
+            )
         },
         key=f"filtros_{rep_sel}"
     )
