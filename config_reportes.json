@@ -100,12 +100,10 @@
             "14:00"
         ],
         "para": [
-            "controldocumentario.marcona@mutudametal.com",
-            "residentepaq5bm@covecperu.com"
+            "rcano@shp.pe"
         ],
         "cc": [
-            "jbeltran@shp.pe",
-            "rcano@shp.pe"
+            "jbeltran@shp.pe"
         ],
         "asunto": "I26A40 - PENDIENTES MUTUDA - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimados Sres MUTUDA,\n\nSe adjunta el reporte PENDIENTES POR MUTDA\n\n {nombre_reporte} \n\nActualizado al {fecha} ({total_registros} registros).\n\nPor favor, subsanar a la brevedad.\n\nSaludos.\n\nRoberto Cano \nControl Documentario SHP",
