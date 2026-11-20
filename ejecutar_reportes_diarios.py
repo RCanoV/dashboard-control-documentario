@@ -30,7 +30,7 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USER = os.environ.get("SMTP_USER", "neocano@gmail.com")
-SMTP_PASS = os.environ.get("SMTP_PASS", "7789C@ntrol")
+SMTP_PASS = os.environ.get("SMTP_PASS", "")
 REPLY_TO_CORREO = "rcano@shp.pe"
 
 RUTA_LOGO = "logoshp.jpeg"
@@ -747,23 +747,24 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
         msg.add_attachment(f.read(), maintype="application", subtype="pdf", filename=os.path.basename(ruta_pdf))
 
     servidor = SMTP_SERVER.strip()
-usuario = SMTP_USER.strip()
-clave = SMTP_PASS.replace(" ", "").strip()
+    usuario = SMTP_USER.strip()
+    clave = SMTP_PASS.replace(" ", "").strip()
 
-print(f"🔌 Conectando a {servidor}:{SMTP_PORT} con usuario {usuario} (longitud clave: {len(clave)})...")
+    print(f"🔌 Conectando a {servidor}:{SMTP_PORT} con usuario {usuario} (longitud clave: {len(clave)})...")
 
-if SMTP_PORT == 465:
-    with smtplib.SMTP_SSL(servidor, SMTP_PORT, timeout=30) as server:
-        server.login(usuario, clave)
-        server.send_message(msg)
-else:
-    with smtplib.SMTP(servidor, SMTP_PORT, timeout=30) as server:
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(usuario, clave)
-        server.send_message(msg)
-    print(f"✅ Correo enviado desde {SMTP_USER} (Reply-To: {REPLY_TO_CORREO}) a: {para_str}")
+    if SMTP_PORT == 465:
+        with smtplib.SMTP_SSL(servidor, SMTP_PORT, timeout=30) as server:
+            server.login(usuario, clave)
+            server.send_message(msg)
+    else:
+        with smtplib.SMTP(servidor, SMTP_PORT, timeout=30) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(usuario, clave)
+            server.send_message(msg)
+
+    print(f"✅ Correo enviado desde {usuario} (Reply-To: {REPLY_TO_CORREO}) a: {para_str}")
 
 
 def main():
