@@ -15,12 +15,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# Librerías para Excel (OpenPyXL)
 import openpyxl
 from openpyxl.drawing.image import Image as ExcelImage
 from openpyxl.styles import Font, PatternFill, Alignment
 
-# Librerías para PDF (ReportLab)
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -29,10 +27,11 @@ from reportlab.platypus import Image as RLImage
 
 CLIENT_ID = os.environ["CLIENT_ID"]
 CLIENT_SECRET = os.environ["CLIENT_SECRET"]
-SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.office365.com")
+SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
-SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_USER = os.environ.get("SMTP_USER", "neocano@gmail.com")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
+REPLY_TO_CORREO = "rcano@shp.pe"
 
 RUTA_LOGO = "logoshp.jpeg"
 DIAS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -42,11 +41,7 @@ token_global = None
 tiempo_inicio_token = 0
 
 
-# ====================================================================
-# --- 1. HORARIOS Y FILTROS DINÁMICOS ---
-# ====================================================================
 def corresponde_ejecutar_ahora(reporte: dict) -> bool:
-    """Verifica si toca enviar el reporte según la hora de Perú (UTC-5)."""
     if not reporte.get("activo", True):
         return False
     if os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch":
@@ -62,12 +57,10 @@ def corresponde_ejecutar_ahora(reporte: dict) -> bool:
 
 
 def aplicar_condiciones_filtro(df: pd.DataFrame, condiciones: list) -> pd.DataFrame:
-    """Aplica dinámicamente reglas AND / OR y listas separadas por coma."""
     if df.empty or not condiciones:
         return df
 
     mask_final = None
-
     for cond in condiciones:
         logica = str(cond.get("logica", "Y (AND)")).strip().upper()
         campo = cond.get("campo")
@@ -76,7 +69,6 @@ def aplicar_condiciones_filtro(df: pd.DataFrame, condiciones: list) -> pd.DataFr
 
         if campo == "DIAS_TRANSCURRIDOS" and "DIAS_TRANSCURRIDOS" not in df.columns and "DIAS" in df.columns:
             campo = "DIAS"
-
         if campo not in df.columns:
             continue
 
@@ -118,11 +110,7 @@ def aplicar_condiciones_filtro(df: pd.DataFrame, condiciones: list) -> pd.DataFr
     return df[mask_final].copy() if mask_final is not None else df
 
 
-# ====================================================================
-# --- 2. RESUMEN EJECUTIVO Y GRÁFICO DASHBOARD ---
-# ====================================================================
 def construir_resumen_ejecutivo(hojas_info: list):
-    """Construye la tabla resumen por contrato/carpeta y los KPIs globales."""
     roles_detectados = []
     for info in hojas_info:
         df_full = info["df_full"]
@@ -142,12 +130,7 @@ def construir_resumen_ejecutivo(hojas_info: list):
         col_pen = info["col_pendiente"]
         meta = info["metadatos"]
 
-        fila = {
-            "Contrato": meta["contrato"],
-            "Carpeta": meta["carpeta"],
-            "Cerrados": 0
-        }
-
+        fila = {"Contrato": meta["contrato"], "Carpeta": meta["carpeta"], "Cerrados": 0}
         total_carp = len(df_full)
         cerrados_carp = 0
 
@@ -202,7 +185,6 @@ def construir_resumen_ejecutivo(hojas_info: list):
 
 
 def generar_grafico_resumen(df_resumen: pd.DataFrame, roles_cols: list, ruta_img: str):
-    """Genera el gráfico de barras apiladas por Carpeta y Responsable."""
     if df_resumen.empty:
         return None
 
@@ -234,9 +216,6 @@ def generar_grafico_resumen(df_resumen: pd.DataFrame, roles_cols: list, ruta_img
     return ruta_img
 
 
-# ====================================================================
-# --- 3. ESTILOS Y EXPORTACIÓN A EXCEL Y PDF ---
-# ====================================================================
 def obtener_colores_estado(estado):
     estado = str(estado).strip().upper()
     if estado == "CERRADO":
@@ -278,20 +257,10 @@ def limpiar_nombre_hoja(nombre: str, usados: set) -> str:
     return limpio
 
 
-def exportar_hojas_a_excel(
-    hojas_info: list,
-    ruta_excel: str,
-    ruta_logo: str,
-    nombre_rep: str,
-    fecha_hora_str: str,
-    df_resumen: pd.DataFrame,
-    kpis: dict,
-    ruta_grafico: str
-):
+def exportar_hojas_a_excel(hojas_info, ruta_excel, ruta_logo, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico):
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
 
-    # --- HOJA 1: RESUMEN EJECUTIVO / DASHBOARD ---
     ws_res = wb.create_sheet(title="Resumen")
     if os.path.exists(ruta_logo):
         img_logo = ExcelImage(ruta_logo)
@@ -304,7 +273,6 @@ def exportar_hojas_a_excel(
     ws_res["A2"] = f"Fecha de Emisión: {fecha_hora_str}"
     ws_res["A2"].font = Font(size=10, italic=True, color="4A5568")
 
-    # Tarjetas KPI (Filas 4 y 5)
     tarjetas = [
         ("A", "TOTAL DOCUMENTOS", kpis["total"], "E2E8F0", "1A365D"),
         ("C", "CERRADOS", kpis["cerrados"], "D4EDDA", "155724"),
@@ -312,10 +280,8 @@ def exportar_hojas_a_excel(
         ("G", "AVANCE GLOBAL", kpis["avance"], "CCE5FF", "004085"),
     ]
     for col_l, titulo_kpi, valor_kpi, bg_hex, fg_hex in tarjetas:
-        c_tit = ws_res[f"{col_l}4"]
-        c_val = ws_res[f"{col_l}5"]
-        c_tit.value = titulo_kpi
-        c_val.value = valor_kpi
+        c_tit, c_val = ws_res[f"{col_l}4"], ws_res[f"{col_l}5"]
+        c_tit.value, c_val.value = titulo_kpi, valor_kpi
         c_tit.font = Font(size=9, bold=True, color=fg_hex)
         c_val.font = Font(size=14, bold=True, color=fg_hex)
         c_tit.fill = PatternFill(start_color=bg_hex, end_color=bg_hex, fill_type="solid")
@@ -323,7 +289,6 @@ def exportar_hojas_a_excel(
         c_tit.alignment = Alignment(horizontal="center")
         c_val.alignment = Alignment(horizontal="center")
 
-    # Tabla Resumen (desde Fila 7)
     fila_ini_res = 7
     for col_num, col_name in enumerate(df_resumen.columns, 1):
         cell = ws_res.cell(row=fila_ini_res, column=col_num, value=col_name)
@@ -340,7 +305,6 @@ def exportar_hojas_a_excel(
             cell = ws_res.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else value)
             cell.fill = PatternFill(start_color=bg_row, end_color=bg_row, fill_type="solid")
 
-    # Incrustar Gráfico debajo de la tabla
     fila_graf = fila_ini_res + len(df_resumen) + 2
     if ruta_grafico and os.path.exists(ruta_grafico):
         img_graf = ExcelImage(ruta_grafico)
@@ -354,7 +318,6 @@ def exportar_hojas_a_excel(
     pie_res = ws_res.cell(row=fila_pie_res, column=1, value="Desarrollado por Roberto Cano - Shougang Hierro Perú")
     pie_res.font = Font(italic=True, color="4A5568")
 
-    # --- HOJAS DE DETALLE ---
     for info in hojas_info:
         ws = wb.create_sheet(title=info["hoja"])
         df = info["df"]
@@ -369,18 +332,11 @@ def exportar_hojas_a_excel(
 
         ws["A1"] = info["titulo"]
         ws["A1"].font = Font(size=14, bold=True)
-
-        ws["A3"] = "Fecha de Exportación:"
-        ws["B3"] = meta["fecha"]
-        ws["A4"] = "Alcance:"
-        ws["B4"] = meta["alcance"]
-        ws["A5"] = "Subproyecto:"
-        ws["B5"] = meta["subproyecto"]
-        ws["A6"] = "Tipo de Obra:"
-        ws["B6"] = meta["tipo_obra"]
-        ws["A7"] = "Contrato:"
-        ws["B7"] = meta["contrato"]
-
+        ws["A3"], ws["B3"] = "Fecha de Exportación:", meta["fecha"]
+        ws["A4"], ws["B4"] = "Alcance:", meta["alcance"]
+        ws["A5"], ws["B5"] = "Subproyecto:", meta["subproyecto"]
+        ws["A6"], ws["B6"] = "Tipo de Obra:", meta["tipo_obra"]
+        ws["A7"], ws["B7"] = "Contrato:", meta["contrato"]
         for row in range(3, 8):
             ws[f"A{row}"].font = Font(bold=True)
 
@@ -399,8 +355,7 @@ def exportar_hojas_a_excel(
             bg_hex, font_hex = "FFFFFF", "000000"
             if col_idx_pendiente is not None:
                 bg, text = obtener_colores_estado(row_data[col_idx_pendiente])
-                bg_hex = bg.replace("#", "")
-                font_hex = text.replace("#", "")
+                bg_hex, font_hex = bg.replace("#", ""), text.replace("#", "")
 
             for c_idx, value in enumerate(row_data, 1):
                 cell = ws.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else str(value))
@@ -415,16 +370,7 @@ def exportar_hojas_a_excel(
     wb.save(ruta_excel)
 
 
-def exportar_hojas_a_pdf(
-    hojas_info: list,
-    ruta_pdf: str,
-    ruta_logo: str,
-    nombre_rep: str,
-    fecha_hora_str: str,
-    df_resumen: pd.DataFrame,
-    kpis: dict,
-    ruta_grafico: str
-):
+def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico):
     def agregar_pie_pagina(canvas, doc):
         canvas.saveState()
         canvas.setFont("Helvetica", 9)
@@ -432,23 +378,15 @@ def exportar_hojas_a_pdf(
         canvas.drawString(doc.leftMargin, 15, "Desarrollado por Roberto Cano - Shougang Hierro Perú")
         canvas.restoreState()
 
-    doc = SimpleDocTemplate(
-        ruta_pdf,
-        pagesize=landscape(letter),
-        leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35
-    )
+    doc = SimpleDocTemplate(ruta_pdf, pagesize=landscape(letter), leftMargin=25, rightMargin=25, topMargin=25, bottomMargin=35)
     ancho_util = 742
     elements = []
     styles = getSampleStyleSheet()
 
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
-    header_style = ParagraphStyle(
-        name="HeaderCellText", parent=styles["Normal"],
-        fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold"
-    )
+    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
     kpi_style = ParagraphStyle(name="KPIText", parent=styles["Normal"], fontSize=9, leading=12, alignment=1)
 
-    # --- PÁGINA 1: RESUMEN EJECUTIVO / DASHBOARD ---
     logo_p1 = RLImage(ruta_logo, width=100, height=30, kind="proportional") if os.path.exists(ruta_logo) else Paragraph("", styles["Normal"])
     meta_p1 = (
         f"<b><font size=13>Resumen Ejecutivo: {nombre_rep}</font></b><br/><br/>"
@@ -460,7 +398,6 @@ def exportar_hojas_a_pdf(
     elements.append(tabla_cab_p1)
     elements.append(Spacer(1, 10))
 
-    # Tarjetas KPI
     kpi_data = [[
         Paragraph(f"<b>TOTAL DOCUMENTOS</b><br/><font size=13>{kpis['total']}</font>", kpi_style),
         Paragraph(f"<b>CERRADOS</b><br/><font size=13 color='#155724'>{kpis['cerrados']}</font>", kpi_style),
@@ -481,17 +418,10 @@ def exportar_hojas_a_pdf(
     elements.append(tabla_kpi)
     elements.append(Spacer(1, 12))
 
-    # Tabla Resumen
     enc_res = [Paragraph(str(c), header_style) for c in df_resumen.columns]
     mat_res = [enc_res]
     for _, row in df_resumen.iterrows():
-        mat_res.append([
-            Paragraph(
-                str("" if pd.isna(v) else v).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"),
-                cell_style
-            )
-            for v in row
-        ])
+        mat_res.append([Paragraph(str("" if pd.isna(v) else v).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"), cell_style) for v in row])
 
     anchos_res = []
     for c in df_resumen.columns:
@@ -499,7 +429,6 @@ def exportar_hojas_a_pdf(
         if cu == "CONTRATO": anchos_res.append(0.18 * ancho_util)
         elif cu == "CARPETA": anchos_res.append(0.14 * ancho_util)
         elif cu == "MAYOR RETRASO": anchos_res.append(0.28 * ancho_util)
-        elif cu in ["TOTAL", "AVANCE (%)", "CERRADOS"]: anchos_res.append(0.08 * ancho_util)
         else: anchos_res.append(0.08 * ancho_util)
     norm_r = ancho_util / sum(anchos_res)
     anchos_res = [w * norm_r for w in anchos_res]
@@ -515,11 +444,9 @@ def exportar_hojas_a_pdf(
     elements.append(tabla_res)
     elements.append(Spacer(1, 14))
 
-    # Gráfico Resumen
     if ruta_grafico and os.path.exists(ruta_grafico):
         elements.append(RLImage(ruta_grafico, width=540, height=195, kind="proportional"))
 
-    # --- PÁGINAS DE DETALLE ---
     for info in hojas_info:
         elements.append(PageBreak())
         df = info["df"]
@@ -535,12 +462,8 @@ def exportar_hojas_a_pdf(
             f"<b>Tipo de Obra:</b> {meta['tipo_obra']}<br/>"
             f"<b>Contrato:</b> {meta['contrato']}"
         )
-
         tabla_cabecera = Table([[logo, Paragraph(meta_text, styles["Normal"])]], colWidths=[120, 600])
-        tabla_cabecera.setStyle(TableStyle([
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-        ]))
+        tabla_cabecera.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("ALIGN", (0, 0), (-1, -1), "LEFT")]))
         elements.append(tabla_cabecera)
         elements.append(Spacer(1, 15))
 
@@ -561,14 +484,12 @@ def exportar_hojas_a_pdf(
             else:
                 bg_color = "#ffffff" if row_idx % 2 != 0 else "#f9fafb"
                 text_color = "#000000"
-
             estilos_tabla.append(("BACKGROUND", (0, row_idx), (-1, row_idx), colors.HexColor(bg_color)))
 
             fila = []
             for col_name in df.columns:
                 val = row[col_name]
-                text_str = "" if pd.isna(val) else str(val)
-                text_str = text_str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                text_str = ("" if pd.isna(val) else str(val)).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
                 if col_pendiente and col_pendiente in df.columns:
                     text_str = f'<font color="{text_color}">{text_str}</font>'
                 fila.append(Paragraph(text_str, cell_style))
@@ -584,7 +505,6 @@ def exportar_hojas_a_pdf(
             elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
             elif col_u == "PENDIENTE POR": anchos_columnas.append(0.15 * ancho_util)
             else: anchos_columnas.append(0.10 * ancho_util)
-
         factor_norm = ancho_util / sum(anchos_columnas)
         anchos_columnas = [w * factor_norm for w in anchos_columnas]
 
@@ -595,14 +515,10 @@ def exportar_hojas_a_pdf(
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
 
 
-# ====================================================================
-# --- 4. API AUTODESK ACC ---
-# ====================================================================
 def obtener_token(scope="data:read"):
     url = "https://developer.api.autodesk.com/authentication/v2/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
-    data = {"grant_type": "client_credentials", "scope": scope}
-    r = requests.post(url, headers=headers, data=data, auth=(CLIENT_ID, CLIENT_SECRET))
+    r = requests.post(url, headers=headers, data={"grant_type": "client_credentials", "scope": scope}, auth=(CLIENT_ID, CLIENT_SECRET))
     return r.json().get("access_token") if r.status_code == 200 else None
 
 
@@ -640,7 +556,6 @@ def obtener_tip_version_metadata(project_id, item_id):
     clean_item_id = item_id.split("?version=")[0]
     url = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/items/{urllib.parse.quote(clean_item_id, safe='')}/tip"
     headers = {"Authorization": f"Bearer {token_global}", "Content-Type": "application/json", "x-ads-region": "US"}
-
     while True:
         headers["x-ads-region"] = "US"
         r = requests.get(url, headers=headers)
@@ -660,11 +575,7 @@ def obtener_tip_version_metadata(project_id, item_id):
 def procesar_archivo_pdf(item, project_id, ruta_actual, name, campos_personalizados):
     asegurar_token()
     item_id = item.get("id", "")
-    registro_plano = {
-        "NOMBRE_DEL_ARCHIVO": name,
-        "RUTA_EN_AUTODESK": ruta_actual,
-        "ITEM_ID": item_id
-    }
+    registro_plano = {"NOMBRE_DEL_ARCHIVO": name, "RUTA_EN_AUTODESK": ruta_actual, "ITEM_ID": item_id}
     deconstruir_diccionario(item, "ITEM", registro_plano)
 
     tip_version = obtener_tip_version_metadata(project_id, item_id)
@@ -688,14 +599,12 @@ def procesar_archivo_pdf(item, project_id, ruta_actual, name, campos_personaliza
                 attr_id = str(attr.get("id"))
                 if attr_id in campos_objetivo:
                     registro_plano[f"CAMPO_CUSTOM_{attr_id}"] = str(attr.get("value", "")).strip()
-
     return registro_plano
 
 
 def escanear_recursivo(project_id, folder_id, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
     if folder_id in ids_excluidos:
         return
-
     encoded_fid = urllib.parse.quote(folder_id, safe="")
     url_api = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/folders/{encoded_fid}/contents"
 
@@ -714,11 +623,9 @@ def escanear_recursivo(project_id, folder_id, lista_datos, longitud_maxima, ids_
 
         data = res.json()
         items_pdf = []
-
         for item in data.get("data", []):
             tipo = item.get("type")
             name = str(item.get("attributes", {}).get("displayName", "Sin Nombre")).strip()
-
             if tipo == "folders":
                 sub_id = item["id"].replace("%3A", ":")
                 if sub_id in ids_excluidos:
@@ -730,10 +637,7 @@ def escanear_recursivo(project_id, folder_id, lista_datos, longitud_maxima, ids_
 
         if items_pdf:
             with ThreadPoolExecutor(max_workers=5) as executor:
-                futures = [
-                    executor.submit(procesar_archivo_pdf, i[0], project_id, ruta_actual, i[1], campos_personalizados)
-                    for i in items_pdf
-                ]
+                futures = [executor.submit(procesar_archivo_pdf, i[0], project_id, ruta_actual, i[1], campos_personalizados) for i in items_pdf]
                 for future in as_completed(futures):
                     res_item = future.result()
                     if res_item:
@@ -743,43 +647,20 @@ def escanear_recursivo(project_id, folder_id, lista_datos, longitud_maxima, ids_
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
 
-# ====================================================================
-# --- 5. ENVÍO DE CORREO (VALIDACIÓN + RESUMEN EN CUERPO + EXCEL + PDF) ---
-# ====================================================================
 def generar_tabla_html(df: pd.DataFrame) -> str:
     html = df.to_html(index=False)
-    html = html.replace(
-        '<table border="1" class="dataframe">',
-        '<table cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px; text-align: center; border: 1px solid #ddd;">'
-    )
-    html = html.replace(
-        '<th>',
-        '<th style="background-color: #1A365D; color: #ffffff; padding: 8px; border: 1px solid #ddd;">'
-    )
-    html = html.replace(
-        '<td>',
-        '<td style="padding: 6px; border: 1px solid #ddd;">'
-    )
+    html = html.replace('<table border="1" class="dataframe">', '<table cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px; text-align: center; border: 1px solid #ddd;">')
+    html = html.replace('<th>', '<th style="background-color: #1A365D; color: #ffffff; padding: 8px; border: 1px solid #ddd;">')
+    html = html.replace('<td>', '<td style="padding: 6px; border: 1px solid #ddd;">')
     return html
 
 
-def enviar_correo(
-    cfg: dict,
-    ruta_excel: str,
-    ruta_pdf: str,
-    variables: dict,
-    df_resumen: pd.DataFrame,
-    kpis: dict,
-    ruta_grafico: str = None
-):
+def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico=None):
     patron_email = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-
     para_raw = cfg.get("para", [])
     cc_raw = cfg.get("cc", [])
-    if isinstance(para_raw, str):
-        para_raw = re.split(r"[;,]", para_raw)
-    if isinstance(cc_raw, str):
-        cc_raw = re.split(r"[;,]", cc_raw)
+    if isinstance(para_raw, str): para_raw = re.split(r"[;,]", para_raw)
+    if isinstance(cc_raw, str): cc_raw = re.split(r"[;,]", cc_raw)
 
     para_validos = [c.strip() for c in para_raw if patron_email.match(c.strip())]
     cc_validos = [c.strip() for c in cc_raw if patron_email.match(c.strip())]
@@ -808,11 +689,9 @@ def enviar_correo(
     <html>
     <body style="font-family: Arial, sans-serif; color: #2d3748; font-size: 13px; line-height: 1.5;">
         <p>{cuerpo_intro_html}</p>
-
         <h3 style="color: #1A365D; border-bottom: 2px solid #1A365D; padding-bottom: 4px;">
             Resumen Ejecutivo - {variables['nombre_reporte']} ({variables['fecha']})
         </h3>
-
         <table cellpadding="10" cellspacing="6" style="width: 100%; border-collapse: separate; margin-bottom: 14px; text-align: center;">
             <tr>
                 <td style="background-color: #E2E8F0; color: #1A365D; border-radius: 6px; width: 25%;">
@@ -833,20 +712,14 @@ def enviar_correo(
                 </td>
             </tr>
         </table>
-
         {generar_tabla_html(df_resumen)}
-
         {bloque_grafico_html}
-
         <p style="margin-top: 18px; font-size: 12px; color: #4A5568;">
             Para mayor detalle, revise los archivos <b>Excel</b> y <b>PDF</b> adjuntos o acceda al dashboard interactivo:
             <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a>.
         </p>
-
         <p style="font-size: 12px; color: #4A5568; margin-top: 14px;">
-            Saludos,<br>
-            <b>Roberto Cano Vílchez</b><br>
-            Control Documentario - Shougang Hierro Perú
+            Saludos,<br><b>Roberto Cano Vílchez</b><br>Control Documentario - Shougang Hierro Perú
         </p>
     </body>
     </html>
@@ -854,7 +727,8 @@ def enviar_correo(
 
     msg = EmailMessage()
     msg["Subject"] = asunto_tpl.format(**variables)
-    msg["From"] = SMTP_USER
+    msg["From"] = f"Control Documentario SHP <{SMTP_USER}>"
+    msg["Reply-To"] = REPLY_TO_CORREO
     msg["To"] = para_str
     if cc_str:
         msg["Cc"] = cc_str
@@ -862,44 +736,23 @@ def enviar_correo(
     msg.set_content(cuerpo_texto)
     msg.add_alternative(cuerpo_html, subtype="html")
 
-    # Incrustar el gráfico dentro del cuerpo HTML
     if ruta_grafico and os.path.exists(ruta_grafico):
         with open(ruta_grafico, "rb") as img_f:
-            msg.get_payload()[1].add_related(
-                img_f.read(),
-                maintype="image",
-                subtype="png",
-                cid="<grafico_resumen>"
-            )
+            msg.get_payload()[1].add_related(img_f.read(), maintype="image", subtype="png", cid="<grafico_resumen>")
 
-    # Adjuntar Excel
     with open(ruta_excel, "rb") as f:
-        msg.add_attachment(
-            f.read(),
-            maintype="application",
-            subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            filename=os.path.basename(ruta_excel)
-        )
+        msg.add_attachment(f.read(), maintype="application", subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename=os.path.basename(ruta_excel))
 
-    # Adjuntar PDF
     with open(ruta_pdf, "rb") as f:
-        msg.add_attachment(
-            f.read(),
-            maintype="application",
-            subtype="pdf",
-            filename=os.path.basename(ruta_pdf)
-        )
+        msg.add_attachment(f.read(), maintype="application", subtype="pdf", filename=os.path.basename(ruta_pdf))
 
     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
         server.starttls()
         server.login(SMTP_USER, SMTP_PASS)
         server.send_message(msg)
-    print(f"✅ Correo enviado (Resumen en cuerpo + Excel + PDF) a: {para_str}")
+    print(f"✅ Correo enviado desde {SMTP_USER} (Reply-To: {REPLY_TO_CORREO}) a: {para_str}")
 
 
-# ====================================================================
-# --- 6. EJECUCIÓN PRINCIPAL ---
-# ====================================================================
 def main():
     global token_global, tiempo_inicio_token
     if not os.path.exists("config_reportes.json"):
@@ -911,7 +764,7 @@ def main():
         plantillas = json.loads(contenido) if contenido else {}
 
     if not plantillas:
-        print("No hay reportes configurados en config_reportes.json.")
+        print("No hay reportes configurados.")
         return
 
     token_global = obtener_token("data:read")
@@ -922,7 +775,7 @@ def main():
     hora_peru = datetime.now(timezone(timedelta(hours=-5)))
     fecha_str = hora_peru.strftime("%d/%m/%Y")
     fecha_hora_str = hora_peru.strftime("%d/%m/%Y %H:%M")
-    fecha_archivo = hora_peru.strftime("%Y%m%d")
+    fecha_archivo = hora_peru.strftime("%Y%m%d_%H%M")
     fecha_hoy_ts = pd.Timestamp(hora_peru.date())
 
     reporte_objetivo = os.getenv("REPORTE_OBJETIVO", "").strip()
@@ -930,18 +783,24 @@ def main():
     for nombre_rep, cfg in plantillas.items():
         if reporte_objetivo and nombre_rep != reporte_objetivo:
             continue
+
+        # Solo procesar reportes configurados en modo Nube
+        modo = cfg.get("modo_envio", "☁️ Nube (GitHub + Gmail)")
+        if "Local" in modo:
+            print(f"💻 Omitido en GitHub Actions '{nombre_rep}' (configurado para ejecución Local en PC).")
+            continue
+
         if not reporte_objetivo and not corresponde_ejecutar_ahora(cfg):
             print(f"⏭️ Omitido '{nombre_rep}' (inactivo o fuera de su día/horario configurado).")
             continue
 
-        print(f"🚀 Procesando reporte: {nombre_rep}...")
+        print(f"🚀 Procesando reporte en Nube: {nombre_rep}...")
         hojas_info = []
         hojas_usadas = set()
         total_registros = 0
 
         for obj in cfg.get("carpetas_seleccionadas", []):
-            url_carpeta = obj.get("url", "")
-            project_id, fid = extraer_project_y_folder_id(url_carpeta)
+            project_id, fid = extraer_project_y_folder_id(obj.get("url", ""))
             if not project_id or not fid:
                 continue
 
@@ -959,7 +818,6 @@ def main():
                 continue
 
             df_completo = pd.DataFrame(datos_carpeta)
-
             if "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION" not in df_completo.columns:
                 df_completo["ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] = ""
 
@@ -979,13 +837,9 @@ def main():
             else:
                 df_completo["DIAS"] = ""
 
-            renombres = {
-                "NOMBRE_DEL_ARCHIVO": "CODIGO",
-                "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": "DESCRIPCION",
-            }
+            renombres = {"NOMBRE_DEL_ARCHIVO": "CODIGO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": "DESCRIPCION"}
             for cid, nombre_col in campos_pers.items():
                 renombres[f"CAMPO_CUSTOM_{cid}"] = nombre_col
-
             df = df_completo.rename(columns=renombres)
 
             if col_pendiente in df.columns:
@@ -1032,7 +886,6 @@ def main():
             print(f"ℹ️ Sin resultados que cumplan los filtros para '{nombre_rep}'.")
             continue
 
-        # Construir Resumen Ejecutivo y Gráfico
         df_resumen, roles_cols, kpis = construir_resumen_ejecutivo(hojas_info)
         base_archivo = re.sub(r'[^\w\-]', '_', nombre_rep)
         ruta_grafico = f"grafico_{base_archivo}.png"
@@ -1045,12 +898,8 @@ def main():
         exportar_hojas_a_pdf(hojas_info, ruta_pdf, RUTA_LOGO, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico)
 
         variables = {
-            "nombre_reporte": nombre_rep,
-            "fecha": fecha_str,
-            "total_registros": total_registros,
-            "REPORTE": nombre_rep,
-            "FECHA": fecha_str,
-            "TOTAL": total_registros
+            "nombre_reporte": nombre_rep, "fecha": fecha_str, "total_registros": total_registros,
+            "REPORTE": nombre_rep, "FECHA": fecha_str, "TOTAL": total_registros
         }
         enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico)
 
