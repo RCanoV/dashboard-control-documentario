@@ -2670,6 +2670,7 @@
             "AREA",
             "DISCIPLINA",
             "TIPO DOC",
+            "CODIGO",
             "DESCRIPCION",
             "REV",
             "FECHA",
