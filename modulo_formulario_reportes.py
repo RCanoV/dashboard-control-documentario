@@ -7,13 +7,18 @@ import re
 
 GITHUB_REPO = "rcanov/dashboard-control-documentario"
 RUTA_JSON = "config_reportes.json"
-ARCHIVO_WORKFLOW = "reportes_diarios.yml"  # Verifica que coincida con tu archivo en .github/workflows/
+ARCHIVO_WORKFLOW = "reportes_diarios.yml"
 
 DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-HORARIOS_PERU = [f"{h:02d}:00" for h in range(5, 23)]  # De 05:00 a 22:00 (Hora Perú)
+HORARIOS_PERU = [f"{h:02d}:00" for h in range(5, 23)]
 COLUMNAS_BASE = [
     "ALCANCE", "SUBPROYECTO", "TIPO_OBRA", "CONTRATO", "CARPETA",
     "CODIGO", "DESCRIPCION", "DIAS_TRANSCURRIDOS"
+]
+
+MODOS_ENVIO = [
+    "☁️ Nube (GitHub + Gmail)",
+    "💻 Local (Mi PC + Outlook SHP)"
 ]
 
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -77,7 +82,7 @@ def disparar_envio_github_actions(reporte_objetivo="", rama="main"):
 
 
 def _extraer_catalogo_completo(estructura_maestra):
-    """Extrae contratos, carpetas configuradas y campos personalizados disponibles."""
+    """Extrae contratos, carpetas configuradas, ruta local y campos personalizados."""
     registros = []
     for alcance, subs in estructura_maestra.items():
         if not isinstance(subs, dict):
@@ -94,6 +99,7 @@ def _extraer_catalogo_completo(estructura_maestra):
                     if not isinstance(info, dict):
                         continue
                     carpetas = info.get("carpetas_config", [])
+                    ruta_local = info.get("ruta_guardado_local", "")
                     for carp in carpetas:
                         registros.append({
                             "ALCANCE": alcance,
@@ -105,7 +111,8 @@ def _extraer_catalogo_completo(estructura_maestra):
                             "LONGITUD_MAX": carp.get("longitud_maxima", 10),
                             "CAMPOS_PERS": campos_pers,
                             "CONFIG_SUB": cfg_sub,
-                            "URLS_EXCLUIDAS": info.get("urls_excluidas", [])
+                            "URLS_EXCLUIDAS": info.get("urls_excluidas", []),
+                            "RUTA_LOCAL": ruta_local
                         })
     return pd.DataFrame(registros)
 
@@ -129,12 +136,22 @@ def mostrar_formulario_reportes(estructura_maestra):
     rep_sel = st.selectbox("Selecciona un reporte para editar o crea uno nuevo:", opciones_rep)
     datos_prev = config_actual.get(rep_sel, {}) if rep_sel != "➕ Nuevo Reporte" else {}
 
-    nombre_reporte = st.text_input(
-        "Nombre identificador del Reporte:",
-        value="" if rep_sel == "➕ Nuevo Reporte" else rep_sel,
-        placeholder="Ej: Reporte Diario Tercera Linea - Ingenieria"
-    )
+    col_n1, col_n2 = st.columns([2, 1.3])
+    with col_n1:
+        nombre_reporte = st.text_input(
+            "Nombre identificador del Reporte:",
+            value="" if rep_sel == "➕ Nuevo Reporte" else rep_sel,
+            placeholder="Ej: Reporte Diario Tercera Linea - Ingenieria"
+        )
+    with col_n2:
+        modo_prev = datos_prev.get("modo_envio", MODOS_ENVIO[0])
+        idx_modo = MODOS_ENVIO.index(modo_prev) if modo_prev in MODOS_ENVIO else 0
+        modo_envio = st.selectbox("Modo de Envío:", MODOS_ENVIO, index=idx_modo)
+
     activo = st.checkbox("Reporte Activo", value=datos_prev.get("activo", True))
+
+    if modo_envio == MODOS_ENVIO[1]:
+        st.info("💻 Este reporte se ejecutará desde tu PC (`ejecutar_reportes_local.py`), se guardará en la carpeta local del contrato y se enviará por tu Outlook corporativo.")
 
     st.markdown("---")
 
@@ -157,7 +174,6 @@ def mostrar_formulario_reportes(estructura_maestra):
         cont_sel = st.multiselect("Contrato / Componente:", cont_disp, default=cont_prev)
         df_f3 = df_f2[df_f2["CONTRATO"].isin(cont_sel)] if cont_sel else df_f2
 
-    # Mostrar carpetas exactas configuradas para los contratos elegidos
     df_f3 = df_f3.copy()
     df_f3["ETIQUETA_CARPETA"] = df_f3["CONTRATO"] + "  ➤  " + df_f3["CARPETA"]
     carpetas_disp = df_f3["ETIQUETA_CARPETA"].tolist()
@@ -174,7 +190,6 @@ def mostrar_formulario_reportes(estructura_maestra):
 
     df_final_carp = df_f3[df_f3["ETIQUETA_CARPETA"].isin(carpetas_sel)]
 
-    # Calcular dinámicamente los campos disponibles para filtrar
     campos_dinamicos = set(COLUMNAS_BASE)
     for lista_c in df_final_carp["CAMPOS_PERS"]:
         campos_dinamicos.update(lista_c)
@@ -185,7 +200,7 @@ def mostrar_formulario_reportes(estructura_maestra):
     # 3. Condiciones de Filtro dinámicas
     st.subheader("2. Condiciones de Filtro (Campos Disponibles)")
     st.caption(
-        "Usa **'está en (lista)'** para varios valores en un mismo campo separados por coma (ej: `SHP, SUPERVISION`). "
+        "Usa **'está en (lista)'** para varios valores separados por coma (ej: `SHP, SUPERVISION`). "
         "Usa **Conector** (`Y (AND)` / `O (OR)`) para combinar filas distintas."
     )
 
@@ -209,29 +224,18 @@ def mostrar_formulario_reportes(estructura_maestra):
                 "Conector",
                 options=["Y (AND)", "O (OR)"],
                 default="Y (AND)",
-                required=True,
-                help="Cómo se une esta regla con la fila anterior (en la primera fila se ignora)."
+                required=True
             ),
             "campo": st.column_config.SelectboxColumn("Campo a Filtrar", options=lista_campos_filtro, required=True),
             "operador": st.column_config.SelectboxColumn(
                 "Condición",
                 options=[
-                    "igual a",
-                    "diferente de",
-                    "está en (lista)",
-                    "no está en (lista)",
-                    "contiene",
-                    "no contiene",
-                    "mayor que",
-                    "menor que"
+                    "igual a", "diferente de", "está en (lista)", "no está en (lista)",
+                    "contiene", "no contiene", "mayor que", "menor que"
                 ],
                 required=True
             ),
-            "valor": st.column_config.TextColumn(
-                "Valor(es)",
-                required=True,
-                help="Para 'está en (lista)' separa los valores con coma. Ej: SHP, SUPERVISION"
-            )
+            "valor": st.column_config.TextColumn("Valor(es)", required=True)
         },
         key=f"filtros_{rep_sel}"
     )
@@ -308,7 +312,8 @@ def mostrar_formulario_reportes(estructura_maestra):
                         "url": r["URL"],
                         "longitud_maxima": int(r["LONGITUD_MAX"]),
                         "config_sub": r["CONFIG_SUB"],
-                        "urls_excluidas": r["URLS_EXCLUIDAS"]
+                        "urls_excluidas": r["URLS_EXCLUIDAS"],
+                        "ruta_guardado_local": r["RUTA_LOCAL"]
                     }
                     for _, r in df_final_carp.iterrows()
                 ]
@@ -330,6 +335,7 @@ def mostrar_formulario_reportes(estructura_maestra):
 
                 config_actual[nombre_reporte.strip()] = {
                     "activo": activo,
+                    "modo_envio": modo_envio,
                     "filtro_alcance": alc_sel,
                     "filtro_subproyecto": sub_sel,
                     "filtro_contrato": cont_sel,
@@ -352,14 +358,15 @@ def mostrar_formulario_reportes(estructura_maestra):
                     st.error(f"Error al guardar en GitHub: {res.text}")
 
     with b2:
-        if st.button("📤 Enviar ahora", use_container_width=True):
+        es_nube = (modo_envio == MODOS_ENVIO[0])
+        if st.button("📤 Enviar ahora", use_container_width=True, disabled=not es_nube):
             nombre_limpio = nombre_reporte.strip()
             if not nombre_limpio or nombre_limpio not in config_actual:
                 st.warning("Primero haz clic en '💾 Guardar Reporte en GitHub' para poder enviarlo.")
             else:
                 res_envio = disparar_envio_github_actions(reporte_objetivo=nombre_limpio)
                 if res_envio.status_code == 204:
-                    st.success(f"✅ Envío inmediato disparado para '{nombre_limpio}'. Llegará en 1 a 2 minutos.")
+                    st.success(f"✅ Envío inmediato disparado para '{nombre_limpio}' vía Gmail. Llegará en 1 a 2 minutos.")
                 else:
                     st.error(f"No se pudo disparar el envío ({res_envio.status_code}): {res_envio.text}")
 
