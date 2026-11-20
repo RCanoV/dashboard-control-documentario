@@ -30,7 +30,7 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USER = os.environ.get("SMTP_USER", "neocano@gmail.com")
-SMTP_PASS = os.environ.get("SMTP_PASS", "")
+SMTP_PASS = os.environ.get("SMTP_PASS", "7789C@ntrol")
 REPLY_TO_CORREO = "rcano@shp.pe"
 
 RUTA_LOGO = "logoshp.jpeg"
