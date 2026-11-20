@@ -744,7 +744,7 @@ def escanear_recursivo(project_id, folder_id, lista_datos, longitud_maxima, ids_
 
 
 # ====================================================================
-# --- 5. ENVÍO DE CORREO (RESUMEN EN CUERPO + EXCEL + PDF) ---
+# --- 5. ENVÍO DE CORREO (VALIDACIÓN + RESUMEN EN CUERPO + EXCEL + PDF) ---
 # ====================================================================
 def generar_tabla_html(df: pd.DataFrame) -> str:
     html = df.to_html(index=False)
@@ -772,15 +772,24 @@ def enviar_correo(
     kpis: dict,
     ruta_grafico: str = None
 ):
-    para_lista = cfg.get("para", [])
-    cc_lista = cfg.get("cc", [])
+    patron_email = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
-    para_str = ", ".join(para_lista) if isinstance(para_lista, list) else str(para_lista)
-    cc_str = ", ".join(cc_lista) if isinstance(cc_lista, list) else str(cc_lista)
+    para_raw = cfg.get("para", [])
+    cc_raw = cfg.get("cc", [])
+    if isinstance(para_raw, str):
+        para_raw = re.split(r"[;,]", para_raw)
+    if isinstance(cc_raw, str):
+        cc_raw = re.split(r"[;,]", cc_raw)
 
-    if not para_str or not SMTP_USER:
-        print("Correo omitido: falta destinatario o SMTP_USER.")
+    para_validos = [c.strip() for c in para_raw if patron_email.match(c.strip())]
+    cc_validos = [c.strip() for c in cc_raw if patron_email.match(c.strip())]
+
+    if not para_validos or not SMTP_USER:
+        print("⚠️ Correo omitido: no hay destinatarios válidos o falta SMTP_USER.")
         return
+
+    para_str = ", ".join(para_validos)
+    cc_str = ", ".join(cc_validos)
 
     asunto_tpl = cfg.get("asunto", "Reporte Control Documentario - {nombre_reporte} ({fecha})")
     cuerpo_tpl = cfg.get("cuerpo", "Adjunto el reporte {nombre_reporte} al {fecha} ({total_registros} registros).")
