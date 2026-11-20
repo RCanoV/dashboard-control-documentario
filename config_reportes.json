@@ -2347,7 +2347,11 @@
                         "11981550": "REV",
                         "11981548": "PENDIENTE POR",
                         "11981549": "FECHA",
-                        "11981551": "ESTADO"
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
                     },
                     "id_campo_fecha": "11981549",
                     "id_campo_pendiente": "11981548"
@@ -2370,7 +2374,11 @@
                         "11981550": "REV",
                         "11981548": "PENDIENTE POR",
                         "11981549": "FECHA",
-                        "11981551": "ESTADO"
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
                     },
                     "id_campo_fecha": "11981549",
                     "id_campo_pendiente": "11981548"
@@ -2393,7 +2401,11 @@
                         "11981550": "REV",
                         "11981548": "PENDIENTE POR",
                         "11981549": "FECHA",
-                        "11981551": "ESTADO"
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
                     },
                     "id_campo_fecha": "11981549",
                     "id_campo_pendiente": "11981548"
@@ -2416,7 +2428,11 @@
                         "11981550": "REV",
                         "11981548": "PENDIENTE POR",
                         "11981549": "FECHA",
-                        "11981551": "ESTADO"
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
                     },
                     "id_campo_fecha": "11981549",
                     "id_campo_pendiente": "11981548"
@@ -2439,7 +2455,11 @@
                         "11981550": "REV",
                         "11981548": "PENDIENTE POR",
                         "11981549": "FECHA",
-                        "11981551": "ESTADO"
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
                     },
                     "id_campo_fecha": "11981549",
                     "id_campo_pendiente": "11981548"
@@ -2474,6 +2494,16 @@
         "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Victor, Yamely:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
-        "columnas_excel": []
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
     }
 }
