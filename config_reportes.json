@@ -2304,9 +2304,11 @@
             "10:00"
         ],
         "para": [
+            "controldocumentario.marcona@mutudametal.com"
+        ],
+        "cc": [
             "rcano@shp.pe"
         ],
-        "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Gina:\n\nSe adjunta Reporte PENDIENTES POR COVEC",
         "columnas_excel": [
