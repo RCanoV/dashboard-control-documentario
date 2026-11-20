@@ -2647,7 +2647,7 @@
                 "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
-                "valor": "CONTRATISTA"
+                "valor": "SHP"
             }
         ],
         "dias_semana": [
@@ -2665,7 +2665,7 @@
         ],
         "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimada Victor, Yamely:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
+        "cuerpo": "Estimado:\n\nSe adjunta Reporte PENDIENTES POR GEOSERVICE",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
