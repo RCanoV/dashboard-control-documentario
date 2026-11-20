@@ -2497,9 +2497,12 @@
             "10:00"
         ],
         "para": [
+            "cdoc-c619@chec-nmmsg.com",
+            "vandygz@gmail.com"
+        ],
+        "cc": [
             "rcano@shp.pe"
         ],
-        "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Victor, Yamely:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
         "columnas_excel": [
