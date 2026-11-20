@@ -2326,6 +2326,7 @@
     },
     "I26R20 Tanque 402-026 - C619 - PENDIENTES CHEC": {
         "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
         "filtro_alcance": [
             "Proyectos Menores"
         ],
@@ -2361,7 +2362,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Menores",
@@ -2388,7 +2390,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Menores",
@@ -2415,7 +2418,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Menores",
@@ -2442,7 +2446,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Menores",
@@ -2469,7 +2474,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             }
         ],
         "condiciones_filtro": [
@@ -2500,6 +2506,7 @@
             "AREA",
             "DISCIPLINA",
             "TIPO DOC",
+            "CODIGO",
             "DESCRIPCION",
             "REV",
             "FECHA",
