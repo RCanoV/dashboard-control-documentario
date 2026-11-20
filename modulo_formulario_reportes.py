@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import base64
 import json
+import re
 
 GITHUB_REPO = "rcanov/dashboard-control-documentario"
 RUTA_JSON = "config_reportes.json"
@@ -14,6 +15,16 @@ COLUMNAS_BASE = [
     "ALCANCE", "SUBPROYECTO", "TIPO_OBRA", "CONTRATO", "CARPETA",
     "CODIGO", "DESCRIPCION", "DIAS_TRANSCURRIDOS"
 ]
+
+EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def _validar_correos(texto_correos: str):
+    """Separa por comas o punto y coma y devuelve (lista_validos, lista_invalidos)."""
+    crudos = [x.strip() for x in re.split(r"[;,]", texto_correos) if x.strip()]
+    validos = [c for c in crudos if EMAIL_REGEX.match(c)]
+    invalidos = [c for c in crudos if not EMAIL_REGEX.match(c)]
+    return validos, invalidos
 
 
 def _get_headers():
@@ -272,12 +283,20 @@ def mostrar_formulario_reportes(estructura_maestra):
     b1, b2, b3 = st.columns([2, 1.5, 1])
     with b1:
         if st.button("💾 Guardar Reporte en GitHub", type="primary", use_container_width=True):
+            para_validos, para_invalidos = _validar_correos(para)
+            cc_validos, cc_invalidos = _validar_correos(cc)
+
             if not nombre_reporte.strip():
                 st.warning("Ingresa un nombre para el reporte.")
             elif df_final_carp.empty:
                 st.warning("Selecciona al menos una carpeta para escanear.")
             elif not dias_sel or not horarios_sel:
                 st.warning("Selecciona al menos un día de la semana y un horario.")
+            elif not para_validos:
+                st.error("❌ Debes ingresar al menos un correo válido en el campo 'Para'.")
+            elif para_invalidos or cc_invalidos:
+                errores = para_invalidos + cc_invalidos
+                st.error(f"❌ Corrige estos correos inválidos antes de guardar: {', '.join(errores)}")
             else:
                 carpetas_guardar = [
                     {
@@ -318,8 +337,8 @@ def mostrar_formulario_reportes(estructura_maestra):
                     "condiciones_filtro": condiciones_guardar,
                     "dias_semana": dias_sel,
                     "horarios": horarios_sel,
-                    "para": [x.strip() for x in para.split(",") if x.strip()],
-                    "cc": [x.strip() for x in cc.split(",") if x.strip()],
+                    "para": para_validos,
+                    "cc": cc_validos,
                     "asunto": asunto.strip(),
                     "cuerpo": cuerpo,
                     "columnas_excel": cols_excel
