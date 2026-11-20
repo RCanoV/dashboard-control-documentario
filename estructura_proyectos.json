@@ -827,7 +827,11 @@
                     "11981550": "REV",
                     "11981548": "PENDIENTE POR",
                     "11981549": "FECHA",
-                    "11981551": "ESTADO"
+                    "11981551": "ESTADO",
+                    "11981546": "AREA",
+                    "11981543": "TIPO DOC",
+                    "11981544": "DISCIPLINA",
+                    "11981545": "FASE"
                 },
                 "id_campo_fecha": "11981549",
                 "id_campo_pendiente": "11981548"
