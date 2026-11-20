@@ -2325,148 +2325,128 @@
     "I26R20 Tanque 402-026 - C619 - PENDIENTES CHEC": {
         "activo": true,
         "filtro_alcance": [
-            "Proyectos Mayores"
+            "Proyectos Menores"
         ],
         "filtro_subproyecto": [
-            "994440 - Tercera Línea"
+            "I26R20 Reparacion de Tanque C402-026"
         ],
         "filtro_contrato": [
-            "Paquete 05B - CGI-SHP-010-2026"
+            "C619 CGI-SHP-019-2026"
         ],
         "carpetas_seleccionadas": [
             {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
                 "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.5zGmicrWQv6DSKhv-QGlQA&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.waNHhkfZRV2EMpm5TvMaqw&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 10,
                 "config_sub": {
                     "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO"
                     },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
                 ]
             },
             {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
                 "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cx_ccOZRRCGHb3J8EfSl2Q&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Fj8vsQg8R4KtDg1262Al3Q&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 3,
                 "config_sub": {
                     "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO"
                     },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
                 ]
             },
             {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
                 "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.RPXN3sO1QDmvJS-5hn_kBg&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z4k_ZGrnTMeQlOJyTN9p0A&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 6,
                 "config_sub": {
                     "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO"
                     },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
                 ]
             },
             {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
                 "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.MtSekBToRhGs0xIKfvL9rg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
-                "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Y31XHPY2Sy265fvyKhPt_g&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.f5BtCYtRS6yeRdPNgA5-qA&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 7,
                 "config_sub": {
                     "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO"
                     },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CGg_avSiQXKunwiqy7mSKg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO"
+                    },
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
                 ]
             }
         ],
@@ -2494,17 +2474,6 @@
         "cc": [],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Gina:\n\nSe adjunta Reporte PENDIENTES POR COVEC",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
+        "columnas_excel": []
     }
 }
