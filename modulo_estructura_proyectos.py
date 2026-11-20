@@ -7,11 +7,13 @@ import json
 GITHUB_REPO = "rcanov/dashboard-control-documentario"
 RUTA_ESTRUCTURA = "estructura_proyectos.json"
 
+
 def _get_headers():
     return {
         "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
         "Accept": "application/vnd.github.v3+json"
     }
+
 
 def cargar_estructura_github(estructura_respaldo: dict):
     """Carga la estructura desde GitHub; si aún no existe o está vacía, usa la de respaldo."""
@@ -32,6 +34,7 @@ def cargar_estructura_github(estructura_respaldo: dict):
         return estructura_respaldo, data["sha"]
     return estructura_respaldo, None
 
+
 def guardar_estructura_github(estructura_dict: dict, sha=None):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_ESTRUCTURA}"
     contenido_b64 = base64.b64encode(
@@ -45,12 +48,16 @@ def guardar_estructura_github(estructura_dict: dict, sha=None):
         payload["sha"] = sha
     return requests.put(url, headers=_get_headers(), json=payload)
 
+
 def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
     st.header("🏗️ Administrar Estructura de Proyectos y Contratos")
 
     if "GITHUB_TOKEN" not in st.secrets:
         st.error("Falta configurar `GITHUB_TOKEN` en los Secrets de Streamlit.")
         return
+
+    if "modo_editar_nombres" not in st.session_state:
+        st.session_state["modo_editar_nombres"] = False
 
     # ====================================================================
     # 1. UBICACIÓN EN LA JERARQUÍA (Fuera del form para actualización en vivo)
@@ -78,6 +85,120 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
         contratos = list(contratos_dict.keys()) + ["➕ Nuevo Contrato / Componente"]
         cont_sel = st.selectbox("4. Contrato / Componente:", contratos)
         cont_final = st.text_input("Nombre del nuevo Contrato / Componente:") if cont_sel == "➕ Nuevo Contrato / Componente" else cont_sel
+
+    # --- BOTONES DE EDITAR NOMBRES Y CANCELAR ---
+    existe_alc = alc_sel != "➕ Nuevo Tipo de Alcance" and alcance_final in estructura_actual
+    existe_sub = existe_alc and sub_sel != "➕ Nuevo Subproyecto" and sub_final in subs_dict
+    existe_obra = existe_sub and obra_sel != "➕ Nuevo Tipo de Obra" and obra_final in sub_data
+    existe_cont = existe_obra and cont_sel != "➕ Nuevo Contrato / Componente" and cont_final in contratos_dict
+
+    if existe_alc:
+        btn_e1, btn_e2, _ = st.columns([1.3, 1, 3])
+        with btn_e1:
+            if st.button("✏️ Editar nombres", use_container_width=True):
+                st.session_state["modo_editar_nombres"] = True
+        with btn_e2:
+            if st.session_state["modo_editar_nombres"]:
+                if st.button("❌ Cancelar", key="btn_cancelar_top", use_container_width=True):
+                    st.session_state["modo_editar_nombres"] = False
+                    st.rerun()
+
+    if st.session_state["modo_editar_nombres"] and existe_alc:
+        st.info("Modifica solo los nombres que deseas renombrar y haz clic en **💾 Guardar nombres**.")
+        with st.form("form_renombrar_jerarquia"):
+            r1, r2 = st.columns(2)
+            with r1:
+                nuevo_alc = st.text_input("Nuevo nombre de Alcance:", value=alcance_final)
+                nuevo_sub = st.text_input(
+                    "Nuevo nombre de Subproyecto:",
+                    value=sub_final if existe_sub else "",
+                    disabled=not existe_sub
+                )
+            with r2:
+                nueva_obra = st.text_input(
+                    "Nuevo nombre de Tipo de Obra:",
+                    value=obra_final if existe_obra else "",
+                    disabled=not existe_obra
+                )
+                nuevo_cont = st.text_input(
+                    "Nuevo nombre de Contrato / Componente:",
+                    value=cont_final if existe_cont else "",
+                    disabled=not existe_cont
+                )
+
+            fg1, fg2 = st.columns(2)
+            with fg1:
+                btn_guardar_nom = st.form_submit_button("💾 Guardar nombres", type="primary", use_container_width=True)
+            with fg2:
+                btn_cancelar_nom = st.form_submit_button("❌ Cancelar", use_container_width=True)
+
+            if btn_cancelar_nom:
+                st.session_state["modo_editar_nombres"] = False
+                st.rerun()
+
+            if btn_guardar_nom:
+                error_renombre = None
+                alc_curr, sub_curr, obra_curr, cont_curr = alcance_final, sub_final, obra_final, cont_final
+
+                # Validar colisiones antes de modificar
+                if existe_cont and nuevo_cont.strip() and nuevo_cont.strip() != cont_curr:
+                    if nuevo_cont.strip() in estructura_actual[alc_curr][sub_curr][obra_curr]:
+                        error_renombre = f"Ya existe un contrato llamado '{nuevo_cont.strip()}'."
+                if not error_renombre and existe_obra and nueva_obra.strip() and nueva_obra.strip() != obra_curr:
+                    if nueva_obra.strip() in estructura_actual[alc_curr][sub_curr]:
+                        error_renombre = f"Ya existe un tipo de obra llamado '{nueva_obra.strip()}'."
+                if not error_renombre and existe_sub and nuevo_sub.strip() and nuevo_sub.strip() != sub_curr:
+                    if nuevo_sub.strip() in estructura_actual[alc_curr]:
+                        error_renombre = f"Ya existe un subproyecto llamado '{nuevo_sub.strip()}'."
+                if not error_renombre and nuevo_alc.strip() and nuevo_alc.strip() != alc_curr:
+                    if nuevo_alc.strip() in estructura_actual:
+                        error_renombre = f"Ya existe un alcance llamado '{nuevo_alc.strip()}'."
+
+                if error_renombre:
+                    st.error(f"❌ {error_renombre}")
+                else:
+                    cambios = False
+                    # 1. Renombrar Contrato
+                    if existe_cont and nuevo_cont.strip() and nuevo_cont.strip() != cont_curr:
+                        estructura_actual[alc_curr][sub_curr][obra_curr][nuevo_cont.strip()] = (
+                            estructura_actual[alc_curr][sub_curr][obra_curr].pop(cont_curr)
+                        )
+                        cont_curr = nuevo_cont.strip()
+                        cambios = True
+
+                    # 2. Renombrar Tipo de Obra
+                    if existe_obra and nueva_obra.strip() and nueva_obra.strip() != obra_curr:
+                        estructura_actual[alc_curr][sub_curr][nueva_obra.strip()] = (
+                            estructura_actual[alc_curr][sub_curr].pop(obra_curr)
+                        )
+                        obra_curr = nueva_obra.strip()
+                        cambios = True
+
+                    # 3. Renombrar Subproyecto
+                    if existe_sub and nuevo_sub.strip() and nuevo_sub.strip() != sub_curr:
+                        estructura_actual[alc_curr][nuevo_sub.strip()] = (
+                            estructura_actual[alc_curr].pop(sub_curr)
+                        )
+                        sub_curr = nuevo_sub.strip()
+                        cambios = True
+
+                    # 4. Renombrar Alcance
+                    if nuevo_alc.strip() and nuevo_alc.strip() != alc_curr:
+                        estructura_actual[nuevo_alc.strip()] = estructura_actual.pop(alc_curr)
+                        alc_curr = nuevo_alc.strip()
+                        cambios = True
+
+                    if cambios:
+                        res = guardar_estructura_github(estructura_actual, sha_actual)
+                        if res.status_code in [200, 201]:
+                            st.session_state["modo_editar_nombres"] = False
+                            st.success("✅ Nombres actualizados en GitHub correctamente.")
+                            st.rerun()
+                        else:
+                            st.error(f"Error al guardar en GitHub: {res.text}")
+                    else:
+                        st.session_state["modo_editar_nombres"] = False
+                        st.rerun()
 
     # Precargar datos existentes si se está editando
     info_cont = contratos_dict.get(cont_final, {}) if cont_final in contratos_dict else {}
@@ -186,9 +307,9 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
     st.markdown("---")
 
     # ====================================================================
-    # 4. BOTONES DE GUARDADO Y ELIMINACIÓN
+    # 4. BOTONES DE GUARDADO, CANCELAR Y ELIMINACIÓN
     # ====================================================================
-    b1, b2 = st.columns([2, 1])
+    b1, b2, b3 = st.columns([2, 1, 1])
     with b1:
         if st.button("💾 Guardar Configuración en GitHub", type="primary", use_container_width=True):
             if not all([alcance_final.strip(), sub_final.strip(), obra_final.strip(), cont_final.strip()]):
@@ -248,8 +369,13 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                     st.error(f"Error al guardar en GitHub: {res.text}")
 
     with b2:
+        if st.button("❌ Cancelar", key="btn_cancelar_bottom", use_container_width=True):
+            st.session_state["modo_editar_nombres"] = False
+            st.rerun()
+
+    with b3:
         if cont_sel != "➕ Nuevo Contrato / Componente" and cont_final in contratos_dict:
-            if st.button(f"🗑️ Eliminar Contrato", use_container_width=True):
+            if st.button("🗑️ Eliminar Contrato", use_container_width=True):
                 del estructura_actual[alcance_final][sub_final][obra_final][cont_final]
                 res = guardar_estructura_github(estructura_actual, sha_actual)
                 if res.status_code in [200, 201]:
