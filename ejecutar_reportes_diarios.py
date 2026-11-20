@@ -746,9 +746,22 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
     with open(ruta_pdf, "rb") as f:
         msg.add_attachment(f.read(), maintype="application", subtype="pdf", filename=os.path.basename(ruta_pdf))
 
-    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+    servidor = SMTP_SERVER.strip()
+usuario = SMTP_USER.strip()
+clave = SMTP_PASS.replace(" ", "").strip()
+
+print(f"🔌 Conectando a {servidor}:{SMTP_PORT} con usuario {usuario} (longitud clave: {len(clave)})...")
+
+if SMTP_PORT == 465:
+    with smtplib.SMTP_SSL(servidor, SMTP_PORT, timeout=30) as server:
+        server.login(usuario, clave)
+        server.send_message(msg)
+else:
+    with smtplib.SMTP(servidor, SMTP_PORT, timeout=30) as server:
+        server.ehlo()
         server.starttls()
-        server.login(SMTP_USER, SMTP_PASS)
+        server.ehlo()
+        server.login(usuario, clave)
         server.send_message(msg)
     print(f"✅ Correo enviado desde {SMTP_USER} (Reply-To: {REPLY_TO_CORREO}) a: {para_str}")
 
