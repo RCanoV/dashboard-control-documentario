@@ -248,7 +248,7 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
     st.markdown("---")
 
     # ====================================================================
-    # 3. DATOS DEL CONTRATO, CARPETAS Y URLS EXCLUIDAS
+    # 3. DATOS DEL CONTRATO, RUTA LOCAL, CARPETAS Y URLS EXCLUIDAS
     # ====================================================================
     st.subheader("3. Datos Generales del Contrato")
 
@@ -262,6 +262,11 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
     with f2:
         coordinador = st.text_input("Coordinador SHP:", value=info_cont.get("coordinador_shp", ""))
         admin_cont = st.text_input("Administrador de Contratos:", value=info_cont.get("administrador_contratos", ""))
+        ruta_guardado_local = st.text_input(
+            "Carpeta local donde se guardarán los reportes (PC):",
+            value=info_cont.get("ruta_guardado_local", ""),
+            placeholder=r"Ej: D:\Reportes_ACC\994440\C610"
+        )
 
     # Campos adicionales solo si es Tripartito
     empresa_1, empresa_2 = "", ""
@@ -343,6 +348,7 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                     "nombre_supervisor": supervisor.strip(),
                     "coordinador_shp": coordinador.strip(),
                     "administrador_contratos": admin_cont.strip(),
+                    "ruta_guardado_local": ruta_guardado_local.strip(),
                     "urls_excluidas": [u.strip() for u in excluidas_txt.splitlines() if u.strip()],
                     "carpetas_config": nuevas_carpetas
                 }
