@@ -2507,5 +2507,175 @@
             "PENDIENTE POR",
             "DIAS_TRANSCURRIDOS"
         ]
+    },
+    "I25G40 Mina 09 y 10 - C630 - PENDIENTES SHP": {
+        "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "I25G40 Mina 09 y 10"
+        ],
+        "filtro_contrato": [
+            "CGI-SHP-030-2026 Estudio Geotecnico y Topografico"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Estudio",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.uG9xlgHiS7K_YXJCsemrwQ&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Cronograma",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XrfMm5RpRG-UYRf7hGUAzQ&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.fhjB6fE6R6-deJ-UKjnv6A&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SIWEjMAOThqbni1Qx7FE0w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "rcano@shp.pe"
+        ],
+        "cc": [],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimada Victor, Yamely:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
     }
 }
