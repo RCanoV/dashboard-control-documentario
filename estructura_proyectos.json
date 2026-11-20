@@ -818,6 +818,59 @@
                     ]
                 }
             }
+        },
+        "Mina 09 y 10": {
+            "config": {
+                "campos_personalizados": {
+                    "12464893": "REV",
+                    "12464891": "PENDIENTE POR",
+                    "12464892": "FECHA",
+                    "12464894": "ESTADO",
+                    "12464886": "TIPO DOC",
+                    "12464889": "AREA",
+                    "12464888": "FASE",
+                    "12464890": "API",
+                    "12464880": "EMPRESA",
+                    "12464887": "DISCIPLINA"
+                },
+                "id_campo_fecha": "12464892",
+                "id_campo_pendiente": "12464891"
+            },
+            "Estudios": {
+                "CGI-SHP-030-2026 Estudio Geotecnico y Topografico": {
+                    "nombre_proyecto": "Estudio Geotecnico y Topografico Mina 09 y 10",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "",
+                    "coordinador_shp": "Jesus Cornejo",
+                    "administrador_contratos": "Marco Escobedo",
+                    "urls_excluidas": [
+                        "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                        "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                    ],
+                    "carpetas_config": [
+                        {
+                            "nombre": "Estudio",
+                            "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.uG9xlgHiS7K_YXJCsemrwQ&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        },
+                        {
+                            "nombre": "Cronograma",
+                            "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XrfMm5RpRG-UYRf7hGUAzQ&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        },
+                        {
+                            "nombre": "Cartas",
+                            "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.fhjB6fE6R6-deJ-UKjnv6A&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        },
+                        {
+                            "nombre": "Valorizaciones",
+                            "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SIWEjMAOThqbni1Qx7FE0w&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 10
+                        }
+                    ]
+                }
+            }
         }
     },
     "Proyectos Menores": {
