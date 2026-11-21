@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import urllib.parse
 from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import streamlit as st
@@ -937,15 +938,8 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
 def obtener_periodo_actual():
     tz_peru = pytz.timezone('America/Lima')
     ahora = datetime.now(tz_peru)
-    fecha_hoy = ahora.strftime("%Y-%m-%d")
-    hora = ahora.hour
-
-    if hora < 6:
-        bloque = "madrugada"
-    elif hora < 14:
-        bloque = "manana"
-    else:
-        bloque = "tarde"
+    fecha_corte = (ahora - timedelta(hours=4)).strftime("%Y-%m-%d")
+    return f"{fecha_corte}_04AM"
 
     return f"{fecha_hoy}_{bloque}"
 
