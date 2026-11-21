@@ -1055,6 +1055,22 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
                 if attr_id in campos_objetivo:
                     registro_plano[f"CAMPO_CUSTOM_{attr_id}"] = str(attr.get("value", "")).strip()
 
+url_web = item.get("links", {}).get("webView", {}).get("href", "")
+    if not url_web and tip_version:
+        url_web = tip_version.get("links", {}).get("webView", {}).get("href", "")
+    if not url_web:
+        parent_id = item.get("relationships", {}).get("parent", {}).get("data", {}).get("id", "")
+        pid_limpio = project_id.replace("b.", "")
+        url_web = (
+            f"https://acc.autodesk.com/docs/files/projects/{pid_limpio}"
+            f"?folderUrn={urllib.parse.quote(parent_id, safe='')}"
+            f"&entityId={urllib.parse.quote(item_id, safe='')}"
+            f"&viewModel=detail&moduleId=folders"
+        )
+    registro_plano["URL_DOC"] = url_web
+
+    return registro_plano
+    
     return registro_plano
 
 def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
