@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import smtplib
 from email.message import EmailMessage
 
-#conexion al modulo de reportes
+# conexion al modulo de reportes
 from modulo_formulario_reportes import mostrar_formulario_reportes
 
 # Librerías para exportación a PDF (ReportLab)
@@ -29,7 +29,7 @@ import openpyxl
 from openpyxl.drawing.image import Image as ExcelImage
 from openpyxl.styles import Font, Alignment, PatternFill
 
-#conexion al editor de estructura
+# conexion al editor de estructura
 from modulo_estructura_proyectos import cargar_estructura_github, mostrar_editor_estructura
 
 # ====================================================================
@@ -38,7 +38,6 @@ from modulo_estructura_proyectos import cargar_estructura_github, mostrar_editor
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
 
 ESTRUCTURA_MAESTRA = {
-    
     "Proyectos Mayores": {
         "994440 - Tercera Línea": {
             "config": {
@@ -530,13 +529,13 @@ COL_DESCRIPCION = "DESCRIPCION"
 try:
     CLIENT_ID = st.secrets["CLIENT_ID"]
     CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
-    EMAIL_USER = st.secrets.get("EMAIL_USER", "tu_correo@gmail.com")
-    EMAIL_PASS = st.secrets.get("EMAIL_PASSWORD", "tu_contraseña_aplicacion")
-except:
-    CLIENT_ID = "v1qczmMgnll6AUsLAPKuPVC31GaKLNnqmFsVvc6OA2Seqx4H"
-    CLIENT_SECRET = "MAKRfMaqiXWBTJiFY5sJP3BLqwcRDWClc0LjFN79HYKBoyOcBfC7ObjCdRkQzebW"
-    EMAIL_USER = "tu_correo@gmail.com"
-    EMAIL_PASS = "tu_contraseña_aplicacion"
+    EMAIL_USER = st.secrets.get("EMAIL_USER", "")
+    EMAIL_PASS = st.secrets.get("EMAIL_PASSWORD", "")
+except Exception:
+    CLIENT_ID = os.environ.get("CLIENT_ID", "")
+    CLIENT_SECRET = os.environ.get("CLIENT_SECRET", "")
+    EMAIL_USER = os.environ.get("EMAIL_USER", "")
+    EMAIL_PASS = os.environ.get("EMAIL_PASSWORD", "")
 
 # ====================================================================
 # --- 3. FUNCIONES DE EXPORTACIÓN A PDF, EXCEL Y CORREO ---
@@ -568,7 +567,6 @@ def enviar_correo_con_pdf(destinatario, asunto, cuerpo_texto, cuerpo_html, pdf_b
         msg['From'] = EMAIL_USER
         msg['To'] = destinatario
 
-        # Primero texto plano (fallback) y luego HTML
         msg.set_content(cuerpo_texto)
         msg.add_alternative(cuerpo_html, subtype='html')
 
@@ -579,7 +577,7 @@ def enviar_correo_con_pdf(destinatario, asunto, cuerpo_texto, cuerpo_html, pdf_b
             filename=nombre_archivo
         )
 
-        with smtplib.SMTP('smtp.office365.com', 587) as smtp:
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
             smtp.ehlo()
             smtp.starttls()
             smtp.ehlo()
@@ -674,8 +672,6 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
     elements = []
     styles = getSampleStyleSheet()
 
-    titulo_style = styles["Heading2"]
-    meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
     header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
     link_style = ParagraphStyle(name="Link", parent=styles["Normal"], fontSize=8, textColor=colors.blue)
@@ -810,7 +806,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
                 desplazamiento = x + (i - len(columnas_grafico_c)/2 + 0.5) * ancho_barra
                 ax.bar(desplazamiento, df_res_contrato[col], ancho_barra, label=col, color=colores[i % len(colores)])
 
-            ax.set_title(f"Estado Documentario por Carpeta y Responsable", fontsize=10, fontweight='bold')
+            ax.set_title("Estado Documentario por Carpeta y Responsable", fontsize=10, fontweight='bold')
             ax.set_xticks(x)
             ax.set_xticklabels(df_res_contrato["Carpeta"], rotation=15, ha='right', fontsize=8)
             ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc='upper left')
@@ -846,7 +842,6 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
     elements = []
     styles = getSampleStyleSheet()
 
-    meta_style = ParagraphStyle(name="Meta", parent=styles["Normal"], fontSize=9, leading=12)
     cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
     header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
 
@@ -1055,7 +1050,8 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
                 if attr_id in campos_objetivo:
                     registro_plano[f"CAMPO_CUSTOM_{attr_id}"] = str(attr.get("value", "")).strip()
 
-url_web = item.get("links", {}).get("webView", {}).get("href", "")
+    # Capturar enlace directo al documento en Autodesk ACC
+    url_web = item.get("links", {}).get("webView", {}).get("href", "")
     if not url_web and tip_version:
         url_web = tip_version.get("links", {}).get("webView", {}).get("href", "")
     if not url_web:
@@ -1069,8 +1065,6 @@ url_web = item.get("links", {}).get("webView", {}).get("href", "")
         )
     registro_plano["URL_DOC"] = url_web
 
-    return registro_plano
-    
     return registro_plano
 
 def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
@@ -1142,7 +1136,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
 
     dataframes_por_pestana = {}
     col_pendiente = campos_personalizados.get(id_campo_pendiente)
-    orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS"]
+    orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS", "URL_DOC"]
 
     for config_carpeta in carpetas_config:
         url_carpeta = config_carpeta.get("url")
@@ -1171,6 +1165,11 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
 
             df_completo = pd.DataFrame(datos_filtrados)
 
+            if "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION" not in df_completo.columns:
+                df_completo["ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] = ""
+            if "URL_DOC" not in df_completo.columns:
+                df_completo["URL_DOC"] = ""
+
             for campo_id in campos_personalizados.keys():
                 col_name = f"CAMPO_CUSTOM_{campo_id}"
                 if col_name not in df_completo.columns:
@@ -1185,7 +1184,11 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
             df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
             df_completo["DIAS"] = df_completo["DIAS"].fillna("")
 
-            columnas_finales = ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()] + ["DIAS"]
+            columnas_finales = (
+                ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"]
+                + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()]
+                + ["DIAS", "URL_DOC"]
+            )
             df = df_completo[columnas_finales].copy()
 
             diccionario_renombres = {
@@ -1204,7 +1207,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
 
             dataframes_por_pestana[nombre_pestana] = df
 
-        except Exception as e:
+        except Exception:
             continue
 
     tz_pe = pytz.timezone('America/Lima')
@@ -1233,32 +1236,17 @@ def precargar_todos_los_contratos(periodo):
                 for cont_nom, info_cont in contratos_dict.items():
                     extraer_datos_contrato_completo(cont_nom, info_cont, campos, id_fec, id_pen, periodo)
 
-def construir_catalogo_desde_estructura(estructura):
-    filas = []
-    for alcance, sub_dict in estructura.items():
-        for sub_nom, sub_data in sub_dict.items():
-            if sub_nom == "config" or not isinstance(sub_data, dict):
-                continue
-            for tipo_obra, contratos_dict in sub_data.items():
-                if tipo_obra == "config" or not isinstance(contratos_dict, dict):
-                    continue
-                for cont_nom, info_cont in contratos_dict.items():
-                    for carp in info_cont.get("carpetas_config", []):
-                        url = carp.get("url", "")
-                        if not url or "projects/" not in url:
-                            continue
-                        pid_raw = url.split("projects/")[1].split("?")[0].split("/")[0]
-                        pid = pid_raw if pid_raw.startswith("b.") else "b." + pid_raw
-                        filas.append({
-                            "ALCANCE": alcance,
-                            "SUBPROYECTO": sub_nom,
-                            "TIPO_OBRA": tipo_obra,
-                            "CONTRATO": cont_nom,
-                            "COMPONENTE": carp.get("nombre", "Sin_Nombre"),
-                            "PROJECT_ID": pid,
-                            "URL": url
-                        })
-    return pd.DataFrame(filas)
+def preparar_df_con_links(df_in: pd.DataFrame) -> pd.DataFrame:
+    """Incrusta el enlace de ACC en la columna CODIGO para mostrarlo como LinkColumn."""
+    df_vista = df_in.copy()
+    if "URL_DOC" in df_vista.columns and COL_CODIGO in df_vista.columns:
+        df_vista[COL_CODIGO] = df_vista.apply(
+            lambda r: f"{r['URL_DOC']}#doc={str(r[COL_CODIGO]).replace(' ', '\u00A0')}"
+            if pd.notna(r["URL_DOC"]) and str(r["URL_DOC"]).startswith("http")
+            else str(r[COL_CODIGO]),
+            axis=1
+        )
+    return df_vista
 
 # ====================================================================
 # --- 5. INTERFAZ WEB STREAMLIT ---
@@ -1281,7 +1269,7 @@ with col_logo:
     ruta_logo_sidebar = "logoshp.jpeg"
     try:
         st.image(ruta_logo_sidebar, use_container_width=True)
-    except:
+    except Exception:
         pass
 
 st.sidebar.markdown(
@@ -1359,7 +1347,6 @@ if st.session_state["es_admin"]:
         st.session_state["es_admin"] = False
         st.rerun()
 else:
-    # Vista por defecto: solo Reportes
     vista_modo = st.sidebar.radio(
         "📊 Reportes:",
         ["Detalle de Contrato", "Consolidado de Subproyecto"]
@@ -1373,13 +1360,13 @@ else:
 
             if btn_login:
                 admin_user = st.secrets.get("ADMIN_USER", "rcano")
-                admin_pass = st.secrets.get("ADMIN_PASS", "7789Control*")
-                if usuario_ing.strip() == admin_user and clave_ing == admin_pass:
+                admin_pass = st.secrets.get("ADMIN_PASS", "")
+                if admin_pass and usuario_ing.strip() == admin_user and clave_ing == admin_pass:
                     st.session_state["es_admin"] = True
                     st.rerun()
                 else:
                     st.error("Usuario o contraseña incorrectos.")
-    
+
 st.sidebar.markdown("---")
 
 st.sidebar.info(
@@ -1405,7 +1392,7 @@ col_firma1, col_firma2 = st.sidebar.columns([1, 3])
 with col_firma1:
     try:
         st.image(url_logo_personal, use_container_width=True)
-    except:
+    except Exception:
         pass
 with col_firma2:
     st.markdown(
@@ -1450,7 +1437,6 @@ elif vista_modo == "Consolidado de Subproyecto":
                 )
                 datos_pestanas_sub = res_cache.get("datos", {})
 
-                # --- Procesamiento Global para la Tabla Principal ---
                 conteo_roles = {}
                 total_docs = 0
                 for df_sub in datos_pestanas_sub.values():
@@ -1476,7 +1462,6 @@ elif vista_modo == "Consolidado de Subproyecto":
                 fila_sub["Avance (%)"] = f"{avance_pct:.1f}%"
                 datos_subproyecto.append(fila_sub)
 
-                # --- Procesamiento Detallado de Carpetas (Para el PDF del Subproyecto) ---
                 tipo_contrato_val_sub = info_contrato_sub.get("tipo_contrato", "Con Supervisión")
                 if tipo_contrato_val_sub == "Tripartito":
                     emp1 = info_contrato_sub.get("nombre_empresa_1", "EMPRESA 1")
@@ -1544,7 +1529,7 @@ elif vista_modo == "Consolidado de Subproyecto":
                 pdf_sub = generar_pdf_subproyecto(metadata_export, df_consolidado_sub, url_logo_personal, resumenes_por_contrato)
                 st.download_button("📄 Exportar Consolidado (PDF)", data=pdf_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.pdf", mime="application/pdf")
             with c_btn2:
-                excel_sub = exportar_df_a_excel(df_consolidado_sub, f"Consolidado de Subproyecto", metadata_export, url_logo_personal)
+                excel_sub = exportar_df_a_excel(df_consolidado_sub, "Consolidado de Subproyecto", metadata_export, url_logo_personal)
                 st.download_button("📊 Exportar Consolidado (Excel)", data=excel_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     with col_s2:
@@ -1715,10 +1700,10 @@ else:
             if not df_resumen.empty:
                 c_btn1, c_btn2 = st.columns(2)
                 with c_btn1:
-                    pdf_resumen = exportar_df_a_pdf(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
+                    pdf_resumen = exportar_df_a_pdf(df_resumen, "Resumen General de Documentos", metadata_export, url_logo_personal)
                     st.download_button(label="📄 Exportar Resumen (PDF)", data=pdf_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_resumen_pdf")
                 with c_btn2:
-                    excel_resumen = exportar_df_a_excel(df_resumen, f"Resumen General de Documentos", metadata_export, url_logo_personal)
+                    excel_resumen = exportar_df_a_excel(df_resumen, "Resumen General de Documentos", metadata_export, url_logo_personal)
                     st.download_button(label="📊 Exportar Resumen (Excel)", data=excel_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_resumen_excel")
 
         with col_g2:
@@ -1744,7 +1729,7 @@ else:
                     st.error("Por favor, ingresa al menos un correo electrónico válido.")
                 else:
                     with st.spinner("Generando reporte con detalle y enviando correo..."):
-                        pdf_buffer = exportar_df_a_pdf(df_resumen, f"Reporte de Contrato", metadata_export, url_logo_personal, col_pendiente)
+                        pdf_buffer = exportar_df_a_pdf(df_resumen, "Reporte de Contrato", metadata_export, url_logo_personal, col_pendiente)
                         nombre_pdf = f"Reporte_Contrato_{contrato_activo.replace(' ', '_')}.pdf"
 
                         cuerpo_texto = (
@@ -1802,6 +1787,14 @@ else:
 
         df_actual = datos_pestanas[pestana_seleccionada].copy()
 
+        config_columnas_detalle = {
+            COL_CODIGO: st.column_config.LinkColumn(
+                COL_CODIGO,
+                display_text=r"#doc=(.*)"
+            ),
+            "URL_DOC": None
+        }
+
         if col_pendiente in df_actual.columns:
             roles_con_cerrado = roles_pendientes + ["CERRADO"]
             estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
@@ -1842,26 +1835,42 @@ else:
                     st.plotly_chart(fig_detalle, use_container_width=True)
 
             if not df_filtrado.empty:
-                st.dataframe(df_filtrado.style.apply(pintar_filas_streamlit, axis=1), width='stretch', height=400)
+                df_vista = preparar_df_con_links(df_filtrado)
+                st.dataframe(
+                    df_vista.style.apply(pintar_filas_streamlit, axis=1),
+                    width='stretch',
+                    height=400,
+                    hide_index=True,
+                    column_config=config_columnas_detalle
+                )
 
+                df_export_det = df_filtrado.drop(columns=["URL_DOC"], errors="ignore")
                 c_det1, c_det2 = st.columns(2)
                 with c_det1:
-                    pdf_detalle = exportar_df_a_pdf(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
+                    pdf_detalle = exportar_df_a_pdf(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
                     st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf")
                 with c_det2:
-                    excel_detalle = exportar_df_a_excel(df_filtrado, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
+                    excel_detalle = exportar_df_a_excel(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
                     st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
             else:
                 st.info("No hay documentos que coincidan con el filtro seleccionado.")
 
         else:
-            st.dataframe(df_actual, width='stretch', height=400)
+            df_vista = preparar_df_con_links(df_actual)
+            st.dataframe(
+                df_vista,
+                width='stretch',
+                height=400,
+                hide_index=True,
+                column_config=config_columnas_detalle
+            )
 
             if not df_actual.empty:
+                df_export_det = df_actual.drop(columns=["URL_DOC"], errors="ignore")
                 c_det1, c_det2 = st.columns(2)
                 with c_det1:
-                    pdf_detalle = exportar_df_a_pdf(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
+                    pdf_detalle = exportar_df_a_pdf(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
                     st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_alt_pdf")
                 with c_det2:
-                    excel_detalle = exportar_df_a_excel(df_actual, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
+                    excel_detalle = exportar_df_a_excel(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
                     st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_alt_excel")
