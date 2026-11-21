@@ -1,0 +1,40 @@
+name: Precarga Diaria Dashboard (04:00 AM Perú)
+
+on:
+  schedule:
+    # 09:00 UTC equivale exactamente a las 04:00 AM en Perú (UTC-5)
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Permite probarlo manualmente cuando quieras
+
+jobs:
+  precargar_cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar Playwright
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Ejecutar precarga en Streamlit
+        run: |
+          python -c "
+          from playwright.sync_api import sync_playwright
+
+          url = 'https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/?preload=true'
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page()
+              print('Abriendo dashboard en modo preload...')
+              page.goto(url, wait_until='domcontentloaded', timeout=60000)
+              # Espera hasta 15 minutos a que aparezca el mensaje de éxito de tu script
+              page.wait_for_selector('text=¡Data global precargada exitosamente!', timeout=900000)
+              print('✅ Precarga completada con éxito.')
+              browser.close()
+          "
