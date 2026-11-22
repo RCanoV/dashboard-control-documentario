@@ -2,14 +2,14 @@ name: Precarga Diaria Dashboard (04:00 AM Perú)
 
 on:
   schedule:
-    # 09:00 UTC equivale exactamente a las 04:00 AM en Perú (UTC-5)
-    - cron: '0 9 * * *'
-  workflow_dispatch: # Permite probarlo manualmente cuando quieras
+    # 08:55 UTC equivale a las 03:55 AM en Perú (evita congestión en :00)
+    - cron: '55 8 * * *'
+  workflow_dispatch:
 
 jobs:
   precargar_cache:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Configurar Python
@@ -25,6 +25,7 @@ jobs:
       - name: Ejecutar precarga en Streamlit
         run: |
           python -c "
+          import time
           from playwright.sync_api import sync_playwright
 
           url = 'https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/?preload=true'
@@ -33,8 +34,37 @@ jobs:
               page = browser.new_page()
               print('Abriendo dashboard en modo preload...')
               page.goto(url, wait_until='domcontentloaded', timeout=60000)
-              # Espera hasta 15 minutos a que aparezca el mensaje de éxito de tu script
-              page.wait_for_selector('text=¡Data global precargada exitosamente!', timeout=900000)
-              print('✅ Precarga completada con éxito.')
+
+              # 1. Si la app está dormida, hacer clic en el botón de reactivación
+              try:
+                  btn_despertar = page.locator('button:has-text(\"Yes, get this app back up\")')
+                  if btn_despertar.is_visible(timeout=8000):
+                      print('💤 App dormida detectada. Despertando...')
+                      btn_despertar.click()
+                      time.sleep(10)
+              except Exception:
+                  pass
+
+              # 2. Esperar hasta 25 minutos buscando el texto en la página o dentro de iframes
+              inicio = time.time()
+              exito = False
+              while time.time() - inicio < 1500:
+                  for frame in page.frames:
+                      try:
+                          if frame.locator('text=Data global precargada exitosamente').count() > 0:
+                              exito = True
+                              break
+                      except Exception:
+                          pass
+                  if exito:
+                      break
+                  time.sleep(10)
+
+              if exito:
+                  print(f'✅ Precarga completada con éxito en {int(time.time() - inicio)} segundos.')
+              else:
+                  print('❌ Tiempo agotado (25 min). URL actual:', page.url)
+                  raise TimeoutError('No se detectó el mensaje de precarga completada.')
+
               browser.close()
           "
