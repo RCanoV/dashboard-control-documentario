@@ -41,33 +41,32 @@ token_global = None
 tiempo_inicio_token = 0
 
 
-def corresponde_ejecutar_ahora(
-    reporte: dict, ahora_peru: datetime, tolerancia_minutos: int = 120
-) -> bool:
-  if not reporte.get("activo", True):
-    return False
-  if os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch":
-    return True
-
-  dia_actual = DIAS_ES[ahora_peru.weekday()]
-  dias_conf = reporte.get("dias_semana", DIAS_ES)
-  if dia_actual not in dias_conf:
-    return False
-
-  horas_conf = reporte.get("horarios", [])
-  minutos_actuales = ahora_peru.hour * 60 + ahora_peru.minute
-
-  for h_str in horas_conf:
-    try:
-      hh, mm = map(int, str(h_str).strip().split(":"))
-      minutos_conf = hh * 60 + mm
-      diferencia = minutos_actuales - minutos_conf
-      if -5 <= diferencia <= tolerancia_minutos:
+def corresponde_ejecutar_ahora(reporte: dict, ahora_peru: datetime, tolerancia_minutos: int = 120) -> bool:
+    if not reporte.get("activo", True):
+        return False
+    if os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch":
         return True
-    except ValueError:
-      continue
 
-  return False
+    dia_actual = DIAS_ES[ahora_peru.weekday()]
+    dias_conf = reporte.get("dias_semana", DIAS_ES)
+    if dia_actual not in dias_conf:
+        return False
+
+    horas_conf = reporte.get("horarios", [])
+    minutos_actuales = ahora_peru.hour * 60 + ahora_peru.minute
+
+    for h_str in horas_conf:
+        try:
+            hh, mm = map(int, str(h_str).strip().split(":"))
+            minutos_conf = hh * 60 + mm
+            diferencia = minutos_actuales - minutos_conf
+            # Acepta desde 5 min antes hasta 120 min después para absorber retrasos de GitHub Actions
+            if -5 <= diferencia <= tolerancia_minutos:
+                return True
+        except ValueError:
+            continue
+
+    return False
 
 
 def aplicar_condiciones_filtro(df: pd.DataFrame, condiciones: list) -> pd.DataFrame:
@@ -440,10 +439,14 @@ def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora
     anchos_res = []
     for c in df_resumen.columns:
         cu = str(c).upper()
-        if cu == "CONTRATO": anchos_res.append(0.18 * ancho_util)
-        elif cu == "CARPETA": anchos_res.append(0.14 * ancho_util)
-        elif cu == "MAYOR RETRASO": anchos_res.append(0.28 * ancho_util)
-        else: anchos_res.append(0.08 * ancho_util)
+        if cu == "CONTRATO":
+            anchos_res.append(0.18 * ancho_util)
+        elif cu == "CARPETA":
+            anchos_res.append(0.14 * ancho_util)
+        elif cu == "MAYOR RETRASO":
+            anchos_res.append(0.28 * ancho_util)
+        else:
+            anchos_res.append(0.08 * ancho_util)
     norm_r = ancho_util / sum(anchos_res)
     anchos_res = [w * norm_r for w in anchos_res]
 
@@ -512,13 +515,20 @@ def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora
         anchos_columnas = []
         for col in df.columns:
             col_u = str(col).upper()
-            if col_u == "CODIGO": anchos_columnas.append(0.18 * ancho_util)
-            elif col_u == "DESCRIPCION": anchos_columnas.append(0.35 * ancho_util)
-            elif col_u in ["REV", "DIAS"]: anchos_columnas.append(0.06 * ancho_util)
-            elif col_u == "FECHA": anchos_columnas.append(0.09 * ancho_util)
-            elif col_u == "ESTADO": anchos_columnas.append(0.11 * ancho_util)
-            elif col_u == "PENDIENTE POR": anchos_columnas.append(0.15 * ancho_util)
-            else: anchos_columnas.append(0.10 * ancho_util)
+            if col_u == "CODIGO":
+                anchos_columnas.append(0.18 * ancho_util)
+            elif col_u == "DESCRIPCION":
+                anchos_columnas.append(0.35 * ancho_util)
+            elif col_u in ["REV", "DIAS"]:
+                anchos_columnas.append(0.06 * ancho_util)
+            elif col_u == "FECHA":
+                anchos_columnas.append(0.09 * ancho_util)
+            elif col_u == "ESTADO":
+                anchos_columnas.append(0.11 * ancho_util)
+            elif col_u == "PENDIENTE POR":
+                anchos_columnas.append(0.15 * ancho_util)
+            else:
+                anchos_columnas.append(0.10 * ancho_util)
         factor_norm = ancho_util / sum(anchos_columnas)
         anchos_columnas = [w * factor_norm for w in anchos_columnas]
 
@@ -673,8 +683,10 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
     patron_email = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     para_raw = cfg.get("para", [])
     cc_raw = cfg.get("cc", [])
-    if isinstance(para_raw, str): para_raw = re.split(r"[;,]", para_raw)
-    if isinstance(cc_raw, str): cc_raw = re.split(r"[;,]", cc_raw)
+    if isinstance(para_raw, str):
+        para_raw = re.split(r"[;,]", para_raw)
+    if isinstance(cc_raw, str):
+        cc_raw = re.split(r"[;,]", cc_raw)
 
     para_validos = [c.strip() for c in para_raw if patron_email.match(c.strip())]
     cc_validos = [c.strip() for c in cc_raw if patron_email.match(c.strip())]
@@ -806,30 +818,22 @@ def main():
     fecha_archivo = hora_peru.strftime("%Y%m%d_%H%M")
     fecha_hoy_ts = pd.Timestamp(hora_peru.date())
 
-   reporte_objetivo = os.getenv("REPORTE_OBJETIVO", "").strip()
-    objetivos_lista = [
-        r.strip() for r in reporte_objetivo.split(";") if r.strip()
-    ]
+    reporte_objetivo = os.getenv("REPORTE_OBJETIVO", "").strip()
+    objetivos_lista = [r.strip() for r in reporte_objetivo.split(";") if r.strip()]
 
     for nombre_rep, cfg in plantillas.items():
-      if objetivos_lista and nombre_rep not in objetivos_lista:
-        continue
+        if objetivos_lista and nombre_rep not in objetivos_lista:
+            continue
 
-      # Solo procesar reportes configurados en modo Nube
-      modo = cfg.get("modo_envio", "☁️ Nube (GitHub + Gmail)")
-      if "Local" in modo:
-        print(
-            f"💻 Omitido en GitHub Actions '{nombre_rep}' (configurado para"
-            " ejecución Local en PC)."
-        )
-        continue
+        # Solo procesar reportes configurados en modo Nube
+        modo = cfg.get("modo_envio", "☁️ Nube (GitHub + Gmail)")
+        if "Local" in modo:
+            print(f"💻 Omitido en GitHub Actions '{nombre_rep}' (configurado para ejecución Local en PC).")
+            continue
 
-      if not objetivos_lista and not corresponde_ejecutar_ahora(cfg, hora_peru):
-        print(
-            f"⏭️ Omitido '{nombre_rep}' (inactivo o fuera de su día/horario"
-            " configurado)."
-        )
-        continue
+        if not objetivos_lista and not corresponde_ejecutar_ahora(cfg, hora_peru):
+            print(f"⏭️ Omitido '{nombre_rep}' (inactivo o fuera de su día/horario configurado).")
+            continue
 
         print(f"🚀 Procesando reporte en Nube: {nombre_rep}...")
         hojas_info = []
