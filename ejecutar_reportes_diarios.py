@@ -42,14 +42,13 @@ tiempo_inicio_token = 0
 
 
 def corresponde_ejecutar_ahora(
-    reporte: dict, tolerancia_minutos: int = 120
+    reporte: dict, ahora_peru: datetime, tolerancia_minutos: int = 120
 ) -> bool:
   if not reporte.get("activo", True):
     return False
   if os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch":
     return True
 
-  ahora_peru = datetime.now(timezone(timedelta(hours=-5)))
   dia_actual = DIAS_ES[ahora_peru.weekday()]
   dias_conf = reporte.get("dias_semana", DIAS_ES)
   if dia_actual not in dias_conf:
@@ -63,7 +62,6 @@ def corresponde_ejecutar_ahora(
       hh, mm = map(int, str(h_str).strip().split(":"))
       minutos_conf = hh * 60 + mm
       diferencia = minutos_actuales - minutos_conf
-      # Acepta desde 5 min antes hasta 120 min después para absorber retrasos de GitHub Actions
       if -5 <= diferencia <= tolerancia_minutos:
         return True
     except ValueError:
@@ -808,21 +806,30 @@ def main():
     fecha_archivo = hora_peru.strftime("%Y%m%d_%H%M")
     fecha_hoy_ts = pd.Timestamp(hora_peru.date())
 
-    reporte_objetivo = os.getenv("REPORTE_OBJETIVO", "").strip()
+   reporte_objetivo = os.getenv("REPORTE_OBJETIVO", "").strip()
+    objetivos_lista = [
+        r.strip() for r in reporte_objetivo.split(";") if r.strip()
+    ]
 
     for nombre_rep, cfg in plantillas.items():
-        if reporte_objetivo and nombre_rep != reporte_objetivo:
-            continue
+      if objetivos_lista and nombre_rep not in objetivos_lista:
+        continue
 
-        # Solo procesar reportes configurados en modo Nube
-        modo = cfg.get("modo_envio", "☁️ Nube (GitHub + Gmail)")
-        if "Local" in modo:
-            print(f"💻 Omitido en GitHub Actions '{nombre_rep}' (configurado para ejecución Local en PC).")
-            continue
+      # Solo procesar reportes configurados en modo Nube
+      modo = cfg.get("modo_envio", "☁️ Nube (GitHub + Gmail)")
+      if "Local" in modo:
+        print(
+            f"💻 Omitido en GitHub Actions '{nombre_rep}' (configurado para"
+            " ejecución Local en PC)."
+        )
+        continue
 
-        if not reporte_objetivo and not corresponde_ejecutar_ahora(cfg):
-            print(f"⏭️ Omitido '{nombre_rep}' (inactivo o fuera de su día/horario configurado).")
-            continue
+      if not objetivos_lista and not corresponde_ejecutar_ahora(cfg, hora_peru):
+        print(
+            f"⏭️ Omitido '{nombre_rep}' (inactivo o fuera de su día/horario"
+            " configurado)."
+        )
+        continue
 
         print(f"🚀 Procesando reporte en Nube: {nombre_rep}...")
         hojas_info = []
