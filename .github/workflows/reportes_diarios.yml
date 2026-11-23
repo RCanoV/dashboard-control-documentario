@@ -2,7 +2,7 @@ name: Reportes Diarios ACC
 
 on:
   schedule:
-    - cron: '5 * * * *'   # Corre al minuto 05 de cada hora (menos congestión en GitHub)
+    - cron: '0 15 * * *'
   workflow_dispatch:
     inputs:
       reporte_objetivo:
