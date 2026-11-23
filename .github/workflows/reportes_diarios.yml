@@ -2,7 +2,8 @@ name: Reportes Diarios ACC
 
 on:
   schedule:
-    - cron: '0 15 * * *'
+    # 15:07 UTC = 10:07 AM Perú (evita la congestión de las horas en punto :00)
+    - cron: '7 15 * * *'
   workflow_dispatch:
     inputs:
       reporte_objetivo:
@@ -13,13 +14,14 @@ on:
 jobs:
   generar_y_enviar:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Descargar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
