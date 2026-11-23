@@ -41,19 +41,35 @@ token_global = None
 tiempo_inicio_token = 0
 
 
-def corresponde_ejecutar_ahora(reporte: dict) -> bool:
-    if not reporte.get("activo", True):
-        return False
-    if os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch":
+def corresponde_ejecutar_ahora(
+    reporte: dict, tolerancia_minutos: int = 120
+) -> bool:
+  if not reporte.get("activo", True):
+    return False
+  if os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch":
+    return True
+
+  ahora_peru = datetime.now(timezone(timedelta(hours=-5)))
+  dia_actual = DIAS_ES[ahora_peru.weekday()]
+  dias_conf = reporte.get("dias_semana", DIAS_ES)
+  if dia_actual not in dias_conf:
+    return False
+
+  horas_conf = reporte.get("horarios", [])
+  minutos_actuales = ahora_peru.hour * 60 + ahora_peru.minute
+
+  for h_str in horas_conf:
+    try:
+      hh, mm = map(int, str(h_str).strip().split(":"))
+      minutos_conf = hh * 60 + mm
+      diferencia = minutos_actuales - minutos_conf
+      # Acepta desde 5 min antes hasta 120 min después para absorber retrasos de GitHub Actions
+      if -5 <= diferencia <= tolerancia_minutos:
         return True
+    except ValueError:
+      continue
 
-    ahora_peru = datetime.now(timezone(timedelta(hours=-5)))
-    dia_actual = DIAS_ES[ahora_peru.weekday()]
-    hora_actual = f"{ahora_peru.hour:02d}:00"
-
-    dias_conf = reporte.get("dias_semana", DIAS_ES)
-    horas_conf = reporte.get("horarios", [])
-    return (dia_actual in dias_conf) and (hora_actual in horas_conf)
+  return False
 
 
 def aplicar_condiciones_filtro(df: pd.DataFrame, condiciones: list) -> pd.DataFrame:
