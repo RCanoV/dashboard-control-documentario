@@ -2,8 +2,10 @@ name: Precarga Diaria Dashboard (04:00 AM Perú)
 
 on:
   schedule:
-    # 08:55 UTC equivale a las 03:55 AM en Perú (evita congestión en :00)
-    - cron: '55 8 * * *'
+    # 08:17 UTC = 03:17 AM Perú (minuto fuera de congestión :00/:55)
+    - cron: '17 8 * * *'
+    # 09:23 UTC = 04:23 AM Perú (respaldo por si GitHub omite el primer disparo)
+    - cron: '23 9 * * *'
   workflow_dispatch:
 
 jobs:
@@ -13,7 +15,7 @@ jobs:
 
     steps:
       - name: Configurar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
