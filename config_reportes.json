@@ -4272,12 +4272,12 @@
             "10:00"
         ],
         "para": [
-            "jmolina@bisa.com.pe"
+            "cdoc-paquete4@chec-nmmsg.com"
         ],
         "cc": [
             "rcano@shp.pe",
-            "cdoc-paquete4@chec-nmmsg.com",
-            "alinan@shp.pe"
+            "alinan@shp.pe",
+            "jmolina@bisa.com.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Victor:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
