@@ -3081,7 +3081,7 @@
                 "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
-                "valor": "CONTRATISTA"
+                "valor": "SUPERVISION"
             }
         ],
         "dias_semana": [
@@ -3095,11 +3095,11 @@
             "10:00"
         ],
         "para": [
-            "controldocumentario.marcona@mutudametal.com"
+            "jmolina@bisa.com.pe"
         ],
         "cc": [
             "rcano@shp.pe",
-            "jmolina@bisa.com.pe"
+            "controldocumentario.marcona@mutudametal.com"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Gina:\n\nSe adjunta Reporte PENDIENTES POR COVEC",
