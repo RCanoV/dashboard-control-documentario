@@ -1954,6 +1954,7 @@
     },
     "994440 Paquete OEM 07 - C612 - PENDIENTES SHP": {
         "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
         "filtro_alcance": [
             "Proyectos Mayores"
         ],
@@ -1989,7 +1990,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -2016,7 +2018,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -2043,7 +2046,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -2070,7 +2074,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -2097,7 +2102,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             }
         ],
         "condiciones_filtro": [
@@ -2119,11 +2125,14 @@
             "10:00"
         ],
         "para": [
-            "rcano@shp.pe"
+            "mcastillo@shp.pe"
         ],
-        "cc": [],
+        "cc": [
+            "rcano@shp.pe",
+            "jcornejo@shp.pe"
+        ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimada Misael:\n\nSe adjunta Reporte PENDIENTES POR SHP",
+        "cuerpo": "Estimado Misael:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
