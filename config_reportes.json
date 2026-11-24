@@ -531,7 +531,8 @@
         ],
         "cc": [
             "rcano@shp.pe",
-            "cdoc-paquete1@chec-nmmsg.com"
+            "cdoc-paquete1@chec-nmmsg.com",
+            "vguillen@chec-nmmsg.com"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Jenny:\n\nSe adjunta Reporte PENDIENTES POR BISA",
