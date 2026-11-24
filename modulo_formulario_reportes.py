@@ -58,8 +58,11 @@ def cargar_config_github():
 
 def guardar_config_github(config_dict, sha=None):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_JSON}"
+    config_ordenado = dict(
+        sorted(config_dict.items(), key=lambda item: item[0].strip().lower())
+    )
     contenido_b64 = base64.b64encode(
-        json.dumps(config_dict, indent=4, ensure_ascii=False).encode("utf-8")
+        json.dumps(config_ordenado, indent=4, ensure_ascii=False).encode("utf-8")
     ).decode("utf-8")
     payload = {
         "message": "Actualización de reportes programados desde Streamlit",
@@ -131,7 +134,51 @@ def mostrar_formulario_reportes(estructura_maestra):
         st.warning("No hay carpetas configuradas en la Estructura de Proyectos.")
         return
 
-   # 1. Elegir reporte existente o crear uno nuevo
+    # 0. Resumen general de todos los reportes programados
+    if config_actual:
+        with st.expander("📋 Resumen General de Reportes Programados", expanded=True):
+            filas_resumen = []
+            for nom_r, cfg_r in sorted(config_actual.items(), key=lambda item: item[0].strip().lower()):
+                conds = cfg_r.get("condiciones_filtro", [])
+                filtro_txt = " | ".join(
+                    f"{c.get('campo', '')} {c.get('operador', '')} {c.get('valor', '')}"
+                    for c in conds
+                ) or "Sin filtro"
+
+                dias_r = cfg_r.get("dias_semana", [])
+                dias_txt = (
+                    "Lun - Vie"
+                    if dias_r == ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
+                    else ", ".join(dias_r)
+                )
+
+                filas_resumen.append({
+                    "Reporte": nom_r,
+                    "Estado": "🟢 Activo" if cfg_r.get("activo", True) else "🔴 Inactivo",
+                    "Horario": ", ".join(cfg_r.get("horarios", [])),
+                    "Días": dias_txt,
+                    "Filtro": filtro_txt,
+                    "Para": ", ".join(cfg_r.get("para", [])),
+                    "CC": ", ".join(cfg_r.get("cc", [])),
+                })
+
+            df_res_rep = pd.DataFrame(filas_resumen)
+            horarios_disp = ["Todos"] + sorted(
+                {h for cfg_r in config_actual.values() for h in cfg_r.get("horarios", [])}
+            )
+            filtro_hora = st.radio(
+                "Filtrar por horario de envío:",
+                horarios_disp,
+                horizontal=True
+            )
+
+            if filtro_hora != "Todos":
+                df_res_rep = df_res_rep[df_res_rep["Horario"].str.contains(filtro_hora, na=False)]
+
+            st.caption(f"Mostrando **{len(df_res_rep)}** de **{len(filas_resumen)}** reportes configurados.")
+            st.dataframe(df_res_rep, use_container_width=True, hide_index=True)
+
+    # 1. Elegir reporte existente o crear uno nuevo
     opciones_rep = ["➕ Nuevo Reporte"] + sorted(
         config_actual.keys(), key=lambda x: x.strip().lower()
     )
