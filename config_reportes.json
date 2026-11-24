@@ -3685,18 +3685,17 @@
             "10:00"
         ],
         "para": [
-            "jsalazar@shp.pe",
-            "anina@shp.pe",
-            "amayta@shp.pe",
-            "practicantepresupuestos@shp.pe",
-            "gvargas@shp.pe",
-            "anecochea@shp.pe"
+            "controldoc.marcona@cccc-peru.com",
+            "cdebim.cccc@gmail.com",
+            "cccc.proyectos@gmail.com"
         ],
         "cc": [
-            "rcano@shp.pe"
+            "rcano@shp.pe",
+            "jsalazar@shp.pe",
+            "jmolina@bisa.com.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimados:\n\nSe adjunta Reporte PENDIENTES POR SHP",
+        "cuerpo": "Estimado Lizbeth:\n\nSe adjunta Reporte PENDIENTES POR CCCC",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
