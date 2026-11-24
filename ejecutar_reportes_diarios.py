@@ -540,6 +540,70 @@ def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora
     doc.build(elements, onFirstPage=agregar_pie_pagina, onLaterPages=agregar_pie_pagina)
 
 
+def subir_pdf_a_github_release(ruta_pdf: str, fecha_archivo: str) -> str:
+    repo = os.getenv("GITHUB_REPOSITORY", "rcanov/dashboard-control-documentario")
+    token = os.getenv("GITHUB_TOKEN", "").strip()
+    if not token or not os.path.exists(ruta_pdf):
+        return ""
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+    }
+    tag = f"reportes-pdf-{fecha_archivo[:8]}"
+    url_release = f"https://api.github.com/repos/{repo}/releases/tags/{tag}"
+
+    r = requests.get(url_release, headers=headers, timeout=20)
+    if r.status_code == 404:
+        r_create = requests.post(
+            f"https://api.github.com/repos/{repo}/releases",
+            headers=headers,
+            json={
+                "tag_name": tag,
+                "name": f"Reportes PDF {fecha_archivo[:8]}",
+                "body": "Archivos PDF generados automáticamente por Reportes Diarios ACC.",
+                "draft": False,
+                "prerelease": False,
+            },
+            timeout=20,
+        )
+        if r_create.status_code not in (200, 201):
+            print(f"⚠️ No se pudo crear release {tag}: {r_create.text}")
+            return ""
+        release_data = r_create.json()
+    elif r.status_code == 200:
+        release_data = r.json()
+    else:
+        print(f"⚠️ Error consultando release {tag}: {r.text}")
+        return ""
+
+    upload_url = release_data.get("upload_url", "").split("{")[0]
+    nombre_archivo = os.path.basename(ruta_pdf)
+
+    for asset in release_data.get("assets", []):
+        if asset.get("name") == nombre_archivo:
+            requests.delete(asset["url"], headers=headers, timeout=20)
+
+    with open(ruta_pdf, "rb") as f:
+        r_up = requests.post(
+            f"{upload_url}?name={urllib.parse.quote(nombre_archivo)}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/pdf",
+            },
+            data=f.read(),
+            timeout=60,
+        )
+
+    if r_up.status_code in (200, 201):
+        enlace = r_up.json().get("browser_download_url", "")
+        print(f"🔗 PDF subido correctamente. Enlace de descarga: {enlace}")
+        return enlace
+
+    print(f"⚠️ Error al subir PDF a release: {r_up.text}")
+    return ""
+
+
 def obtener_token(scope="data:read"):
     url = "https://developer.api.autodesk.com/authentication/v2/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
@@ -680,7 +744,7 @@ def generar_tabla_html(df: pd.DataFrame) -> str:
     return html
 
 
-def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico=None):
+def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico=None, url_pdf_descarga=""):
     patron_email = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     para_raw = cfg.get("para", [])
     cc_raw = cfg.get("cc", [])
@@ -708,43 +772,63 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
     )
 
     adjuntar_excel = True
-    adjuntar_pdf = (tam_excel + tam_pdf + tam_graf) <= LIMITE_RAW_BYTES
+    adjuntar_pdf = False if url_pdf_descarga else ((tam_excel + tam_pdf + tam_graf) <= LIMITE_RAW_BYTES)
     ruta_excel_final = ruta_excel
     nota_peso_txt = ""
     nota_peso_html = ""
 
     if not adjuntar_pdf:
-        if (tam_excel + tam_graf) <= LIMITE_RAW_BYTES:
-            print("⚠️ Se omitirá el PDF para cumplir el límite de 25 MB de Gmail (se adjunta solo Excel).")
-            nota_peso_txt = "\n\nNota: El archivo PDF detallado se omitió automáticamente porque supera el límite de 25 MB de Gmail. El detalle completo se encuentra en el archivo Excel adjunto."
+        if url_pdf_descarga:
+            print(f"🔗 PDF disponible por enlace de descarga: {url_pdf_descarga}")
+            nota_peso_txt = f"\n\nEl archivo PDF detallado está disponible para descarga aquí: {url_pdf_descarga}"
             nota_peso_html = (
-                '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
-                '<b>Nota:</b> El archivo PDF detallado se omitió automáticamente porque supera el límite de 25 MB de Gmail. '
-                'El detalle completo se encuentra en el archivo Excel adjunto.</p>'
+                f'<p style="margin-top: 12px;">'
+                f'<a href="{url_pdf_descarga}" style="background-color: #1A365D; color: #ffffff; padding: 8px 14px; text-decoration: none; border-radius: 4px; font-weight: bold;">📄 Descargar Reporte PDF</a>'
+                f'</p>'
             )
+            if (tam_excel + tam_graf) > LIMITE_RAW_BYTES:
+                ruta_zip = f"{os.path.splitext(ruta_excel)[0]}.zip"
+                with zipfile.ZipFile(ruta_zip, "w", zipfile.ZIP_DEFLATED) as zf:
+                    zf.write(ruta_excel, arcname=os.path.basename(ruta_excel))
+                tam_zip = os.path.getsize(ruta_zip)
+                if (tam_zip + tam_graf) <= LIMITE_RAW_BYTES:
+                    ruta_excel_final = ruta_zip
+                    print(f"⚠️ Excel comprimido en ZIP ({tam_zip / (1024 * 1024):.1f} MB).")
+                else:
+                    adjuntar_excel = False
+                    print(f"⚠️ Excel ({tam_excel / (1024 * 1024):.1f} MB) también supera el límite de Gmail; se envía enlace del PDF y resumen.")
         else:
-            ruta_zip = f"{os.path.splitext(ruta_excel)[0]}.zip"
-            with zipfile.ZipFile(ruta_zip, "w", zipfile.ZIP_DEFLATED) as zf:
-                zf.write(ruta_excel, arcname=os.path.basename(ruta_excel))
-            tam_zip = os.path.getsize(ruta_zip)
-
-            if (tam_zip + tam_graf) <= LIMITE_RAW_BYTES:
-                ruta_excel_final = ruta_zip
-                print(f"⚠️ Excel comprimido en ZIP ({tam_zip / (1024 * 1024):.1f} MB); se omite el PDF.")
-                nota_peso_txt = "\n\nNota: Debido al gran volumen de registros, el Excel se adjunta comprimido (.zip) y se omitió el PDF para cumplir el límite de 25 MB de Gmail."
+            if (tam_excel + tam_graf) <= LIMITE_RAW_BYTES:
+                print("⚠️ Se omitirá el PDF para cumplir el límite de 25 MB de Gmail (se adjunta solo Excel).")
+                nota_peso_txt = "\n\nNota: El archivo PDF detallado se omitió automáticamente porque supera el límite de 25 MB de Gmail. El detalle completo se encuentra en el archivo Excel adjunto."
                 nota_peso_html = (
                     '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
-                    '<b>Nota:</b> Debido al gran volumen de registros, el Excel se adjunta comprimido (<b>.zip</b>) y se omitió el PDF para cumplir el límite de 25 MB de Gmail.</p>'
+                    '<b>Nota:</b> El archivo PDF detallado se omitió automáticamente porque supera el límite de 25 MB de Gmail. '
+                    'El detalle completo se encuentra en el archivo Excel adjunto.</p>'
                 )
             else:
-                adjuntar_excel = False
-                print(f"⚠️ Incluso el Excel ({tam_excel / (1024 * 1024):.1f} MB) supera el límite de Gmail. Se enviará solo el Resumen Ejecutivo.")
-                nota_peso_txt = "\n\nNota: Los archivos adjuntos (Excel/PDF) superan el límite de 25 MB permitido por Gmail debido al volumen total de documentos. Revise el resumen ejecutivo arriba y consulte el detalle completo en el dashboard web."
-                nota_peso_html = (
-                    '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
-                    '<b>Nota:</b> Los archivos adjuntos (Excel/PDF) superan el límite de 25 MB permitido por Gmail debido al volumen total de documentos. '
-                    'Revise el resumen ejecutivo en este correo y consulte el detalle completo en el dashboard web.</p>'
-                )
+                ruta_zip = f"{os.path.splitext(ruta_excel)[0]}.zip"
+                with zipfile.ZipFile(ruta_zip, "w", zipfile.ZIP_DEFLATED) as zf:
+                    zf.write(ruta_excel, arcname=os.path.basename(ruta_excel))
+                tam_zip = os.path.getsize(ruta_zip)
+
+                if (tam_zip + tam_graf) <= LIMITE_RAW_BYTES:
+                    ruta_excel_final = ruta_zip
+                    print(f"⚠️ Excel comprimido en ZIP ({tam_zip / (1024 * 1024):.1f} MB); se omite el PDF.")
+                    nota_peso_txt = "\n\nNota: Debido al gran volumen de registros, el Excel se adjunta comprimido (.zip) y se omitió el PDF para cumplir el límite de 25 MB de Gmail."
+                    nota_peso_html = (
+                        '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
+                        '<b>Nota:</b> Debido al gran volumen de registros, el Excel se adjunta comprimido (<b>.zip</b>) y se omitió el PDF para cumplir el límite de 25 MB de Gmail.</p>'
+                    )
+                else:
+                    adjuntar_excel = False
+                    print(f"⚠️ Incluso el Excel ({tam_excel / (1024 * 1024):.1f} MB) supera el límite de Gmail. Se enviará solo el Resumen Ejecutivo.")
+                    nota_peso_txt = "\n\nNota: Los archivos adjuntos (Excel/PDF) superan el límite de 25 MB permitido por Gmail debido al volumen total de documentos. Revise el resumen ejecutivo arriba y consulte el detalle completo en el dashboard web."
+                    nota_peso_html = (
+                        '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
+                        '<b>Nota:</b> Los archivos adjuntos (Excel/PDF) superan el límite de 25 MB permitido por Gmail debido al volumen total de documentos. '
+                        'Revise el resumen ejecutivo en este correo y consulte el detalle completo en el dashboard web.</p>'
+                    )
 
     para_str = ", ".join(para_validos)
     cc_str = ", ".join(cc_validos)
@@ -764,8 +848,12 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
 
     if adjuntar_excel and adjuntar_pdf:
         adjuntos_desc = "los archivos <b>Excel</b> y <b>PDF</b> adjuntos o acceda"
+    elif adjuntar_excel and url_pdf_descarga:
+        adjuntos_desc = "el archivo <b>Excel</b> adjunto, el enlace de descarga del <b>PDF</b> o acceda"
     elif adjuntar_excel:
         adjuntos_desc = "el archivo <b>Excel</b> adjunto o acceda"
+    elif url_pdf_descarga:
+        adjuntos_desc = "el enlace de descarga del <b>PDF</b> o acceda"
     else:
         adjuntos_desc = "acceda directamente"
 
@@ -1003,12 +1091,19 @@ def main():
         exportar_hojas_a_excel(hojas_info, ruta_excel, RUTA_LOGO, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico)
         exportar_hojas_a_pdf(hojas_info, ruta_pdf, RUTA_LOGO, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico)
 
+        tam_excel = os.path.getsize(ruta_excel) if os.path.exists(ruta_excel) else 0
+        tam_pdf = os.path.getsize(ruta_pdf) if os.path.exists(ruta_pdf) else 0
+        url_pdf_descarga = ""
+        if (tam_excel + tam_pdf) > (14 * 1024 * 1024):
+            url_pdf_descarga = subir_pdf_a_github_release(ruta_pdf, fecha_archivo)
+
         variables = {
             "nombre_reporte": nombre_rep, "fecha": fecha_str, "total_registros": total_registros,
-            "REPORTE": nombre_rep, "FECHA": fecha_str, "TOTAL": total_registros
+            "REPORTE": nombre_rep, "FECHA": fecha_str, "TOTAL": total_registros,
+            "url_pdf": url_pdf_descarga
         }
         try:
-            enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico)
+            enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico, url_pdf_descarga=url_pdf_descarga)
         except Exception as e:
             print(f"❌ Error enviando correo de '{nombre_rep}': {e}")
 
