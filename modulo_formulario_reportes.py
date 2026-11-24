@@ -131,8 +131,10 @@ def mostrar_formulario_reportes(estructura_maestra):
         st.warning("No hay carpetas configuradas en la Estructura de Proyectos.")
         return
 
-    # 1. Elegir reporte existente o crear uno nuevo
-    opciones_rep = ["➕ Nuevo Reporte"] + list(config_actual.keys())
+   # 1. Elegir reporte existente o crear uno nuevo
+    opciones_rep = ["➕ Nuevo Reporte"] + sorted(
+        config_actual.keys(), key=lambda x: x.strip().lower()
+    )
     rep_sel = st.selectbox("Selecciona un reporte para editar o crea uno nuevo:", opciones_rep)
     datos_prev = config_actual.get(rep_sel, {}) if rep_sel != "➕ Nuevo Reporte" else {}
 
