@@ -3868,7 +3868,7 @@
                 "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
-                "valor": "SHP"
+                "valor": "SUPERVISION"
             }
         ],
         "dias_semana": [
