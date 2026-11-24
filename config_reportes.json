@@ -3914,16 +3914,16 @@
             "994440 - Tercera Línea"
         ],
         "filtro_contrato": [
-            "Paquete 05A - CGI-SHP-004-2026"
+            "Paquete 04 - CGI-SHP-006-2026"
         ],
         "carpetas_seleccionadas": [
             {
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05A - CGI-SHP-004-2026",
+                "contrato": "Paquete 04 - CGI-SHP-006-2026",
                 "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.g756st7KT3yVaRZOztyTSg&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NWcSlYaQTxeFj0sATS_U-A&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 10,
                 "config_sub": {
                     "campos_personalizados": {
@@ -3940,8 +3940,8 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UJKXYjhISuytzIB_rqyjng&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.H3kuOcFhTk6pJOW9IJ0DhA&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.78FSqSiiT2OingJX1Ja9aQ&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZvZsTnO8QlSWDcnjw_H30w&viewModel=detail&moduleId=folders"
                 ],
                 "ruta_guardado_local": ""
             },
@@ -3949,9 +3949,9 @@
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05A - CGI-SHP-004-2026",
+                "contrato": "Paquete 04 - CGI-SHP-006-2026",
                 "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.TgPRi37tQnqLGHFE6GLelQ&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco._kdxfyRsRUGba669vzphTA&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 3,
                 "config_sub": {
                     "campos_personalizados": {
@@ -3968,8 +3968,8 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UJKXYjhISuytzIB_rqyjng&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.H3kuOcFhTk6pJOW9IJ0DhA&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.78FSqSiiT2OingJX1Ja9aQ&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZvZsTnO8QlSWDcnjw_H30w&viewModel=detail&moduleId=folders"
                 ],
                 "ruta_guardado_local": ""
             },
@@ -3977,9 +3977,9 @@
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05A - CGI-SHP-004-2026",
+                "contrato": "Paquete 04 - CGI-SHP-006-2026",
                 "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.YVxMOXejTX-HS_LbD6dHkA&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.xlVNeXVnSXe-4O8j0x-PGA&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 6,
                 "config_sub": {
                     "campos_personalizados": {
@@ -3996,8 +3996,8 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UJKXYjhISuytzIB_rqyjng&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.H3kuOcFhTk6pJOW9IJ0DhA&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.78FSqSiiT2OingJX1Ja9aQ&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZvZsTnO8QlSWDcnjw_H30w&viewModel=detail&moduleId=folders"
                 ],
                 "ruta_guardado_local": ""
             },
@@ -4005,9 +4005,9 @@
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05A - CGI-SHP-004-2026",
+                "contrato": "Paquete 04 - CGI-SHP-006-2026",
                 "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XqxxFA-MQWaF83BGQfVKMg&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.E0DpZUPrQ9GjyRfP6BjmTA&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 7,
                 "config_sub": {
                     "campos_personalizados": {
@@ -4024,8 +4024,8 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UJKXYjhISuytzIB_rqyjng&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.H3kuOcFhTk6pJOW9IJ0DhA&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.78FSqSiiT2OingJX1Ja9aQ&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZvZsTnO8QlSWDcnjw_H30w&viewModel=detail&moduleId=folders"
                 ],
                 "ruta_guardado_local": ""
             },
@@ -4033,9 +4033,9 @@
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05A - CGI-SHP-004-2026",
+                "contrato": "Paquete 04 - CGI-SHP-006-2026",
                 "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bKUwofRQS2uZ-NKyB3YhpA&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zr5NBPPPREegjBM3tgREkw&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 7,
                 "config_sub": {
                     "campos_personalizados": {
@@ -4052,8 +4052,8 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.UJKXYjhISuytzIB_rqyjng&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.H3kuOcFhTk6pJOW9IJ0DhA&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.78FSqSiiT2OingJX1Ja9aQ&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.ZvZsTnO8QlSWDcnjw_H30w&viewModel=detail&moduleId=folders"
                 ],
                 "ruta_guardado_local": ""
             }
@@ -4063,7 +4063,7 @@
                 "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
-                "valor": "SHP"
+                "valor": "SUPERVISION"
             }
         ],
         "dias_semana": [
@@ -4081,8 +4081,8 @@
         ],
         "cc": [
             "rcano@shp.pe",
-            "jsalazar@shp.pe",
-            "controldoc.marcona@cccc-peru.com"
+            "cdoc-paquete4@chec-nmmsg.com",
+            "alinan@shp.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Jenny:\n\nSe adjunta Reporte PENDIENTES POR BISA",
