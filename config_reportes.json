@@ -3275,7 +3275,7 @@
                 "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
-                "valor": "CONTRATISTA"
+                "valor": "SHP"
             }
         ],
         "dias_semana": [
@@ -3289,14 +3289,17 @@
             "10:00"
         ],
         "para": [
-            "cdoc-c619@chec-nmmsg.com",
-            "vandygz@gmail.com"
+            "achipana@shp.pe",
+            "vinjante@shp.pe",
+            "emayta@shp.pe"
         ],
         "cc": [
-            "rcano@shp.pe"
+            "rcano@shp.pe",
+            "iguzman@shp.pe",
+            "ftunque@shp.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimada Victor, Yamely:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
+        "cuerpo": "Estimados:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
