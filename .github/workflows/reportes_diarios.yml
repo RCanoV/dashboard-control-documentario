@@ -2,9 +2,9 @@ name: Reportes Diarios ACC
 
 on:
   schedule:
-    # 15:07 UTC = 10:07 AM Perú (lunes a viernes -> envía los 14 reportes de las 10:00)
+    # 15:07 UTC = 10:07 AM Perú (lunes a viernes -> envía los reportes programados de las 10:00)
     - cron: '7 15 * * 1-5'
-    # 19:07 UTC = 14:07 PM Perú (lunes a viernes -> envía el reporte AS BUILT de las 14:00)
+    # 19:07 UTC = 14:07 PM Perú (lunes a viernes -> envía los reportes programados de las 14:00)
     - cron: '7 19 * * 1-5'
   workflow_dispatch:
     inputs:
@@ -17,6 +17,8 @@ jobs:
   generar_y_enviar:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
 
     steps:
       - name: Descargar repositorio
@@ -44,10 +46,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python ejecutar_reportes_diarios.py
-
-jobs:
-  generar_y_enviar:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: write
