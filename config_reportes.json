@@ -501,6 +501,7 @@
     },
     "994440 Paquete OEM 06 - C611 - PENDIENTES SHP": {
         "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
         "filtro_alcance": [
             "Proyectos Mayores"
         ],
@@ -536,7 +537,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -563,7 +565,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -590,7 +593,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -617,7 +621,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -644,7 +649,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             },
             {
                 "alcance": "Proyectos Mayores",
@@ -671,7 +677,8 @@
                 "urls_excluidas": [
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
                     "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
-                ]
+                ],
+                "ruta_guardado_local": ""
             }
         ],
         "condiciones_filtro": [
@@ -705,6 +712,7 @@
             "AREA",
             "DISCIPLINA",
             "TIPO DOC",
+            "CODIGO",
             "DESCRIPCION",
             "REV",
             "FECHA",
