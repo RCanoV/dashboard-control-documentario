@@ -1,124 +1,4 @@
 {
-    "I-26A40 -SISTEMA COMPENSACION MEDIANTE TOLVA, CAPACIDAD 4,500 TPH CONVEYOR 2 MN": {
-        "activo": true,
-        "filtro_alcance": [
-            "Proyecto con Operaciones"
-        ],
-        "filtro_subproyecto": [
-            "Sistema de Compensacion"
-        ],
-        "filtro_contrato": [
-            "CGI-SHP-039-2026"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyecto con Operaciones",
-                "subproyecto": "Sistema de Compensacion",
-                "tipo_obra": "EPC",
-                "contrato": "CGI-SHP-039-2026",
-                "carpeta": "Ing Basica",
-                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zjxfTbUhRxG-yQ7Qa46MgQ&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "12102611": "REV",
-                        "12102609": "PENDIENTE POR",
-                        "12102610": "FECHA",
-                        "12102612": "ESTADO"
-                    },
-                    "id_campo_fecha": "12102610",
-                    "id_campo_pendiente": "12102609"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyecto con Operaciones",
-                "subproyecto": "Sistema de Compensacion",
-                "tipo_obra": "EPC",
-                "contrato": "CGI-SHP-039-2026",
-                "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8uO3tWdkT8u_K9Aj_VNCIg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "12102611": "REV",
-                        "12102609": "PENDIENTE POR",
-                        "12102610": "FECHA",
-                        "12102612": "ESTADO"
-                    },
-                    "id_campo_fecha": "12102610",
-                    "id_campo_pendiente": "12102609"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyecto con Operaciones",
-                "subproyecto": "Sistema de Compensacion",
-                "tipo_obra": "EPC",
-                "contrato": "CGI-SHP-039-2026",
-                "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.87jPmfFASbeZHlDGpTpx4w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "12102611": "REV",
-                        "12102609": "PENDIENTE POR",
-                        "12102610": "FECHA",
-                        "12102612": "ESTADO"
-                    },
-                    "id_campo_fecha": "12102610",
-                    "id_campo_pendiente": "12102609"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
-                ]
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "CONTRATISTA"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "controldocumentario.marcona@mutudametal.com",
-            "residentepaq5bm@covecperu.com"
-        ],
-        "cc": [
-            "jbeltran@shp.pe",
-            "rcano@shp.pe",
-            "jcornejo@shp.pe"
-        ],
-        "asunto": "I26A40 - PENDIENTES MUTUDA - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimados Sres MUTUDA,\n\nSe adjunta el reporte PENDIENTES POR MUTUDA correspondiente al proyecto :  {nombre_reporte} \n\nActualizado al {fecha} ({total_registros} registros).\n\nPor favor, subsanar a la brevedad.\n\nSaludos.\n\nRoberto Cano \nControl Documentario SHP",
-        "columnas_excel": [
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
     "994440 Miscelaneos - C618 - CVC PENDIENTES SHP": {
         "activo": true,
         "filtro_alcance": [
@@ -274,6 +154,381 @@
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Wilbert:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "994440 Miscelaneos - C618 - PENDIENTES CVC": {
+        "activo": true,
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "994440 - Tercera Línea",
+            "I25G50 Subestacion Mina 02"
+        ],
+        "filtro_contrato": [
+            "Miscelaneos - CGI-SHP-018-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HTWXT1_XSh28xnqRAjYE5A&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J92le3HJRHuoQaAuYM-Rfg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 3,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1IBRbw97TDqVebH2M2FMLA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 6,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8FMvuHB7TlO90XEsZn1S1g&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yyxKEKG3TGWscWS3MNsGkA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ]
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "controldocumentcvc@gmail.com"
+        ],
+        "cc": [
+            "rcano@shp.pe"
+        ],
+        "asunto": "994440- PENDIENTES CVC - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimados Sres CVC:\n\nSe adjunta Reporte PENDIENTES POR CVC",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "994440 Paquete OEM 05B - C610 - PENDIENTES COVEC": {
+        "activo": true,
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "994440 - Tercera Línea"
+        ],
+        "filtro_contrato": [
+            "Paquete 05B - CGI-SHP-010-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.5zGmicrWQv6DSKhv-QGlQA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cx_ccOZRRCGHb3J8EfSl2Q&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 3,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.RPXN3sO1QDmvJS-5hn_kBg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 6,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.MtSekBToRhGs0xIKfvL9rg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 05B - CGI-SHP-010-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Y31XHPY2Sy265fvyKhPt_g&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
+                ]
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "controldocumentario.marcona@mutudametal.com"
+        ],
+        "cc": [
+            "rcano@shp.pe"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimada Gina:\n\nSe adjunta Reporte PENDIENTES POR COVEC",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
             "CODIGO",
             "DESCRIPCION",
             "REV",
@@ -486,6 +741,221 @@
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimado Treyci:\n\nSe adjunta Reporte PENDIENTES POR AID",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "994440 Paquete OEM 06 - C611 - PENDIENTES BISA": {
+        "activo": true,
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "994440 - Tercera Línea"
+        ],
+        "filtro_contrato": [
+            "Paquete 06 - CGI-SHP-011-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HH6wISmLSaWAxr-FUw8lBg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.3OYObaXeSvCljs2HQFYaEw&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 3,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.AUdUCKq0QFeHxlE-PPTOQQ&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 6,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CKikIYrkSQmMF3wyt62jOw&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Zba0ob9tTk6PCFB-k9akUA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "carpeta": "AS BUILT",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.60E9T9u1QN-YlV5uHuwNMw&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 30,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                ]
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "SUPERVISION"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "jmolina@bisa.com.pe"
+        ],
+        "cc": [
+            "rcano@shp.pe",
+            "tcastro@aidingenieros.pe"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimada Jenny:\n\nSe adjunta Reporte PENDIENTES POR BISA",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
@@ -721,7 +1191,7 @@
             "DIAS_TRANSCURRIDOS"
         ]
     },
-    "994440 Paquete OEM 06 - C611 - PENDIENTES BISA": {
+    "994440 Paquete OEM 07 - C612 - PENDIENTES BISA": {
         "activo": true,
         "filtro_alcance": [
             "Proyectos Mayores"
@@ -730,16 +1200,16 @@
             "994440 - Tercera Línea"
         ],
         "filtro_contrato": [
-            "Paquete 06 - CGI-SHP-011-2026"
+            "Paquete 07 - CGI-SHP-012-2026"
         ],
         "carpetas_seleccionadas": [
             {
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
                 "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HH6wISmLSaWAxr-FUw8lBg&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.vKhVxRjjQv2LkLLTFfbaEA&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 10,
                 "config_sub": {
                     "campos_personalizados": {
@@ -756,17 +1226,17 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
                 ]
             },
             {
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
                 "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.3OYObaXeSvCljs2HQFYaEw&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1dXsqtcOTPKzK3RKlZv0rg&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 3,
                 "config_sub": {
                     "campos_personalizados": {
@@ -783,17 +1253,17 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
                 ]
             },
             {
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
                 "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.AUdUCKq0QFeHxlE-PPTOQQ&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NPx2OF7SQUemcJj4g-MJ6w&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 6,
                 "config_sub": {
                     "campos_personalizados": {
@@ -810,17 +1280,17 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
                 ]
             },
             {
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
                 "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CKikIYrkSQmMF3wyt62jOw&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NJUKhA54SiCmLn2X-xXaqw&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 7,
                 "config_sub": {
                     "campos_personalizados": {
@@ -837,17 +1307,17 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
                 ]
             },
             {
                 "alcance": "Proyectos Mayores",
                 "subproyecto": "994440 - Tercera Línea",
                 "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 06 - CGI-SHP-011-2026",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
                 "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Zba0ob9tTk6PCFB-k9akUA&viewModel=detail&moduleId=folders",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders",
                 "longitud_maxima": 7,
                 "config_sub": {
                     "campos_personalizados": {
@@ -864,35 +1334,8 @@
                     "id_campo_pendiente": "6011840"
                 },
                 "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 06 - CGI-SHP-011-2026",
-                "carpeta": "AS BUILT",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.60E9T9u1QN-YlV5uHuwNMw&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 30,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.4i25QgAQQ9WgM7aAPcqK0A&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HuWUE7r6QI2wE9H1T94VQQ&viewModel=detail&moduleId=folders"
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
                 ]
             }
         ],
@@ -919,10 +1362,401 @@
         ],
         "cc": [
             "rcano@shp.pe",
-            "tcastro@aidingenieros.pe"
+            "sgmccontroldoc@gmail.com"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Jenny:\n\nSe adjunta Reporte PENDIENTES POR BISA",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "994440 Paquete OEM 07 - C612 - PENDIENTES SGMC": {
+        "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "994440 - Tercera Línea"
+        ],
+        "filtro_contrato": [
+            "Paquete 07 - CGI-SHP-012-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.vKhVxRjjQv2LkLLTFfbaEA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1dXsqtcOTPKzK3RKlZv0rg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 3,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NPx2OF7SQUemcJj4g-MJ6w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 6,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NJUKhA54SiCmLn2X-xXaqw&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "sgmccontroldoc@gmail.com",
+            "carlos.abarca03@hotmail.com",
+            "edwin.intvsat@gmail.com",
+            "cmendoza.contratos-sgmc@outlook.com"
+        ],
+        "cc": [
+            "rcano@shp.pe",
+            "mcastillo@shp.pe"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimado Enrique:\n\nSe adjunta Reporte PENDIENTES POR SGMC",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "994440 Paquete OEM 07 - C612 - PENDIENTES SHP": {
+        "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "994440 - Tercera Línea"
+        ],
+        "filtro_contrato": [
+            "Paquete 07 - CGI-SHP-012-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.vKhVxRjjQv2LkLLTFfbaEA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1dXsqtcOTPKzK3RKlZv0rg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 3,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NPx2OF7SQUemcJj4g-MJ6w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 6,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NJUKhA54SiCmLn2X-xXaqw&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Obras Electromecanicas",
+                "contrato": "Paquete 07 - CGI-SHP-012-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "SHP"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "mcastillo@shp.pe"
+        ],
+        "cc": [
+            "rcano@shp.pe",
+            "jcornejo@shp.pe"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimado Misael:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
@@ -1011,6 +1845,495 @@
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "I-26A40 -SISTEMA COMPENSACION MEDIANTE TOLVA, CAPACIDAD 4,500 TPH CONVEYOR 2 MN": {
+        "activo": true,
+        "filtro_alcance": [
+            "Proyecto con Operaciones"
+        ],
+        "filtro_subproyecto": [
+            "Sistema de Compensacion"
+        ],
+        "filtro_contrato": [
+            "CGI-SHP-039-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyecto con Operaciones",
+                "subproyecto": "Sistema de Compensacion",
+                "tipo_obra": "EPC",
+                "contrato": "CGI-SHP-039-2026",
+                "carpeta": "Ing Basica",
+                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zjxfTbUhRxG-yQ7Qa46MgQ&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12102611": "REV",
+                        "12102609": "PENDIENTE POR",
+                        "12102610": "FECHA",
+                        "12102612": "ESTADO"
+                    },
+                    "id_campo_fecha": "12102610",
+                    "id_campo_pendiente": "12102609"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyecto con Operaciones",
+                "subproyecto": "Sistema de Compensacion",
+                "tipo_obra": "EPC",
+                "contrato": "CGI-SHP-039-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8uO3tWdkT8u_K9Aj_VNCIg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12102611": "REV",
+                        "12102609": "PENDIENTE POR",
+                        "12102610": "FECHA",
+                        "12102612": "ESTADO"
+                    },
+                    "id_campo_fecha": "12102610",
+                    "id_campo_pendiente": "12102609"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
+                ]
+            },
+            {
+                "alcance": "Proyecto con Operaciones",
+                "subproyecto": "Sistema de Compensacion",
+                "tipo_obra": "EPC",
+                "contrato": "CGI-SHP-039-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.87jPmfFASbeZHlDGpTpx4w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12102611": "REV",
+                        "12102609": "PENDIENTE POR",
+                        "12102610": "FECHA",
+                        "12102612": "ESTADO"
+                    },
+                    "id_campo_fecha": "12102610",
+                    "id_campo_pendiente": "12102609"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.O1CBIojqSkKuQh6wORhnsw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.W789pi2aRrq_Tk8Mh3n-kA&viewModel=detail&moduleId=folders"
+                ]
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "controldocumentario.marcona@mutudametal.com",
+            "residentepaq5bm@covecperu.com"
+        ],
+        "cc": [
+            "jbeltran@shp.pe",
+            "rcano@shp.pe",
+            "jcornejo@shp.pe"
+        ],
+        "asunto": "I26A40 - PENDIENTES MUTUDA - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimados Sres MUTUDA,\n\nSe adjunta el reporte PENDIENTES POR MUTUDA correspondiente al proyecto :  {nombre_reporte} \n\nActualizado al {fecha} ({total_registros} registros).\n\nPor favor, subsanar a la brevedad.\n\nSaludos.\n\nRoberto Cano \nControl Documentario SHP",
+        "columnas_excel": [
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "I25G40 Mina 09 y 10 - C630 - PENDIENTES SHP": {
+        "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "I25G40 Mina 09 y 10"
+        ],
+        "filtro_contrato": [
+            "CGI-SHP-030-2026 Estudio Geotecnico y Topografico"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Estudio",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.uG9xlgHiS7K_YXJCsemrwQ&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Cronograma",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XrfMm5RpRG-UYRf7hGUAzQ&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.fhjB6fE6R6-deJ-UKjnv6A&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "I25G40 Mina 09 y 10",
+                "tipo_obra": "Estudios",
+                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SIWEjMAOThqbni1Qx7FE0w&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "12464893": "REV",
+                        "12464891": "PENDIENTE POR",
+                        "12464892": "FECHA",
+                        "12464894": "ESTADO",
+                        "12464886": "TIPO DOC",
+                        "12464889": "AREA",
+                        "12464888": "FASE",
+                        "12464890": "API",
+                        "12464880": "EMPRESA",
+                        "12464887": "DISCIPLINA"
+                    },
+                    "id_campo_fecha": "12464892",
+                    "id_campo_pendiente": "12464891"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "SHP"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "nchura@shp.pe",
+            "mloyola@shp.pe"
+        ],
+        "cc": [
+            "rcano@shp.pe",
+            "jcornejo@shp.pe"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimado:\n\nSe adjunta Reporte PENDIENTES POR GEOSERVICE",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
+    "I26R20 Tanque 402-026 - C619 - PENDIENTES CHEC": {
+        "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
+        "filtro_alcance": [
+            "Proyectos Menores"
+        ],
+        "filtro_subproyecto": [
+            "I26R20 Reparacion de Tanque C402-026"
+        ],
+        "filtro_contrato": [
+            "C619 CGI-SHP-019-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.waNHhkfZRV2EMpm5TvMaqw&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
+                    },
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Fj8vsQg8R4KtDg1262Al3Q&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 3,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
+                    },
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z4k_ZGrnTMeQlOJyTN9p0A&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 6,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
+                    },
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.f5BtCYtRS6yeRdPNgA5-qA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
+                    },
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Menores",
+                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
+                "tipo_obra": "General",
+                "contrato": "C619 CGI-SHP-019-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CGg_avSiQXKunwiqy7mSKg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "11981550": "REV",
+                        "11981548": "PENDIENTE POR",
+                        "11981549": "FECHA",
+                        "11981551": "ESTADO",
+                        "11981546": "AREA",
+                        "11981543": "TIPO DOC",
+                        "11981544": "DISCIPLINA",
+                        "11981545": "FASE"
+                    },
+                    "id_campo_fecha": "11981549",
+                    "id_campo_pendiente": "11981548"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "CONTRATISTA"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "cdoc-c619@chec-nmmsg.com",
+            "vandygz@gmail.com"
+        ],
+        "cc": [
+            "rcano@shp.pe"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimada Victor, Yamely:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
+        "columnas_excel": [
+            "AREA",
+            "DISCIPLINA",
+            "TIPO DOC",
             "CODIGO",
             "DESCRIPCION",
             "REV",
@@ -1381,1329 +2704,6 @@
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimada Patricia:\n\nSe adjunta Reporte PENDIENTES POR SHP",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
-    "994440 Paquete OEM 07 - C612 - PENDIENTES SGMC": {
-        "activo": true,
-        "modo_envio": "☁️ Nube (GitHub + Gmail)",
-        "filtro_alcance": [
-            "Proyectos Mayores"
-        ],
-        "filtro_subproyecto": [
-            "994440 - Tercera Línea"
-        ],
-        "filtro_contrato": [
-            "Paquete 07 - CGI-SHP-012-2026"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.vKhVxRjjQv2LkLLTFfbaEA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1dXsqtcOTPKzK3RKlZv0rg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 3,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NPx2OF7SQUemcJj4g-MJ6w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 6,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NJUKhA54SiCmLn2X-xXaqw&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "logica": "Y (AND)",
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "CONTRATISTA"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "sgmccontroldoc@gmail.com",
-            "carlos.abarca03@hotmail.com",
-            "edwin.intvsat@gmail.com",
-            "cmendoza.contratos-sgmc@outlook.com"
-        ],
-        "cc": [
-            "rcano@shp.pe",
-            "mcastillo@shp.pe"
-        ],
-        "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado Enrique:\n\nSe adjunta Reporte PENDIENTES POR SGMC",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
-    "994440 Miscelaneos - C618 - PENDIENTES CVC": {
-        "activo": true,
-        "filtro_alcance": [
-            "Proyectos Mayores"
-        ],
-        "filtro_subproyecto": [
-            "994440 - Tercera Línea",
-            "I25G50 Subestacion Mina 02"
-        ],
-        "filtro_contrato": [
-            "Miscelaneos - CGI-SHP-018-2026"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Miscelaneos",
-                "contrato": "Miscelaneos - CGI-SHP-018-2026",
-                "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HTWXT1_XSh28xnqRAjYE5A&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Miscelaneos",
-                "contrato": "Miscelaneos - CGI-SHP-018-2026",
-                "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J92le3HJRHuoQaAuYM-Rfg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 3,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Miscelaneos",
-                "contrato": "Miscelaneos - CGI-SHP-018-2026",
-                "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1IBRbw97TDqVebH2M2FMLA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 6,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Miscelaneos",
-                "contrato": "Miscelaneos - CGI-SHP-018-2026",
-                "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8FMvuHB7TlO90XEsZn1S1g&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Miscelaneos",
-                "contrato": "Miscelaneos - CGI-SHP-018-2026",
-                "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yyxKEKG3TGWscWS3MNsGkA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
-                ]
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "logica": "Y (AND)",
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "CONTRATISTA"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "controldocumentcvc@gmail.com"
-        ],
-        "cc": [
-            "rcano@shp.pe"
-        ],
-        "asunto": "994440- PENDIENTES CVC - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimados Sres CVC:\n\nSe adjunta Reporte PENDIENTES POR CVC",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
-    "994440 Paquete OEM 07 - C612 - PENDIENTES BISA": {
-        "activo": true,
-        "filtro_alcance": [
-            "Proyectos Mayores"
-        ],
-        "filtro_subproyecto": [
-            "994440 - Tercera Línea"
-        ],
-        "filtro_contrato": [
-            "Paquete 07 - CGI-SHP-012-2026"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.vKhVxRjjQv2LkLLTFfbaEA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1dXsqtcOTPKzK3RKlZv0rg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 3,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NPx2OF7SQUemcJj4g-MJ6w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 6,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NJUKhA54SiCmLn2X-xXaqw&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ]
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "logica": "Y (AND)",
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "SUPERVISION"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "jmolina@bisa.com.pe"
-        ],
-        "cc": [
-            "rcano@shp.pe",
-            "sgmccontroldoc@gmail.com"
-        ],
-        "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimada Jenny:\n\nSe adjunta Reporte PENDIENTES POR BISA",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
-    "994440 Paquete OEM 07 - C612 - PENDIENTES SHP": {
-        "activo": true,
-        "modo_envio": "☁️ Nube (GitHub + Gmail)",
-        "filtro_alcance": [
-            "Proyectos Mayores"
-        ],
-        "filtro_subproyecto": [
-            "994440 - Tercera Línea"
-        ],
-        "filtro_contrato": [
-            "Paquete 07 - CGI-SHP-012-2026"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.vKhVxRjjQv2LkLLTFfbaEA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1dXsqtcOTPKzK3RKlZv0rg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 3,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NPx2OF7SQUemcJj4g-MJ6w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 6,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NJUKhA54SiCmLn2X-xXaqw&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 07 - CGI-SHP-012-2026",
-                "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.wsxEGRDMSJ-KFVuU5c463w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.OyYj6aw6SASOsJXmEBmKAA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.VP0NGSxmRBmB6PqVttQK7g&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "logica": "Y (AND)",
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "SHP"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "mcastillo@shp.pe"
-        ],
-        "cc": [
-            "rcano@shp.pe",
-            "jcornejo@shp.pe"
-        ],
-        "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado Misael:\n\nSe adjunta Reporte PENDIENTES POR SHP",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
-    "994440 Paquete OEM 05B - C610 - PENDIENTES COVEC": {
-        "activo": true,
-        "filtro_alcance": [
-            "Proyectos Mayores"
-        ],
-        "filtro_subproyecto": [
-            "994440 - Tercera Línea"
-        ],
-        "filtro_contrato": [
-            "Paquete 05B - CGI-SHP-010-2026"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
-                "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.5zGmicrWQv6DSKhv-QGlQA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
-                "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cx_ccOZRRCGHb3J8EfSl2Q&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 3,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
-                "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.RPXN3sO1QDmvJS-5hn_kBg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 6,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
-                "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.MtSekBToRhGs0xIKfvL9rg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
-                ]
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "994440 - Tercera Línea",
-                "tipo_obra": "Obras Electromecanicas",
-                "contrato": "Paquete 05B - CGI-SHP-010-2026",
-                "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Y31XHPY2Sy265fvyKhPt_g&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "6011837": "REV",
-                        "6011840": "PENDIENTE POR",
-                        "6011839": "FECHA",
-                        "6011838": "ESTADO",
-                        "6011848": "DISCIPLINA",
-                        "6011862": "TIPO DOC",
-                        "6011845": "FASE",
-                        "6011844": "AREA"
-                    },
-                    "id_campo_fecha": "6011839",
-                    "id_campo_pendiente": "6011840"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.bQj2WFhhQs62aGUvEcTxRA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.cAHQmaVtTbyYtwANgqCjYQ&viewModel=detail&moduleId=folders"
-                ]
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "logica": "Y (AND)",
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "CONTRATISTA"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "controldocumentario.marcona@mutudametal.com"
-        ],
-        "cc": [
-            "rcano@shp.pe"
-        ],
-        "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimada Gina:\n\nSe adjunta Reporte PENDIENTES POR COVEC",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
-    "I26R20 Tanque 402-026 - C619 - PENDIENTES CHEC": {
-        "activo": true,
-        "modo_envio": "☁️ Nube (GitHub + Gmail)",
-        "filtro_alcance": [
-            "Proyectos Menores"
-        ],
-        "filtro_subproyecto": [
-            "I26R20 Reparacion de Tanque C402-026"
-        ],
-        "filtro_contrato": [
-            "C619 CGI-SHP-019-2026"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyectos Menores",
-                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
-                "tipo_obra": "General",
-                "contrato": "C619 CGI-SHP-019-2026",
-                "carpeta": "Construccion",
-                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.waNHhkfZRV2EMpm5TvMaqw&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "11981550": "REV",
-                        "11981548": "PENDIENTE POR",
-                        "11981549": "FECHA",
-                        "11981551": "ESTADO",
-                        "11981546": "AREA",
-                        "11981543": "TIPO DOC",
-                        "11981544": "DISCIPLINA",
-                        "11981545": "FASE"
-                    },
-                    "id_campo_fecha": "11981549",
-                    "id_campo_pendiente": "11981548"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Menores",
-                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
-                "tipo_obra": "General",
-                "contrato": "C619 CGI-SHP-019-2026",
-                "carpeta": "RFIs",
-                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Fj8vsQg8R4KtDg1262Al3Q&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 3,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "11981550": "REV",
-                        "11981548": "PENDIENTE POR",
-                        "11981549": "FECHA",
-                        "11981551": "ESTADO",
-                        "11981546": "AREA",
-                        "11981543": "TIPO DOC",
-                        "11981544": "DISCIPLINA",
-                        "11981545": "FASE"
-                    },
-                    "id_campo_fecha": "11981549",
-                    "id_campo_pendiente": "11981548"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Menores",
-                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
-                "tipo_obra": "General",
-                "contrato": "C619 CGI-SHP-019-2026",
-                "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z4k_ZGrnTMeQlOJyTN9p0A&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 6,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "11981550": "REV",
-                        "11981548": "PENDIENTE POR",
-                        "11981549": "FECHA",
-                        "11981551": "ESTADO",
-                        "11981546": "AREA",
-                        "11981543": "TIPO DOC",
-                        "11981544": "DISCIPLINA",
-                        "11981545": "FASE"
-                    },
-                    "id_campo_fecha": "11981549",
-                    "id_campo_pendiente": "11981548"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Menores",
-                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
-                "tipo_obra": "General",
-                "contrato": "C619 CGI-SHP-019-2026",
-                "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.f5BtCYtRS6yeRdPNgA5-qA&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "11981550": "REV",
-                        "11981548": "PENDIENTE POR",
-                        "11981549": "FECHA",
-                        "11981551": "ESTADO",
-                        "11981546": "AREA",
-                        "11981543": "TIPO DOC",
-                        "11981544": "DISCIPLINA",
-                        "11981545": "FASE"
-                    },
-                    "id_campo_fecha": "11981549",
-                    "id_campo_pendiente": "11981548"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            },
-            {
-                "alcance": "Proyectos Menores",
-                "subproyecto": "I26R20 Reparacion de Tanque C402-026",
-                "tipo_obra": "General",
-                "contrato": "C619 CGI-SHP-019-2026",
-                "carpeta": "RNCs",
-                "url": "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.CGg_avSiQXKunwiqy7mSKg&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 7,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "11981550": "REV",
-                        "11981548": "PENDIENTE POR",
-                        "11981549": "FECHA",
-                        "11981551": "ESTADO",
-                        "11981546": "AREA",
-                        "11981543": "TIPO DOC",
-                        "11981544": "DISCIPLINA",
-                        "11981545": "FASE"
-                    },
-                    "id_campo_fecha": "11981549",
-                    "id_campo_pendiente": "11981548"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yCuIPfheQcOEb1lL9eobqw&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/6030afc6-005c-4bb8-937e-c9a97850d14b?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8L99-KY-SEeFu7qGx677YA&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": ""
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "logica": "Y (AND)",
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "CONTRATISTA"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "cdoc-c619@chec-nmmsg.com",
-            "vandygz@gmail.com"
-        ],
-        "cc": [
-            "rcano@shp.pe"
-        ],
-        "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimada Victor, Yamely:\n\nSe adjunta Reporte PENDIENTES POR CHEC",
-        "columnas_excel": [
-            "AREA",
-            "DISCIPLINA",
-            "TIPO DOC",
-            "CODIGO",
-            "DESCRIPCION",
-            "REV",
-            "FECHA",
-            "ESTADO",
-            "PENDIENTE POR",
-            "DIAS_TRANSCURRIDOS"
-        ]
-    },
-    "I25G40 Mina 09 y 10 - C630 - PENDIENTES SHP": {
-        "activo": true,
-        "modo_envio": "☁️ Nube (GitHub + Gmail)",
-        "filtro_alcance": [
-            "Proyectos Mayores"
-        ],
-        "filtro_subproyecto": [
-            "I25G40 Mina 09 y 10"
-        ],
-        "filtro_contrato": [
-            "CGI-SHP-030-2026 Estudio Geotecnico y Topografico"
-        ],
-        "carpetas_seleccionadas": [
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "I25G40 Mina 09 y 10",
-                "tipo_obra": "Estudios",
-                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
-                "carpeta": "Estudio",
-                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.uG9xlgHiS7K_YXJCsemrwQ&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "12464893": "REV",
-                        "12464891": "PENDIENTE POR",
-                        "12464892": "FECHA",
-                        "12464894": "ESTADO",
-                        "12464886": "TIPO DOC",
-                        "12464889": "AREA",
-                        "12464888": "FASE",
-                        "12464890": "API",
-                        "12464880": "EMPRESA",
-                        "12464887": "DISCIPLINA"
-                    },
-                    "id_campo_fecha": "12464892",
-                    "id_campo_pendiente": "12464891"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "I25G40 Mina 09 y 10",
-                "tipo_obra": "Estudios",
-                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
-                "carpeta": "Cronograma",
-                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XrfMm5RpRG-UYRf7hGUAzQ&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "12464893": "REV",
-                        "12464891": "PENDIENTE POR",
-                        "12464892": "FECHA",
-                        "12464894": "ESTADO",
-                        "12464886": "TIPO DOC",
-                        "12464889": "AREA",
-                        "12464888": "FASE",
-                        "12464890": "API",
-                        "12464880": "EMPRESA",
-                        "12464887": "DISCIPLINA"
-                    },
-                    "id_campo_fecha": "12464892",
-                    "id_campo_pendiente": "12464891"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "I25G40 Mina 09 y 10",
-                "tipo_obra": "Estudios",
-                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
-                "carpeta": "Cartas",
-                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.fhjB6fE6R6-deJ-UKjnv6A&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "12464893": "REV",
-                        "12464891": "PENDIENTE POR",
-                        "12464892": "FECHA",
-                        "12464894": "ESTADO",
-                        "12464886": "TIPO DOC",
-                        "12464889": "AREA",
-                        "12464888": "FASE",
-                        "12464890": "API",
-                        "12464880": "EMPRESA",
-                        "12464887": "DISCIPLINA"
-                    },
-                    "id_campo_fecha": "12464892",
-                    "id_campo_pendiente": "12464891"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
-            },
-            {
-                "alcance": "Proyectos Mayores",
-                "subproyecto": "I25G40 Mina 09 y 10",
-                "tipo_obra": "Estudios",
-                "contrato": "CGI-SHP-030-2026 Estudio Geotecnico y Topografico",
-                "carpeta": "Valorizaciones",
-                "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SIWEjMAOThqbni1Qx7FE0w&viewModel=detail&moduleId=folders",
-                "longitud_maxima": 10,
-                "config_sub": {
-                    "campos_personalizados": {
-                        "12464893": "REV",
-                        "12464891": "PENDIENTE POR",
-                        "12464892": "FECHA",
-                        "12464894": "ESTADO",
-                        "12464886": "TIPO DOC",
-                        "12464889": "AREA",
-                        "12464888": "FASE",
-                        "12464890": "API",
-                        "12464880": "EMPRESA",
-                        "12464887": "DISCIPLINA"
-                    },
-                    "id_campo_fecha": "12464892",
-                    "id_campo_pendiente": "12464891"
-                },
-                "urls_excluidas": [
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.z5cgPanDTHu_pp_voaqfiA&viewModel=detail&moduleId=folders",
-                    "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1jxUHe-_SZysH0OHqi8O7Q&viewModel=detail&moduleId=folders"
-                ],
-                "ruta_guardado_local": "C:\\Users\\RCano\\DC\\ACCDocs\\Shougang Hierro Peru\\I25G40 Mina 09 y 10\\Project Files\\00 Comunicaciones\\01 Tran\\00 Estudios\\CGI-SHP-030-2026\\04 Reporte\\TODO"
-            }
-        ],
-        "condiciones_filtro": [
-            {
-                "logica": "Y (AND)",
-                "campo": "PENDIENTE POR",
-                "operador": "igual a",
-                "valor": "SHP"
-            }
-        ],
-        "dias_semana": [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes"
-        ],
-        "horarios": [
-            "10:00"
-        ],
-        "para": [
-            "nchura@shp.pe",
-            "mloyola@shp.pe"
-        ],
-        "cc": [
-            "rcano@shp.pe",
-            "jcornejo@shp.pe"
-        ],
-        "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado:\n\nSe adjunta Reporte PENDIENTES POR GEOSERVICE",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
