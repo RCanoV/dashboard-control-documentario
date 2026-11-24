@@ -41,6 +41,8 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           REPORTE_OBJETIVO: ${{ github.event.inputs.reporte_objetivo }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: python ejecutar_reportes_diarios.py
 
 jobs:
