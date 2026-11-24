@@ -2876,7 +2876,7 @@
                 "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
-                "valor": "CONTRATISTA"
+                "valor": "SHP"
             }
         ],
         "dias_semana": [
@@ -2890,13 +2890,17 @@
             "10:00"
         ],
         "para": [
-            "controldocumentario.marcona@mutudametal.com"
+            "jsalazar@shp.pe",
+            "anina@shp.pe",
+            "amayta@shp.pe",
+            "practicantepresupuestos@shp.pe",
+            "gvargas@shp.pe"
         ],
         "cc": [
             "rcano@shp.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimada Gina:\n\nSe adjunta Reporte PENDIENTES POR COVEC",
+        "cuerpo": "Estimados:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
