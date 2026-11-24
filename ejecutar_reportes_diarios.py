@@ -696,30 +696,55 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
         print("⚠️ Correo omitido: no hay destinatarios válidos o falta SMTP_USER.")
         return
 
-    # Límite seguro en disco (~18 MB raw = ~24 MB tras codificación Base64 de Gmail)
-    LIMITE_RAW_BYTES = 18 * 1024 * 1024
+    # 14 MiB en disco ≈ 19.5 MB tras codificación Base64 (margen seguro bajo los 25 MB de Gmail)
+    LIMITE_RAW_BYTES = 14 * 1024 * 1024
     tam_excel = os.path.getsize(ruta_excel) if os.path.exists(ruta_excel) else 0
     tam_pdf = os.path.getsize(ruta_pdf) if os.path.exists(ruta_pdf) else 0
     tam_graf = os.path.getsize(ruta_grafico) if (ruta_grafico and os.path.exists(ruta_grafico)) else 0
 
+    print(
+        f"📊 Tamaño archivos -> Excel: {tam_excel / (1024 * 1024):.1f} MB | "
+        f"PDF: {tam_pdf / (1024 * 1024):.1f} MB"
+    )
+
+    adjuntar_excel = True
     adjuntar_pdf = (tam_excel + tam_pdf + tam_graf) <= LIMITE_RAW_BYTES
     ruta_excel_final = ruta_excel
     nota_peso_txt = ""
     nota_peso_html = ""
 
     if not adjuntar_pdf:
-        mb_total = (tam_excel + tam_pdf) / (1024 * 1024)
-        print(f"⚠️ Adjuntos suman {mb_total:.1f} MB (>18 MB). Se omitirá el PDF para cumplir el límite de Gmail.")
-        nota_peso_txt = "\n\nNota: El archivo PDF detallado se omitió automáticamente porque el volumen de registros supera el límite de 25 MB de Gmail. El detalle completo se encuentra en el archivo Excel adjunto."
-        nota_peso_html = (
-            '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
-            '<b>Nota:</b> El archivo PDF detallado se omitió automáticamente porque el volumen de registros supera el límite de 25 MB de Gmail. '
-            'El detalle completo se encuentra en el archivo Excel adjunto.</p>'
-        )
-        if (tam_excel + tam_graf) > LIMITE_RAW_BYTES:
-            ruta_excel_final = f"{os.path.splitext(ruta_excel)[0]}.zip"
-            with zipfile.ZipFile(ruta_excel_final, "w", zipfile.ZIP_DEFLATED) as zf:
+        if (tam_excel + tam_graf) <= LIMITE_RAW_BYTES:
+            print("⚠️ Se omitirá el PDF para cumplir el límite de 25 MB de Gmail (se adjunta solo Excel).")
+            nota_peso_txt = "\n\nNota: El archivo PDF detallado se omitió automáticamente porque supera el límite de 25 MB de Gmail. El detalle completo se encuentra en el archivo Excel adjunto."
+            nota_peso_html = (
+                '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
+                '<b>Nota:</b> El archivo PDF detallado se omitió automáticamente porque supera el límite de 25 MB de Gmail. '
+                'El detalle completo se encuentra en el archivo Excel adjunto.</p>'
+            )
+        else:
+            ruta_zip = f"{os.path.splitext(ruta_excel)[0]}.zip"
+            with zipfile.ZipFile(ruta_zip, "w", zipfile.ZIP_DEFLATED) as zf:
                 zf.write(ruta_excel, arcname=os.path.basename(ruta_excel))
+            tam_zip = os.path.getsize(ruta_zip)
+
+            if (tam_zip + tam_graf) <= LIMITE_RAW_BYTES:
+                ruta_excel_final = ruta_zip
+                print(f"⚠️ Excel comprimido en ZIP ({tam_zip / (1024 * 1024):.1f} MB); se omite el PDF.")
+                nota_peso_txt = "\n\nNota: Debido al gran volumen de registros, el Excel se adjunta comprimido (.zip) y se omitió el PDF para cumplir el límite de 25 MB de Gmail."
+                nota_peso_html = (
+                    '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
+                    '<b>Nota:</b> Debido al gran volumen de registros, el Excel se adjunta comprimido (<b>.zip</b>) y se omitió el PDF para cumplir el límite de 25 MB de Gmail.</p>'
+                )
+            else:
+                adjuntar_excel = False
+                print(f"⚠️ Incluso el Excel ({tam_excel / (1024 * 1024):.1f} MB) supera el límite de Gmail. Se enviará solo el Resumen Ejecutivo.")
+                nota_peso_txt = "\n\nNota: Los archivos adjuntos (Excel/PDF) superan el límite de 25 MB permitido por Gmail debido al volumen total de documentos. Revise el resumen ejecutivo arriba y consulte el detalle completo en el dashboard web."
+                nota_peso_html = (
+                    '<p style="margin-top: 10px; padding: 8px 12px; background-color: #FFF3CD; color: #856404; border-radius: 4px; font-size: 12px;">'
+                    '<b>Nota:</b> Los archivos adjuntos (Excel/PDF) superan el límite de 25 MB permitido por Gmail debido al volumen total de documentos. '
+                    'Revise el resumen ejecutivo en este correo y consulte el detalle completo en el dashboard web.</p>'
+                )
 
     para_str = ", ".join(para_validos)
     cc_str = ", ".join(cc_validos)
@@ -737,7 +762,12 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
         </div>
         """
 
-    adjuntos_desc = "los archivos <b>Excel</b> y <b>PDF</b> adjuntos" if adjuntar_pdf else "el archivo <b>Excel</b> adjunto"
+    if adjuntar_excel and adjuntar_pdf:
+        adjuntos_desc = "los archivos <b>Excel</b> y <b>PDF</b> adjuntos o acceda"
+    elif adjuntar_excel:
+        adjuntos_desc = "el archivo <b>Excel</b> adjunto o acceda"
+    else:
+        adjuntos_desc = "acceda directamente"
 
     cuerpo_html = f"""
     <html>
@@ -770,7 +800,7 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
         {bloque_grafico_html}
         {nota_peso_html}
         <p style="margin-top: 18px; font-size: 12px; color: #4A5568;">
-            Para mayor detalle, revise {adjuntos_desc} o acceda al dashboard interactivo:
+            Para mayor detalle, revise {adjuntos_desc} al dashboard interactivo:
             <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a>.
         </p>
         <p style="font-size: 12px; color: #4A5568; margin-top: 14px;">
@@ -795,12 +825,13 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
         with open(ruta_grafico, "rb") as img_f:
             msg.get_payload()[1].add_related(img_f.read(), maintype="image", subtype="png", cid="<grafico_resumen>")
 
-    if ruta_excel_final.endswith(".zip"):
-        with open(ruta_excel_final, "rb") as f:
-            msg.add_attachment(f.read(), maintype="application", subtype="zip", filename=os.path.basename(ruta_excel_final))
-    else:
-        with open(ruta_excel_final, "rb") as f:
-            msg.add_attachment(f.read(), maintype="application", subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename=os.path.basename(ruta_excel_final))
+    if adjuntar_excel:
+        if ruta_excel_final.endswith(".zip"):
+            with open(ruta_excel_final, "rb") as f:
+                msg.add_attachment(f.read(), maintype="application", subtype="zip", filename=os.path.basename(ruta_excel_final))
+        else:
+            with open(ruta_excel_final, "rb") as f:
+                msg.add_attachment(f.read(), maintype="application", subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename=os.path.basename(ruta_excel_final))
 
     if adjuntar_pdf:
         with open(ruta_pdf, "rb") as f:
