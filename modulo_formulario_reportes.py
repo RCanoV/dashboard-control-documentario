@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import base64
 import json
+import time
 import re
 
 GITHUB_REPO = "rcanov/dashboard-control-documentario"
@@ -204,10 +205,10 @@ def mostrar_formulario_reportes(estructura_maestra):
         return
 
     # ====================================================================
-    # 0. TABLA EDITABLE MASIVA DE TODOS LOS REPORTES PROGRAMADOS
+    # 0. TABLA EDITABLE MASIVA + CHECKLIST DE ENVÍO MÚLTIPLE
     # ====================================================================
     if config_actual:
-        with st.expander("📋 Panel de Edición Rápida de Reportes Programados", expanded=True):
+        with st.expander("📋 Panel de Edición Rápida y Envío de Reportes Programados", expanded=True):
             campos_tabla = set(COLUMNAS_BASE)
             for lista_c in df_cat["CAMPOS_PERS"]:
                 campos_tabla.update(lista_c)
@@ -215,7 +216,7 @@ def mostrar_formulario_reportes(estructura_maestra):
                 for c in cfg_r.get("condiciones_filtro", []):
                     if c.get("campo"):
                         campos_tabla.add(c.get("campo"))
-            opciones_campos_tabla = sorted(campos_tabla)
+            opciones_campos_tabla = [""] + sorted(campos_tabla)
 
             filas_resumen = []
             for nom_r, cfg_r in sorted(config_actual.items(), key=lambda item: item[0].strip().lower()):
@@ -229,13 +230,14 @@ def mostrar_formulario_reportes(estructura_maestra):
                 )
 
                 filas_resumen.append({
+                    "Seleccionar": False,
                     "Reporte": nom_r,
                     "Activo": bool(cfg_r.get("activo", True)),
                     "Modo": cfg_r.get("modo_envio", MODOS_ENVIO[0]),
                     "Horario": ", ".join(cfg_r.get("horarios", [])),
                     "Días": dias_txt,
-                    "Campo Filtro": cond_0.get("campo", "PENDIENTE POR"),
-                    "Operador": cond_0.get("operador", "igual a"),
+                    "Campo Filtro": cond_0.get("campo", ""),
+                    "Operador": cond_0.get("operador", ""),
                     "Valor Filtro": cond_0.get("valor", ""),
                     "Para": ", ".join(cfg_r.get("para", [])),
                     "CC": ", ".join(cfg_r.get("cc", [])),
@@ -274,7 +276,7 @@ def mostrar_formulario_reportes(estructura_maestra):
 
             st.caption(
                 f"Mostrando **{len(df_vista_tabla)}** de **{len(filas_resumen)}** reportes. "
-                "Edita directamente cualquier celda y pulsa **Guardar Cambios de la Tabla**."
+                "Marca la casilla **Seleccionar** en uno o varios reportes para enviarlos, o edita celdas y guarda."
             )
 
             df_editado = st.data_editor(
@@ -284,13 +286,14 @@ def mostrar_formulario_reportes(estructura_maestra):
                 num_rows="fixed",
                 disabled=["Reporte"],
                 column_config={
+                    "Seleccionar": st.column_config.CheckboxColumn("Enviar", default=False, width="small"),
                     "Reporte": st.column_config.TextColumn("Reporte", width="large"),
-                    "Activo": st.column_config.CheckboxColumn("Activo", default=True),
+                    "Activo": st.column_config.CheckboxColumn("Activo", default=True, width="small"),
                     "Modo": st.column_config.SelectboxColumn("Modo de Envío", options=MODOS_ENVIO, required=True),
                     "Horario": st.column_config.TextColumn("Horario (HH:MM)", help="Ej: 10:00 o 10:00, 14:00"),
                     "Días": st.column_config.TextColumn("Días", help="Ej: Lun - Vie o Lunes, Miércoles, Viernes"),
                     "Campo Filtro": st.column_config.SelectboxColumn("Campo Filtro", options=opciones_campos_tabla),
-                    "Operador": st.column_config.SelectboxColumn("Operador", options=OPERADORES_FILTRO),
+                    "Operador": st.column_config.SelectboxColumn("Operador", options=[""] + OPERADORES_FILTRO),
                     "Valor Filtro": st.column_config.TextColumn("Valor Filtro", help="Ej: CONTRATISTA, SHP, SUPERVISION"),
                     "Para": st.column_config.TextColumn("Para (separar con comas)", width="medium"),
                     "CC": st.column_config.TextColumn("CC (separar con comas)", width="medium"),
@@ -299,65 +302,113 @@ def mostrar_formulario_reportes(estructura_maestra):
                 key=f"editor_masivo_{filtro_hora}_{texto_buscar}"
             )
 
-            if st.button("💾 Guardar Cambios de la Tabla en GitHub", type="primary"):
-                errores_tabla = []
-                for _, row in df_editado.iterrows():
-                    nom_r = row["Reporte"]
-                    if nom_r not in config_actual:
-                        continue
+            col_acc1, col_acc2 = st.columns([1.6, 1.6])
 
-                    horarios_ok, horarios_bad = _parsear_horarios(row["Horario"])
-                    if not horarios_ok or horarios_bad:
-                        errores_tabla.append(f"**{nom_r}**: horario inválido (`{row['Horario']}`). Usa formato `HH:MM`, ej. `10:00`.")
+            with col_acc1:
+                if st.button("💾 Guardar Cambios de la Tabla en GitHub", type="primary", use_container_width=True):
+                    errores_tabla = []
+                    for _, row in df_editado.iterrows():
+                        nom_r = row["Reporte"]
+                        if nom_r not in config_actual:
+                            continue
 
-                    dias_ok, dias_bad = _parsear_dias(row["Días"])
-                    if not dias_ok or dias_bad:
-                        errores_tabla.append(f"**{nom_r}**: días inválidos (`{row['Días']}`). Usa `Lun - Vie` o nombres de días separados por coma.")
+                        horarios_ok, horarios_bad = _parsear_horarios(row["Horario"])
+                        if not horarios_ok or horarios_bad:
+                            errores_tabla.append(f"**{nom_r}**: horario inválido (`{row['Horario']}`). Usa formato `HH:MM`, ej. `10:00`.")
 
-                    para_ok, para_bad = _validar_correos(row["Para"])
-                    if not para_ok or para_bad:
-                        errores_tabla.append(f"**{nom_r}**: correos inválidos en Para (`{row['Para']}`).")
+                        dias_ok, dias_bad = _parsear_dias(row["Días"])
+                        if not dias_ok or dias_bad:
+                            errores_tabla.append(f"**{nom_r}**: días inválidos (`{row['Días']}`). Usa `Lun - Vie` o nombres de días separados por coma.")
 
-                    cc_ok, cc_bad = _validar_correos(row["CC"])
-                    if cc_bad:
-                        errores_tabla.append(f"**{nom_r}**: correos inválidos en CC (`{', '.join(cc_bad)}`).")
+                        para_ok, para_bad = _validar_correos(row["Para"])
+                        if not para_ok or para_bad:
+                            errores_tabla.append(f"**{nom_r}**: correos inválidos en Para (`{row['Para']}`).")
 
-                    if not errores_tabla:
-                        config_actual[nom_r]["activo"] = bool(row["Activo"])
-                        config_actual[nom_r]["modo_envio"] = str(row["Modo"]).strip()
-                        config_actual[nom_r]["horarios"] = horarios_ok
-                        config_actual[nom_r]["dias_semana"] = dias_ok
-                        config_actual[nom_r]["para"] = para_ok
-                        config_actual[nom_r]["cc"] = cc_ok
-                        config_actual[nom_r]["asunto"] = str(row["Asunto"]).strip()
+                        cc_ok, cc_bad = _validar_correos(row["CC"])
+                        if cc_bad:
+                            errores_tabla.append(f"**{nom_r}**: correos inválidos en CC (`{', '.join(cc_bad)}`).")
 
-                        campo_f = str(row.get("Campo Filtro", "")).strip()
-                        op_f = str(row.get("Operador", "")).strip()
-                        val_f = str(row.get("Valor Filtro", "")).strip()
-                        conds_prev = config_actual[nom_r].get("condiciones_filtro", [])
+                        if not errores_tabla:
+                            config_actual[nom_r]["activo"] = bool(row["Activo"])
+                            config_actual[nom_r]["modo_envio"] = str(row["Modo"]).strip()
+                            config_actual[nom_r]["horarios"] = horarios_ok
+                            config_actual[nom_r]["dias_semana"] = dias_ok
+                            config_actual[nom_r]["para"] = para_ok
+                            config_actual[nom_r]["cc"] = cc_ok
+                            config_actual[nom_r]["asunto"] = str(row["Asunto"]).strip()
 
-                        if campo_f and op_f and val_f:
-                            logica_0 = conds_prev[0].get("logica", "Y (AND)") if conds_prev else "Y (AND)"
-                            nueva_cond_0 = {
-                                "logica": logica_0,
-                                "campo": campo_f,
-                                "operador": op_f,
-                                "valor": val_f
-                            }
-                            config_actual[nom_r]["condiciones_filtro"] = [nueva_cond_0] + conds_prev[1:]
-                        elif not val_f:
-                            config_actual[nom_r]["condiciones_filtro"] = conds_prev[1:] if len(conds_prev) > 1 else []
+                            campo_f = str(row.get("Campo Filtro", "")).strip()
+                            op_f = str(row.get("Operador", "")).strip() or "igual a"
+                            val_f = str(row.get("Valor Filtro", "")).strip()
+                            conds_prev = config_actual[nom_r].get("condiciones_filtro", [])
 
-                if errores_tabla:
-                    for err in errores_tabla:
-                        st.error(f"❌ {err}")
-                else:
-                    res_tbl = guardar_config_github(config_actual, sha_actual)
-                    if res_tbl.status_code in [200, 201]:
-                        st.success("✅ Todos los cambios de la tabla se guardaron correctamente en GitHub.")
-                        st.rerun()
+                            if campo_f and val_f:
+                                logica_0 = conds_prev[0].get("logica", "Y (AND)") if conds_prev else "Y (AND)"
+                                nueva_cond_0 = {
+                                    "logica": logica_0,
+                                    "campo": campo_f,
+                                    "operador": op_f,
+                                    "valor": val_f
+                                }
+                                config_actual[nom_r]["condiciones_filtro"] = [nueva_cond_0] + conds_prev[1:]
+                            elif not campo_f or not val_f:
+                                config_actual[nom_r]["condiciones_filtro"] = conds_prev[1:] if len(conds_prev) > 1 else []
+
+                    if errores_tabla:
+                        for err in errores_tabla:
+                            st.error(f"❌ {err}")
                     else:
-                        st.error(f"Error al guardar en GitHub: {res_tbl.text}")
+                        res_tbl = guardar_config_github(config_actual, sha_actual)
+                        if res_tbl.status_code in [200, 201]:
+                            st.success("✅ Todos los cambios de la tabla se guardaron correctamente en GitHub.")
+                            st.rerun()
+                        else:
+                            st.error(f"Error al guardar en GitHub: {res_tbl.text}")
+
+            with col_acc2:
+                seleccionados_df = df_editado[df_editado["Seleccionar"] == True]
+                n_sel = len(seleccionados_df)
+                etiqueta_btn_envio = (
+                    f"📤 Enviar Reporte ({n_sel} seleccionado)"
+                    if n_sel == 1
+                    else f"📤 Enviar Reportes ({n_sel} seleccionados)"
+                    if n_sel > 1
+                    else "📤 Enviar Reporte (marca en la tabla)"
+                )
+
+                if st.button(etiqueta_btn_envio, use_container_width=True, disabled=(n_sel == 0)):
+                    enviados_ok = []
+                    enviados_err = []
+                    omitidos_local = []
+
+                    for _, r_sel in seleccionados_df.iterrows():
+                        nom_rep_env = str(r_sel["Reporte"]).strip()
+                        modo_rep_env = str(r_sel.get("Modo", MODOS_ENVIO[0]))
+
+                        if "Local" in modo_rep_env:
+                            omitidos_local.append(nom_rep_env)
+                            continue
+
+                        resp_disp = disparar_envio_github_actions(reporte_objetivo=nom_rep_env)
+                        if resp_disp.status_code == 204:
+                            enviados_ok.append(nom_rep_env)
+                        else:
+                            enviados_err.append(f"{nom_rep_env} (HTTP {resp_disp.status_code})")
+
+                        if n_sel > 1:
+                            time.sleep(0.5)
+
+                    if enviados_ok:
+                        st.success(
+                            f"✅ Envío disparado ({len(enviados_ok)}): {', '.join(enviados_ok)}. "
+                            "Llegarán en 1 a 2 minutos."
+                        )
+                    if omitidos_local:
+                        st.info(
+                            f"💻 Omitidos por modo Local (se ejecutan en PC): {', '.join(omitidos_local)}."
+                        )
+                    if enviados_err:
+                        st.error(f"❌ No se pudieron disparar: {', '.join(enviados_err)}.")
 
     st.markdown("---")
 
