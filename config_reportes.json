@@ -247,9 +247,19 @@
             "14:00"
         ],
         "para": [
-            "rcano@shp.pe"
+            "nflores@shp.pe",
+            "vcalvo@shp.pe",
+            "gvargas@shp.pe",
+            "ringa@shp.pe",
+            "aescobedo@shp.pe",
+            "ilimay@shp.pe"
         ],
-        "cc": [],
+        "cc": [
+            "rcano@shp.pe",
+            "ftunque@shp.pe",
+            "jmarcelo@shp.pe",
+            "jmolina@bisa.com.pe"
+        ],
         "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimados,\n\nSe adjunta el reporte {nombre_reporte} actualizado al {fecha} ({total_registros} registros).\n\nSaludos.",
         "columnas_excel": []
