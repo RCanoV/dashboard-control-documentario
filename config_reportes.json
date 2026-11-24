@@ -258,7 +258,9 @@
             "rcano@shp.pe",
             "ftunque@shp.pe",
             "jmarcelo@shp.pe",
-            "jmolina@bisa.com.pe"
+            "jmolina@bisa.com.pe",
+            "jcornejo@shp.pe",
+            "jalvarez@shp.pe"
         ],
         "asunto": "Reporte Control Documentario - {nombre_reporte} ({fecha})",
         "cuerpo": "Estimados,\n\nSe adjunta el reporte {nombre_reporte} actualizado al {fecha} ({total_registros} registros).\n\nSaludos.",
