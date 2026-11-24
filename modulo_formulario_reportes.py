@@ -33,27 +33,49 @@ def _validar_correos(texto_correos: str):
 
 
 def _get_headers():
+    token = str(st.secrets["GITHUB_TOKEN"]).strip()
     return {
-        "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
+        "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json"
     }
 
 
 def cargar_config_github():
     if "GITHUB_TOKEN" not in st.secrets:
-        return {}, None
+        return {}, None, "Falta configurar `GITHUB_TOKEN` en los Secrets de Streamlit."
+
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_JSON}"
-    r = requests.get(url, headers=_get_headers())
+    try:
+        r = requests.get(url, headers=_get_headers(), timeout=15)
+    except Exception as e:
+        return {}, None, f"Error de conexión con GitHub: {e}"
+
     if r.status_code == 200:
         data = r.json()
-        contenido = base64.b64decode(data["content"]).decode("utf-8").strip()
+        contenido_b64 = data.get("content", "")
+        if contenido_b64:
+            contenido = base64.b64decode(contenido_b64).decode("utf-8").strip()
+        elif data.get("download_url"):
+            r_raw = requests.get(data["download_url"], headers=_get_headers(), timeout=15)
+            contenido = r_raw.text.strip()
+        else:
+            contenido = ""
+
         if not contenido:
-            return {}, data["sha"]
+            return {}, data.get("sha"), None
+
         try:
-            return json.loads(contenido), data["sha"]
-        except json.JSONDecodeError:
-            return {}, data["sha"]
-    return {}, None
+            return json.loads(contenido), data.get("sha"), None
+        except json.JSONDecodeError as e:
+            return {}, data.get("sha"), (
+                f"Error de sintaxis en `{RUTA_JSON}` (línea {e.lineno}, columna {e.colno}): {e.msg}"
+            )
+
+    try:
+        detalle = r.json().get("message", r.text)
+    except Exception:
+        detalle = r.text
+    return {}, None, f"GitHub devolvió HTTP {r.status_code} al leer `{RUTA_JSON}`: {detalle}"
 
 
 def guardar_config_github(config_dict, sha=None):
@@ -127,7 +149,12 @@ def mostrar_formulario_reportes(estructura_maestra):
         st.error("Falta configurar `GITHUB_TOKEN` en los Secrets de Streamlit.")
         return
 
-    config_actual, sha_actual = cargar_config_github()
+    config_actual, sha_actual, error_carga = cargar_config_github()
+    if error_carga:
+        st.error(f"❌ No se pudo cargar la configuración desde GitHub: {error_carga}")
+        st.info("Corrige el archivo o el token en GitHub antes de guardar cambios para evitar sobrescribir tus reportes.")
+        return
+
     df_cat = _extraer_catalogo_completo(estructura_maestra)
 
     if df_cat.empty:
