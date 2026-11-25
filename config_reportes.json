@@ -621,6 +621,197 @@
         ],
         "modo_envio": "☁️ Nube (GitHub + Gmail)"
     },
+    "994440 Miscelaneos - C626 - PENDIENTES SHP": {
+        "activo": true,
+        "modo_envio": "☁️ Nube (GitHub + Gmail)",
+        "filtro_alcance": [
+            "Proyectos Mayores"
+        ],
+        "filtro_subproyecto": [
+            "994440 - Tercera Línea"
+        ],
+        "filtro_contrato": [
+            "Miscelaneos - CGI-SHP-018-2026"
+        ],
+        "carpetas_seleccionadas": [
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "Construccion",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.HTWXT1_XSh28xnqRAjYE5A&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 10,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "RFIs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.J92le3HJRHuoQaAuYM-Rfg&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 3,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "Valorizaciones",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.1IBRbw97TDqVebH2M2FMLA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 6,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "Cartas",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8FMvuHB7TlO90XEsZn1S1g&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            },
+            {
+                "alcance": "Proyectos Mayores",
+                "subproyecto": "994440 - Tercera Línea",
+                "tipo_obra": "Miscelaneos",
+                "contrato": "Miscelaneos - CGI-SHP-018-2026",
+                "carpeta": "RNCs",
+                "url": "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.yyxKEKG3TGWscWS3MNsGkA&viewModel=detail&moduleId=folders",
+                "longitud_maxima": 7,
+                "config_sub": {
+                    "campos_personalizados": {
+                        "6011837": "REV",
+                        "6011840": "PENDIENTE POR",
+                        "6011839": "FECHA",
+                        "6011838": "ESTADO",
+                        "6011848": "DISCIPLINA",
+                        "6011862": "TIPO DOC",
+                        "6011845": "FASE",
+                        "6011844": "AREA"
+                    },
+                    "id_campo_fecha": "6011839",
+                    "id_campo_pendiente": "6011840"
+                },
+                "urls_excluidas": [
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
+                    "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders"
+                ],
+                "ruta_guardado_local": ""
+            }
+        ],
+        "condiciones_filtro": [
+            {
+                "logica": "Y (AND)",
+                "campo": "PENDIENTE POR",
+                "operador": "igual a",
+                "valor": "SHP"
+            }
+        ],
+        "dias_semana": [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes"
+        ],
+        "horarios": [
+            "10:00"
+        ],
+        "para": [
+            "wsalas@shp.pe",
+            "aescobedo@shp.pe"
+        ],
+        "cc": [
+            "rcano@shp.pe"
+        ],
+        "asunto": "Reporte - {nombre_reporte} ({fecha})",
+        "cuerpo": "Estimado Wilbert:\n\nSe adjunta Reporte PENDIENTES POR SHP",
+        "columnas_excel": [
+            "CODIGO",
+            "DESCRIPCION",
+            "REV",
+            "FECHA",
+            "ESTADO",
+            "PENDIENTE POR",
+            "DIAS_TRANSCURRIDOS"
+        ]
+    },
     "994440 Paquete OEM 01 - C601 - PENDIENTES BISA": {
         "activo": true,
         "modo_envio": "☁️ Nube (GitHub + Gmail)",
