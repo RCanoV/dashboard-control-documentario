@@ -1901,7 +1901,7 @@
             "practicanteconstruccion@shp.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado Wilbert:\n\nSe adjunta Reporte PENDIENTES POR SGMC",
+        "cuerpo": "Estimado Wilbert:\n\nSe adjunta Reporte PENDIENTES POR SHP",
         "columnas_excel": [
             "AREA",
             "DISCIPLINA",
