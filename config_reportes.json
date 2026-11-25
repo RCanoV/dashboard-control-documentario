@@ -972,7 +972,7 @@
                 "logica": "Y (AND)",
                 "campo": "PENDIENTE POR",
                 "operador": "igual a",
-                "valor": "SHP"
+                "valor": "CONTRATISTA"
             }
         ],
         "dias_semana": [
@@ -986,15 +986,13 @@
             "10:00"
         ],
         "para": [
-            "wsalas@shp.pe",
-            "aescobedo@shp.pe",
-            "practicanteconstruccion@shp.pe"
+            "controldocument.tecgu@gmail.com"
         ],
         "cc": [
             "rcano@shp.pe"
         ],
         "asunto": "Reporte - {nombre_reporte} ({fecha})",
-        "cuerpo": "Estimado Wilbert:\n\nSe adjunta Reporte PENDIENTES POR SHP",
+        "cuerpo": "Estimada:\n\nSe adjunta Reporte PENDIENTES POR TECGU",
         "columnas_excel": [
             "CODIGO",
             "DESCRIPCION",
