@@ -1398,6 +1398,14 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     }
 
 
+def _formatear_hms(segundos: float) -> str:
+    total_seg = max(0, int(round(segundos)))
+    hh = total_seg // 3600
+    mm = (total_seg % 3600) // 60
+    ss = total_seg % 60
+    return f"{hh:02d}h {mm:02d}m {ss:02d}s"
+
+
 def precargar_todos_los_contratos(periodo, progress_bar=None, status_text=None):
     obtener_token(forzar_renovacion=True)
     tareas = []
@@ -1423,16 +1431,30 @@ def precargar_todos_los_contratos(periodo, progress_bar=None, status_text=None):
                         tareas.append((cont_nom, info_cont, campos, id_fec, id_pen, periodo))
 
     total_tareas = max(1, len(tareas))
+    inicio_global = time.perf_counter()
+
     for idx, t in enumerate(tareas, start=1):
         nombre_c = t[0]
+        inicio_c = time.perf_counter()
         if status_text:
-            status_text.caption(f"Cargando {idx}/{total_tareas}: {nombre_c}")
+            status_text.caption(
+                f"Cargando {idx}/{total_tareas}: {nombre_c} | "
+                f"Acumulado: {_formatear_hms(time.perf_counter() - inicio_global)}"
+            )
         try:
             extraer_datos_contrato_completo(*t)
         except Exception:
             pass
+
+        dur_c = time.perf_counter() - inicio_c
+        dur_global = time.perf_counter() - inicio_global
         if progress_bar:
             progress_bar.progress(min(1.0, idx / total_tareas))
+        if status_text:
+            status_text.caption(
+                f"Listo {idx}/{total_tareas}: {nombre_c} "
+                f"(Tardó: {_formatear_hms(dur_c)} | Total: {_formatear_hms(dur_global)})"
+            )
 
 
 def preparar_df_con_links(df_in: pd.DataFrame) -> pd.DataFrame:
