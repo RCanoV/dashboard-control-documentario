@@ -5,7 +5,6 @@ import requests
 import pandas as pd
 import numpy as np
 import urllib.parse
-from datetime import datetime
 from datetime import datetime, timedelta
 import pytz
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -15,7 +14,7 @@ import matplotlib.pyplot as plt
 import smtplib
 from email.message import EmailMessage
 
-# conexion al modulo de reportes
+# Conexión al módulo de reportes
 from modulo_formulario_reportes import mostrar_formulario_reportes
 
 # Librerías para exportación a PDF (ReportLab)
@@ -30,13 +29,14 @@ import openpyxl
 from openpyxl.drawing.image import Image as ExcelImage
 from openpyxl.styles import Font, Alignment, PatternFill
 
-# conexion al editor de estructura
+# Conexión al editor de estructura
 from modulo_estructura_proyectos import cargar_estructura_github, mostrar_editor_estructura
 
 # ====================================================================
 # --- 1. CONFIGURACIÓN DE LA JERARQUÍA MAESTRA Y METADATOS ---
 # ====================================================================
 NOMBRE_PROYECTO_GENERAL = "Control Documentario - Shougang Hierro Perú"
+URL_DASHBOARD_WEB = "https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/"
 
 ESTRUCTURA_MAESTRA = {
     "Proyectos Mayores": {
@@ -46,7 +46,11 @@ ESTRUCTURA_MAESTRA = {
                     "6011837": "REV",
                     "6011840": "PENDIENTE POR",
                     "6011839": "FECHA",
-                    "6011838": "ESTADO"
+                    "6011838": "ESTADO",
+                    "6011848": "DISCIPLINA",
+                    "6011862": "TIPO DOC",
+                    "6011845": "FASE",
+                    "6011844": "AREA"
                 },
                 "id_campo_fecha": "6011839",
                 "id_campo_pendiente": "6011840"
@@ -59,13 +63,9 @@ ESTRUCTURA_MAESTRA = {
                     "coordinador_shp": "Jesus Cornejo",
                     "administrador_contratos": "Edison Chocce",
                     "urls_excluidas": [
-                        # 03 Sustento Estructural
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.P6ERQDdUQ9yDm6BWGwpyZw&viewModel=detail&moduleId=folders",
-                        # OB
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.uqQZrtVbSSGiYEXjWmQGyQ&viewModel=detail&moduleId=folders",
-                        # RCD
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.9j3mWJsQTKOewx9UmgEWwA&viewModel=detail&moduleId=folders",
-                        # DG
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.NreYzLusR2OWbKVy_jeVOw&viewModel=detail&moduleId=folders",
                     ],
                     "carpetas_config": [
@@ -82,9 +82,7 @@ ESTRUCTURA_MAESTRA = {
                     "coordinador_shp": "Jorcy Aliaga",
                     "administrador_contratos": "Roger Inga",
                     "urls_excluidas": [
-                        # Reporte diario
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.QZdZPMk-SsaVXq7NY59Izw&viewModel=detail&moduleId=folders",
-                        # Reporte Semanal
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jMQvRbehR96-nwRmxqdevQ&viewModel=detail&moduleId=folders",
                     ],
                     "carpetas_config": [
@@ -368,9 +366,7 @@ ESTRUCTURA_MAESTRA = {
                     "coordinador_shp": "Wilbert Salas",
                     "administrador_contratos": "Ivan Lima",
                     "urls_excluidas": [
-                        # Reporte Diario
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.jHdVvMt5R3CqypB631rH-w&viewModel=detail&moduleId=folders",
-                        # Reporte Semanal
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.06WrpTqRT9mbATvnXIuS6w&viewModel=detail&moduleId=folders",
                     ],
                     "carpetas_config": [
@@ -388,9 +384,7 @@ ESTRUCTURA_MAESTRA = {
                     "coordinador_shp": "Wilbert Salas",
                     "administrador_contratos": "Ivan Lima",
                     "urls_excluidas": [
-                        # Reporte Diario
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco._swNh6iESsy6Kp8bCJ7TPA&viewModel=detail&moduleId=folders",
-                        # Reporte Semanal
                         "https://acc.autodesk.com/docs/files/projects/24914611-716e-4e2b-a8a2-bf28757efbe9?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SolQ4vcKQfWlsnXhZQH8xg&viewModel=detail&moduleId=folders",
                     ],
                     "carpetas_config": [
@@ -406,13 +400,34 @@ ESTRUCTURA_MAESTRA = {
         "998316 Nuevo Muelle San Nicolas": {
             "config": {
                 "campos_personalizados": {
-                    "6011837": "REV",
-                    "6011840": "PENDIENTE POR",
-                    "6011839": "FECHA",
-                    "6011838": "ESTADO"
+                    "10295605": "REV",
+                    "10295608": "PENDIENTE POR",
+                    "10295607": "FECHA",
+                    "10295613": "TIPO DOC",
+                    "10295610": "AREA",
+                    "10295611": "FASE",
+                    "10295612": "DISCIPLINA",
+                    "10295606": "ESTADO"
                 },
-                "id_campo_fecha": "6011839",
-                "id_campo_pendiente": "6011840"
+                "id_campo_fecha": "10295607",
+                "id_campo_pendiente": "10295608"
+            },
+            "EPC Nuevo Muelle": {
+                "CGI-SHP-066-2025 Construccion Nuevo Muelle SN": {
+                    "nombre_proyecto": "EPC Nuevo Muelle SN",
+                    "tipo_contrato": "Con Supervisión",
+                    "nombre_supervisor": "Sergio Saenz",
+                    "coordinador_shp": "Melchor Almeyda / Jose Herrera",
+                    "administrador_contratos": "Sergio Casado",
+                    "urls_excluidas": [],
+                    "carpetas_config": [
+                        {
+                            "nombre": "Planos As Built",
+                            "url": "https://acc.autodesk.com/docs/files/projects/3fe40740-4483-4ed9-895b-9cb579cd7b1d?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.JYeXkA13Quiif-P-f5Ea5g&viewModel=detail&moduleId=folders",
+                            "longitud_maxima": 30
+                        }
+                    ]
+                }
             }
         },
         "I25G50 Subestacion Mina 02": {
@@ -434,9 +449,7 @@ ESTRUCTURA_MAESTRA = {
                     "coordinador_shp": "M. Yaranga / W. Benites",
                     "administrador_contratos": "Marco Escobedo",
                     "urls_excluidas": [
-                        # RS INGENIERIA
                         "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.kdWoi4hPRVW1MROh01b5dg&viewModel=detail&moduleId=folders",
-                        # RS PROCURA
                         "https://acc.autodesk.com/docs/files/projects/18ec0b1a-6335-472d-95bb-854a9259704e?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Z6yRZ6zMTyyDSNy6UTk1hg&viewModel=detail&moduleId=folders",
                     ],
                     "carpetas_config": [
@@ -448,6 +461,40 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 }
             },
+        },
+        "I25G40 Mina 09 y 10": {
+            "config": {
+                "campos_personalizados": {
+                    "12464893": "REV",
+                    "12464891": "PENDIENTE POR",
+                    "12464892": "FECHA",
+                    "12464894": "ESTADO",
+                    "12464886": "TIPO DOC",
+                    "12464889": "AREA",
+                    "12464888": "FASE",
+                    "12464890": "API",
+                    "12464880": "EMPRESA",
+                    "12464887": "DISCIPLINA"
+                },
+                "id_campo_fecha": "12464892",
+                "id_campo_pendiente": "12464891"
+            },
+            "Estudios": {
+                "CGI-SHP-030-2026 Estudio Geotecnico y Topografico": {
+                    "nombre_proyecto": "Estudio Geotecnico y Topografico Mina 09 y 10",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "",
+                    "coordinador_shp": "Jesus Cornejo",
+                    "administrador_contratos": "Marco Escobedo",
+                    "urls_excluidas": [],
+                    "carpetas_config": [
+                        {"nombre": "Estudio", "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.uG9xlgHiS7K_YXJCsemrwQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "Cronograma", "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XrfMm5RpRG-UYRf7hGUAzQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "Cartas", "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.fhjB6fE6R6-deJ-UKjnv6A&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "Valorizaciones", "url": "https://acc.autodesk.com/docs/files/projects/4b6267f3-3668-46b1-ad43-7736ac60d7c1?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.SIWEjMAOThqbni1Qx7FE0w&viewModel=detail&moduleId=folders", "longitud_maxima": 10}
+                    ]
+                }
+            }
         }
     },
     "Proyectos Menores": {
@@ -457,7 +504,11 @@ ESTRUCTURA_MAESTRA = {
                     "11981550": "REV",
                     "11981548": "PENDIENTE POR",
                     "11981549": "FECHA",
-                    "11981551": "ESTADO"
+                    "11981551": "ESTADO",
+                    "11981546": "AREA",
+                    "11981543": "TIPO DOC",
+                    "11981544": "DISCIPLINA",
+                    "11981545": "FASE"
                 },
                 "id_campo_fecha": "11981549",
                 "id_campo_pendiente": "11981548"
@@ -491,7 +542,11 @@ ESTRUCTURA_MAESTRA = {
                     "5737743": "REV",
                     "5737740": "PENDIENTE POR",
                     "5737741": "FECHA",
-                    "5737742": "ESTADO"
+                    "5737742": "ESTADO",
+                    "5737729": "DISCIPLINA",
+                    "5737728": "TIPO DOC",
+                    "5737738": "AREA",
+                    "5737737": "FASE"
                 },
                 "id_campo_fecha": "5737741",
                 "id_campo_pendiente": "5737740"
@@ -503,7 +558,6 @@ ESTRUCTURA_MAESTRA = {
                     "nombre_supervisor": "",
                     "coordinador_shp": "Victor Injante",
                     "administrador_contratos": "Hugo Cardenas",
-                    "project_id": "3fe40740-4483-4ed9-895b-9cb579cd7b1d",
                     "urls_excluidas": [
                         "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.L17F4gQ5QeeRgtrsF6oQTg&viewModel=detail&moduleId=folders",
                         "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.DH6CRKemTJqfDz2Je3zE9g&viewModel=detail&moduleId=folders",
@@ -517,9 +571,71 @@ ESTRUCTURA_MAESTRA = {
                     ]
                 }
             }
+        },
+        "Paquete 07 Lima": {
+            "config": {
+                "campos_personalizados": {
+                    "5737741": "FECHA",
+                    "5737740": "PENDIENTE POR",
+                    "5737742": "ESTADO",
+                    "5737728": "TIPO DOC",
+                    "5737738": "AREA",
+                    "5737737": "FASE",
+                    "5737729": "DISCIPLINA"
+                },
+                "id_campo_fecha": "5737741",
+                "id_campo_pendiente": "5737740"
+            },
+            "Lima": {
+                "CGI-SHP-013-2026": {
+                    "nombre_proyecto": "Plan de Conservacion PQ07",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "",
+                    "coordinador_shp": "R. Gamarra M. Wang",
+                    "administrador_contratos": "Marco Escobedo",
+                    "urls_excluidas": [],
+                    "carpetas_config": [
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.XLSVu_D3QlSU-lV6QdJ5Gg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFI", "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.effHI1b5QICsDAQBcUrS9Q&viewModel=detail&moduleId=folders", "longitud_maxima": 3},
+                        {"nombre": "RNC", "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8DIKwX-bTyq0l2pX9a4_Fg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "VALORIZACIONES", "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.Wk_us_7_TtCP1-kNSPpXTA&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "CARTAS", "url": "https://acc.autodesk.com/docs/files/projects/d11143b8-25a1-4eaa-a49c-d491c738f06c?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.czQUOAzcTgS5APfjX_oUlg&viewModel=detail&moduleId=folders", "longitud_maxima": 10}
+                    ]
+                }
+            }
+        }
+    },
+    "Proyecto con Operaciones": {
+        "Sistema de Compensacion": {
+            "config": {
+                "campos_personalizados": {
+                    "12102611": "REV",
+                    "12102609": "PENDIENTE POR",
+                    "12102610": "FECHA",
+                    "12102612": "ESTADO"
+                },
+                "id_campo_fecha": "12102610",
+                "id_campo_pendiente": "12102609"
+            },
+            "EPC": {
+                "CGI-SHP-039-2026": {
+                    "nombre_proyecto": "I26A40 - SISTEMA DE COMPENSACION DE TOLVA DE 4,500",
+                    "tipo_contrato": "Contrato Directo",
+                    "nombre_supervisor": "Manuel Loyola",
+                    "coordinador_shp": "Jesus Cornejo",
+                    "administrador_contratos": "Marco Escobedo",
+                    "urls_excluidas": [],
+                    "carpetas_config": [
+                        {"nombre": "Ing Basica", "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.zjxfTbUhRxG-yQ7Qa46MgQ&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "Construccion", "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.8uO3tWdkT8u_K9Aj_VNCIg&viewModel=detail&moduleId=folders", "longitud_maxima": 10},
+                        {"nombre": "RFIs", "url": "https://acc.autodesk.com/docs/files/projects/cced61e4-8a0f-47a5-81f2-1aa6e85dafe5?folderUrn=urn%3Aadsk.wipprod%3Afs.folder%3Aco.87jPmfFASbeZHlDGpTpx4w&viewModel=detail&moduleId=folders", "longitud_maxima": 10}
+                    ]
+                }
+            }
         }
     }
 }
+
 ESTRUCTURA_MAESTRA, SHA_ESTRUCTURA = cargar_estructura_github(ESTRUCTURA_MAESTRA)
 COL_CODIGO = "CODIGO"
 COL_DESCRIPCION = "DESCRIPCION"
@@ -625,8 +741,8 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
     for col_num, col_name in enumerate(df.columns, 1):
         cell = ws.cell(row=fila_inicio, column=col_num, value=col_name)
         cell.font = Font(bold=True, color="FFFFFF")
-        cell.fill = openpyxl.styles.PatternFill(start_color="1A365D", end_color="1A365D", fill_type="solid")
-        ws.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = 20
+        cell.fill = PatternFill(start_color="1A365D", end_color="1A365D", fill_type="solid")
+        ws.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = 22
 
     col_idx_pendiente = None
     if col_pendiente and col_pendiente in df.columns:
@@ -644,7 +760,7 @@ def exportar_df_a_excel(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_log
         for c_idx, value in enumerate(row_data, 1):
             cell = ws.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else str(value))
             if col_idx_pendiente is not None:
-                cell.fill = openpyxl.styles.PatternFill(start_color=bg_hex, end_color=bg_hex, fill_type="solid")
+                cell.fill = PatternFill(start_color=bg_hex, end_color=bg_hex, fill_type="solid")
                 cell.font = Font(color=font_hex)
 
     fila_pie = fila_inicio + len(df) + 2
@@ -715,7 +831,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             elif col == "Contrato": anchos_resumen_g.append(0.25 * ancho_util)
             elif col == "Total": anchos_resumen_g.append(0.10 * ancho_util)
             elif col == "Avance (%)": anchos_resumen_g.append(0.10 * ancho_util)
-            else: anchos_resumen_g.append((0.40 * ancho_util) / (len(df_resumen_global.columns) - 4))
+            else: anchos_resumen_g.append((0.40 * ancho_util) / max(1, (len(df_resumen_global.columns) - 4)))
 
         tabla_resumen_g = Table(data_matrix_g, repeatRows=1, colWidths=anchos_resumen_g)
         tabla_resumen_g.setStyle(TableStyle([
@@ -734,7 +850,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
 
         fig, ax = plt.subplots(figsize=(8, 2.8))
         x = np.arange(len(df_resumen_global["Contrato"]))
-        ancho_barra = 0.8 / len(columnas_roles)
+        ancho_barra = 0.8 / max(1, len(columnas_roles))
         colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
 
         for i, col in enumerate(columnas_roles):
@@ -758,7 +874,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
 
     if resumenes_por_contrato:
         nota_enlace = Paragraph(
-            '<i>Nota: Para mayor detalle de la documentación, revisar el dashboard en la web: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" color="blue">https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/</a></i>',
+            f'<i>Nota: Para mayor detalle de la documentación, revisar el dashboard en la web: <a href="{URL_DASHBOARD_WEB}" color="blue">{URL_DASHBOARD_WEB}</a></i>',
             link_style
         )
 
@@ -784,7 +900,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             for col in df_res_contrato.columns:
                 if col == "Carpeta": anchos_c.append(0.15 * ancho_util)
                 elif col == "Mayor Retraso": anchos_c.append(0.35 * ancho_util)
-                else: anchos_c.append((0.50 * ancho_util) / (len(df_res_contrato.columns) - 2))
+                else: anchos_c.append((0.50 * ancho_util) / max(1, (len(df_res_contrato.columns) - 2)))
 
             tabla_c = Table(data_matrix_c, repeatRows=1, colWidths=anchos_c)
             tabla_c.setStyle(TableStyle([
@@ -800,7 +916,7 @@ def generar_pdf_subproyecto(metadatos, df_resumen_global, ruta_logo, resumenes_p
             columnas_grafico_c = ["Cerrados"] + [c for c in df_res_contrato.columns if c not in ["Carpeta", "Cerrados", "Total", "Mayor Retraso"]]
             fig, ax = plt.subplots(figsize=(8, 3.2))
             x = np.arange(len(df_res_contrato["Carpeta"]))
-            ancho_barra = 0.8 / len(columnas_grafico_c)
+            ancho_barra = 0.8 / max(1, len(columnas_grafico_c))
             colores = ['#0052cc', '#66b2ff', '#ff3333', '#ff9999', '#33cc33', '#99ff99']
 
             for i, col in enumerate(columnas_grafico_c):
@@ -843,8 +959,8 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
     elements = []
     styles = getSampleStyleSheet()
 
-    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=7, leading=9)
-    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=7, leading=9, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
+    cell_style = ParagraphStyle(name="CellText", parent=styles["Normal"], fontSize=6.5, leading=8.5)
+    header_style = ParagraphStyle(name="HeaderCellText", parent=styles["Normal"], fontSize=6.5, leading=8.5, textColor=colors.whitesmoke, fontName="Helvetica-Bold")
 
     if os.path.exists(ruta_logo):
         logo = RLImage(ruta_logo, width=100, height=30, kind='proportional')
@@ -885,8 +1001,6 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
 
     for row_idx, (_, row) in enumerate(df.iterrows(), start=1):
         fila = []
-        bg_color = "#ffffff"
-
         if col_pendiente and col_pendiente in df.columns:
             bg_color, text_color = obtener_colores_estado(row[col_pendiente])
         else:
@@ -897,7 +1011,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
 
         for col_name in df.columns:
             val = row[col_name]
-            text_str = "" if pd.isna(val) else str(val)
+            text_str = ("" if pd.isna(val) else str(val)).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             if col_pendiente and col_pendiente in df.columns:
                 text_str = f'<font color="{text_color}">{text_str}</font>'
             fila.append(Paragraph(text_str, cell_style))
@@ -920,7 +1034,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
         elif col_u == "PENDIENTE POR": anchos_columnas.append(0.15 * ancho_util)
         else: anchos_columnas.append(0.10 * ancho_util)
 
-    factor_norm = ancho_util / sum(anchos_columnas)
+    factor_norm = ancho_util / max(1e-6, sum(anchos_columnas))
     anchos_columnas = [w * factor_norm for w in anchos_columnas]
 
     tabla = Table(data_matrix, repeatRows=1, colWidths=anchos_columnas)
@@ -940,8 +1054,6 @@ def obtener_periodo_actual():
     ahora = datetime.now(tz_peru)
     fecha_corte = (ahora - timedelta(hours=4)).strftime("%Y-%m-%d")
     return f"{fecha_corte}_04AM"
-
-    return f"{fecha_hoy}_{bloque}"
 
 def obtener_ids_excluidos(urls):
     ids = set()
@@ -982,7 +1094,7 @@ def deconstruir_diccionario(datos, prefijo, resultado):
 
 def obtener_tip_version_metadata(token, project_id, item_id):
     clean_item_id = item_id.split("?version=")[0]
-    url = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/items/{clean_item_id}/tip"
+    url = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/items/{urllib.parse.quote(clean_item_id, safe='')}/tip"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json", "x-ads-region": "US"}
 
     while True:
@@ -1038,13 +1150,14 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
             break
 
         if res_attr.status_code == 200:
-            campos_objetivo = list(campos_personalizados.keys())
             for attr in res_attr.json():
                 attr_id = str(attr.get("id"))
-                if attr_id in campos_objetivo:
-                    registro_plano[f"CAMPO_CUSTOM_{attr_id}"] = str(attr.get("value", "")).strip()
+                attr_name = str(attr.get("name", "")).strip()
+                attr_val = str(attr.get("value", "")).strip()
+                registro_plano[f"CAMPO_CUSTOM_{attr_id}"] = attr_val
+                if attr_name:
+                    registro_plano[f"ATTR_{attr_name.upper()}"] = attr_val
 
-    # Capturar enlace directo al documento en Autodesk ACC
     url_web = item.get("links", {}).get("webView", {}).get("href", "")
     if not url_web and tip_version:
         url_web = tip_version.get("links", {}).get("webView", {}).get("href", "")
@@ -1129,6 +1242,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     carpetas_config = info_contrato.get("carpetas_config", [])
 
     dataframes_por_pestana = {}
+    dataframes_completos_por_pestana = {}
     col_pendiente = campos_personalizados.get(id_campo_pendiente)
     orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS", "URL_DOC"]
 
@@ -1152,7 +1266,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
                 continue
 
             datos_filtrados = []
-            escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos, campos_personalizados)
+            escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos, campos_personalizados, nombre_pestana)
 
             if not datos_filtrados:
                 continue
@@ -1178,13 +1292,6 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
             df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
             df_completo["DIAS"] = df_completo["DIAS"].fillna("")
 
-            columnas_finales = (
-                ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"]
-                + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()]
-                + ["DIAS", "URL_DOC"]
-            )
-            df = df_completo[columnas_finales].copy()
-
             diccionario_renombres = {
                 "NOMBRE_DEL_ARCHIVO": COL_CODIGO,
                 "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": COL_DESCRIPCION,
@@ -1192,6 +1299,20 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
             for campo_id, nombre_columna in campos_personalizados.items():
                 diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
 
+            # DataFrame íntegro con todos los metadatos y atributos extraídos
+            df_todo = df_completo.rename(columns=diccionario_renombres).copy()
+            if col_pendiente in df_todo.columns:
+                df_todo.loc[df_todo[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
+            df_todo.insert(0, "CARPETA", nombre_pestana)
+            dataframes_completos_por_pestana[nombre_pestana] = df_todo
+
+            # DataFrame estándar para las tablas principales
+            columnas_finales = (
+                ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"]
+                + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()]
+                + ["DIAS", "URL_DOC"]
+            )
+            df = df_completo[columnas_finales].copy()
             df = df.rename(columns=diccionario_renombres)
             columnas_existentes = [col for col in orden_columnas_deseado if col in df.columns]
             df = df[columnas_existentes]
@@ -1209,6 +1330,7 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
 
     return {
         "datos": dataframes_por_pestana,
+        "datos_completos": dataframes_completos_por_pestana,
         "hora_actualizacion": hora_cache
     }
 
@@ -1242,33 +1364,61 @@ def preparar_df_con_links(df_in: pd.DataFrame) -> pd.DataFrame:
         )
     return df_vista
 
+
 # ====================================================================
 # --- 5. INTERFAZ WEB STREAMLIT ---
 # ====================================================================
 st.set_page_config(page_title="Control Documentario SHP", layout="wide", page_icon="📊")
 
+st.markdown(
+    """
+    <style>
+        .bloque-guia {
+            background-color: #f8fafc;
+            border-left: 4px solid #1A365D;
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-size: 13.5px;
+            color: #334155;
+        }
+        .barra-contexto {
+            background-color: #eef2f6;
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: #1e293b;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 periodo_actual = obtener_periodo_actual()
+ruta_logo = "logoshp.jpeg"
 
 col_head1, col_head2 = st.columns([5, 1])
 with col_head1:
     st.title("📊 Dashboard de Control Documentario")
-    st.markdown("**Institución:** Shougang Hierro Perú")
+    st.markdown("**Institución:** Shougang Hierro Perú · Seguimiento y reportes desde Autodesk Construction Cloud")
 
 with col_head2:
-    st.image("logoshp.jpeg", width=130)
+    try:
+        st.image(ruta_logo, width=130)
+    except Exception:
+        pass
 
 col_espacio1, col_logo, col_espacio2 = st.sidebar.columns([1, 2.5, 1])
-
 with col_logo:
-    ruta_logo_sidebar = "logoshp.jpeg"
     try:
-        st.image(ruta_logo_sidebar, use_container_width=True)
+        st.image(ruta_logo, use_container_width=True)
     except Exception:
         pass
 
 st.sidebar.markdown(
     """
-    <div style="text-align: center; font-size: 13.5px; color: #4A5568; margin-top: -10px; margin-bottom: 25px;">
+    <div style="text-align: center; font-size: 13.5px; color: #4A5568; margin-top: -10px; margin-bottom: 20px;">
         Desarrollado por<br>
         <b>Roberto Cano</b>
     </div>
@@ -1276,16 +1426,16 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-st.sidebar.title("Estructura de Proyectos")
+st.sidebar.title("1. Estructura de Proyectos")
 
-grupo_activo = st.sidebar.selectbox("1. Tipo de Alcance:", list(ESTRUCTURA_MAESTRA.keys()))
+grupo_activo = st.sidebar.selectbox("Tipo de Alcance:", list(ESTRUCTURA_MAESTRA.keys()))
 
 subproyectos_dict = ESTRUCTURA_MAESTRA.get(grupo_activo, {})
 if not subproyectos_dict:
     st.warning(f"No hay subproyectos configurados en '{grupo_activo}'.")
     st.stop()
 
-subproyecto_activo = st.sidebar.selectbox("2. Subproyecto:", list(subproyectos_dict.keys()))
+subproyecto_activo = st.sidebar.selectbox("Subproyecto:", list(subproyectos_dict.keys()))
 subproyecto_data = subproyectos_dict.get(subproyecto_activo, {})
 
 config_sub = subproyecto_data.get("config", {
@@ -1294,28 +1444,28 @@ config_sub = subproyecto_data.get("config", {
     "id_campo_pendiente": "6011840"
 })
 
-campos_pers_activos = config_sub.get("campos_personalizados")
-id_fec_activo = config_sub.get("id_campo_fecha")
-id_pen_activo = config_sub.get("id_campo_pendiente")
+campos_pers_activos = config_sub.get("campos_personalizados", {})
+id_fec_activo = config_sub.get("id_campo_fecha", "")
+id_pen_activo = config_sub.get("id_campo_pendiente", "")
 
 tipos_obra_dict = {k: v for k, v in subproyecto_data.items() if k != "config"}
 if not tipos_obra_dict:
     st.warning(f"No hay tipos de obra o contratos configurados en '{subproyecto_activo}'.")
     st.stop()
 
-tipo_obra_activo = st.sidebar.selectbox("3. Tipo de Obra:", list(tipos_obra_dict.keys()))
+tipo_obra_activo = st.sidebar.selectbox("Tipo de Obra:", list(tipos_obra_dict.keys()))
 
 contratos_dict = tipos_obra_dict.get(tipo_obra_activo, {})
 if not contratos_dict:
     st.warning(f"No hay contratos configurados en '{tipo_obra_activo}'.")
     st.stop()
 
-contrato_activo = st.sidebar.selectbox("4. Contrato / Componente:", list(contratos_dict.keys()))
+contrato_activo = st.sidebar.selectbox("Contrato / Componente:", list(contratos_dict.keys()))
 info_contrato = contratos_dict[contrato_activo]
 
 # --- SELECTOR DE MODO DE VISTA Y ACCESO ADMINISTRADOR ---
 st.sidebar.markdown("---")
-st.sidebar.subheader("🧭 Navegación")
+st.sidebar.subheader("2. Navegación")
 
 if "es_admin" not in st.session_state:
     st.session_state["es_admin"] = False
@@ -1342,7 +1492,7 @@ if st.session_state["es_admin"]:
         st.rerun()
 else:
     vista_modo = st.sidebar.radio(
-        "📊 Reportes:",
+        "Tipo de reporte:",
         ["Detalle de Contrato", "Consolidado de Subproyecto"]
     )
 
@@ -1363,37 +1513,14 @@ else:
 
 st.sidebar.markdown("---")
 
-st.sidebar.info(
-    f"**Selección Actual:**\n"
-    f"• {grupo_activo}\n"
-    f"• {subproyecto_activo}\n"
-    f"• {tipo_obra_activo}\n"
-    f"• Contrato: **{contrato_activo}**\n\n"
-    f"*(Corte activo: {periodo_actual.split('_')[-1].upper()})*"
-)
-
 if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=True):
     extraer_datos_contrato_completo.clear()
     st.sidebar.warning("Descargando data global (Autodesk API)... Por favor, espera.")
     with st.spinner("Descargando data global (Autodesk API)... Por favor, espera."):
         precargar_todos_los_contratos(periodo_actual)
-    st.sidebar.success("¡Data global actualizada existosamente!")
+    st.sidebar.success("¡Data global actualizada exitosamente!")
 
-url_logo_personal = "logoshp.jpeg"
-
-st.sidebar.markdown("<br>", unsafe_allow_html=True)
-col_firma1, col_firma2 = st.sidebar.columns([1, 3])
-with col_firma1:
-    try:
-        st.image(url_logo_personal, use_container_width=True)
-    except Exception:
-        pass
-with col_firma2:
-    st.markdown(
-        """<div style="font-size: 13px; color: #4A5568; margin-top: 5px;">
-            Desarrollado por<br><b>Roberto Cano</b>
-        </div>""", unsafe_allow_html=True
-    )
+st.sidebar.caption(f"Corte activo: {periodo_actual.split('_')[-1].upper()} · {periodo_actual.split('_')[0]}")
 
 tz_pe = pytz.timezone('America/Lima')
 metadata_export = {
@@ -1409,6 +1536,11 @@ if "preload" in st.query_params and st.query_params["preload"] == "true":
     st.success("¡Data global precargada exitosamente!")
     st.stop()
 
+st.markdown(
+    f'<div class="barra-contexto"><b>Ruta activa:</b> {grupo_activo} › <b>{subproyecto_activo}</b> › {tipo_obra_activo} › <b>{contrato_activo}</b></div>',
+    unsafe_allow_html=True
+)
+
 col_pendiente = campos_pers_activos.get(id_pen_activo, "PENDIENTE POR")
 
 if vista_modo == "📝 Programar Reportes Diarios":
@@ -1419,6 +1551,7 @@ elif vista_modo == "🏗️ Administrar Estructura":
 
 elif vista_modo == "Consolidado de Subproyecto":
     st.subheader(f"📊 Resumen Consolidado: {subproyecto_activo}")
+    st.markdown('<div class="bloque-guia">Vista global de todos los contratos del subproyecto. Compara cierres, pendientes y avance porcentual por contrato.</div>', unsafe_allow_html=True)
 
     with st.spinner("Procesando y agrupando todos los contratos del subproyecto..."):
         datos_subproyecto = []
@@ -1506,25 +1639,28 @@ elif vista_modo == "Consolidado de Subproyecto":
                 resumenes_por_contrato[contrato_nombre] = pd.DataFrame(resumen_lista_contrato)
 
         df_consolidado_sub = pd.DataFrame(datos_subproyecto)
-        cols_numericas = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Avance (%)"]]
-        df_consolidado_sub[cols_numericas] = df_consolidado_sub[cols_numericas].fillna(0).astype(int)
+        if not df_consolidado_sub.empty:
+            cols_numericas = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Avance (%)"]]
+            df_consolidado_sub[cols_numericas] = df_consolidado_sub[cols_numericas].fillna(0).astype(int)
 
-        roles_cols = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Cerrados", "Total", "Avance (%)"]]
-        orden_cols = ["Tipo de Obra", "Contrato", "Cerrados"] + roles_cols + ["Total", "Avance (%)"]
-        df_consolidado_sub = df_consolidado_sub[orden_cols]
+            roles_cols = [c for c in df_consolidado_sub.columns if c not in ["Tipo de Obra", "Contrato", "Cerrados", "Total", "Avance (%)"]]
+            orden_cols = ["Tipo de Obra", "Contrato", "Cerrados"] + roles_cols + ["Total", "Avance (%)"]
+            df_consolidado_sub = df_consolidado_sub[orden_cols]
+        else:
+            roles_cols = []
 
     col_s1, col_s2 = st.columns([1.3, 1])
     with col_s1:
-        st.dataframe(df_consolidado_sub, width='stretch', hide_index=True)
+        st.dataframe(df_consolidado_sub, use_container_width=True, hide_index=True)
 
         if not df_consolidado_sub.empty:
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
-                pdf_sub = generar_pdf_subproyecto(metadata_export, df_consolidado_sub, url_logo_personal, resumenes_por_contrato)
-                st.download_button("📄 Exportar Consolidado (PDF)", data=pdf_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.pdf", mime="application/pdf")
+                pdf_sub = generar_pdf_subproyecto(metadata_export, df_consolidado_sub, ruta_logo, resumenes_por_contrato)
+                st.download_button("📄 Exportar Consolidado (PDF)", data=pdf_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.pdf", mime="application/pdf", use_container_width=True)
             with c_btn2:
-                excel_sub = exportar_df_a_excel(df_consolidado_sub, "Consolidado de Subproyecto", metadata_export, url_logo_personal)
-                st.download_button("📊 Exportar Consolidado (Excel)", data=excel_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                excel_sub = exportar_df_a_excel(df_consolidado_sub, "Consolidado de Subproyecto", metadata_export, ruta_logo)
+                st.download_button("📊 Exportar Consolidado (Excel)", data=excel_sub, file_name=f"Subproyecto_{subproyecto_activo.replace(' ','_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
 
     with col_s2:
         if not df_consolidado_sub.empty:
@@ -1541,16 +1677,16 @@ elif vista_modo == "Consolidado de Subproyecto":
 
     st.markdown("---")
     with st.expander("📧 Enviar Consolidado de Subproyecto por Correo Electrónico"):
-        st.markdown("**Configura el envío del resumen global de contratos directamente desde la aplicación.**")
-        correo_destino_sub = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):", key="email_sub")
+        st.markdown("Envía el resumen global por contrato y el PDF consolidado directamente desde esta pantalla.")
+        correo_destino_sub = st.text_input("Destinatarios (separa múltiples correos con coma):", key="email_sub")
 
         if st.button("🚀 Enviar Consolidado Ahora"):
-            if not correo_destino_sub:
+            if not correo_destino_sub.strip():
                 st.error("Por favor, ingresa al menos un correo electrónico válido.")
             else:
                 with st.spinner("Generando reporte consolidado del subproyecto y enviando correo..."):
                     pdf_buffer_sub = generar_pdf_subproyecto(
-                        metadata_export, df_consolidado_sub, url_logo_personal, resumenes_por_contrato
+                        metadata_export, df_consolidado_sub, ruta_logo, resumenes_por_contrato
                     )
                     nombre_pdf_sub = f"Consolidado_Subproyecto_{subproyecto_activo.replace(' ', '_')}.pdf"
 
@@ -1558,8 +1694,7 @@ elif vista_modo == "Consolidado de Subproyecto":
                         f"Estimados:\n\n"
                         f"Adjunto encontrará el reporte consolidado global actualizado al {metadata_export['fecha']} "
                         f"correspondiente al subproyecto: {subproyecto_activo}.\n\n"
-                        f"Este documento incluye el estado y avance de todos los contratos, así como la estructura detallada de las carpetas de cada uno de ellos.\n\n"
-                        f"Para mayor detalle de los documentos, acceda a nuestro dashboard interactivo: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
+                        f"Para mayor detalle de los documentos, acceda a nuestro dashboard interactivo: {URL_DASHBOARD_WEB}\n\n"
                         f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                     )
 
@@ -1570,8 +1705,7 @@ elif vista_modo == "Consolidado de Subproyecto":
                         <p>Adjunto encontrará el reporte consolidado global actualizado al <b>{metadata_export['fecha']}</b> correspondiente al subproyecto: <b>{subproyecto_activo}</b>.</p>
                         <p>A continuación, se muestra el resumen general por contrato:</p>
                         {generar_tabla_html(df_consolidado_sub)}
-                        <p>El documento adjunto (PDF) incluye el estado y avance de todos los contratos, así como la estructura detallada de las carpetas de cada uno de ellos.</p>
-                        <p>Para mayor detalle, acceda a nuestro dashboard interactivo: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a></p>
+                        <p>Para mayor detalle, acceda a nuestro dashboard interactivo: <a href="{URL_DASHBOARD_WEB}" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a></p>
                         <br>
                         <p>Atentamente,<br>
                         <b>Roberto Cano</b><br>
@@ -1604,10 +1738,11 @@ else:
         )
 
     datos_pestanas = resultado_cache.get("datos", {})
+    datos_completos_pestanas = resultado_cache.get("datos_completos", {})
     hora_actualizacion = resultado_cache.get("hora_actualizacion", "Desconocida")
 
     if not datos_pestanas:
-        st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en el código.")
+        st.info(f"El contrato {contrato_activo} no contiene registros o sus carpetas están pendientes de enlace en la estructura.")
     else:
         tipo_contrato_val = info_contrato.get("tipo_contrato", "Con Supervisión")
 
@@ -1621,10 +1756,10 @@ else:
                 c2.metric("Empresa 1", emp1)
                 c3.metric("Empresa 2", emp2)
             else:
-                c2.metric("Supervisor", info_contrato.get("nombre_supervisor", "N/A"))
-                c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp", "N/A"))
+                c2.metric("Supervisor", info_contrato.get("nombre_supervisor") or "N/A")
+                c3.metric("Coordinador SHP", info_contrato.get("coordinador_shp") or "N/A")
 
-            c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos", "N/A"))
+            c4.metric("Admin. Contratos", info_contrato.get("administrador_contratos") or "N/A")
             c5.metric("Última Actualiz.", hora_actualizacion)
 
         if tipo_contrato_val == "Tripartito":
@@ -1647,11 +1782,11 @@ else:
 
             if col_pendiente in df.columns:
                 estados = df[col_pendiente].astype(str).str.strip().str.upper()
-                cerrados_carp = (estados == "CERRADO").sum()
+                cerrados_carp = int((estados == "CERRADO").sum())
                 fila_res["Cerrados"] = cerrados_carp
 
                 for rol in roles_pendientes:
-                    cant_rol = (estados == rol).sum()
+                    cant_rol = int((estados == rol).sum())
                     fila_res[rol.title()] = cant_rol
                     abiertos_carp += cant_rol
 
@@ -1679,26 +1814,33 @@ else:
             fila_res["Total"] = cerrados_carp + abiertos_carp
             resumen_lista.append(fila_res)
 
-        m1, m2, m3 = st.columns(3)
+        avance_contrato = (total_cerrados / (total_cerrados + total_abiertos) * 100) if (total_cerrados + total_abiertos) > 0 else 0.0
+
+        m1, m2, m3, m4 = st.columns(4)
         m1.metric("Total de Documentos", total_cerrados + total_abiertos)
         m2.metric("Documentos Cerrados", total_cerrados)
-        m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención", delta_color="inverse")
+        m3.metric("Documentos Pendientes", total_abiertos, delta="Requieren atención" if total_abiertos > 0 else "Al día", delta_color="inverse")
+        m4.metric("Avance de Cierre", f"{avance_contrato:.1f}%")
         st.markdown("---")
 
-        st.subheader(f"Resumen General por Carpeta - Contrato: {contrato_activo}")
+        # ====================================================================
+        # --- RESUMEN 1: POR RESPONSABLE (PENDIENTE POR) ---
+        # ====================================================================
+        st.subheader(f"1. Resumen por Responsable — {contrato_activo}")
+        st.markdown('<div class="bloque-guia">Muestra cuántos documentos están cerrados o pendientes por cada parte involucrada y cuál documento acumula mayor retraso en cada carpeta.</div>', unsafe_allow_html=True)
         df_resumen = pd.DataFrame(resumen_lista)
 
         col_g1, col_g2 = st.columns([1.3, 1])
         with col_g1:
-            st.dataframe(df_resumen, width='stretch', hide_index=True)
+            st.dataframe(df_resumen, use_container_width=True, hide_index=True)
             if not df_resumen.empty:
                 c_btn1, c_btn2 = st.columns(2)
                 with c_btn1:
-                    pdf_resumen = exportar_df_a_pdf(df_resumen, "Resumen General de Documentos", metadata_export, url_logo_personal)
-                    st.download_button(label="📄 Exportar Resumen (PDF)", data=pdf_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_resumen_pdf")
+                    pdf_resumen = exportar_df_a_pdf(df_resumen, "Resumen por Responsable", metadata_export, ruta_logo)
+                    st.download_button(label="📄 Exportar Responsables (PDF)", data=pdf_resumen, file_name=f"Resumen_Responsables_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_resumen_pdf", use_container_width=True)
                 with c_btn2:
-                    excel_resumen = exportar_df_a_excel(df_resumen, "Resumen General de Documentos", metadata_export, url_logo_personal)
-                    st.download_button(label="📊 Exportar Resumen (Excel)", data=excel_resumen, file_name=f"Resumen_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_resumen_excel")
+                    excel_resumen = exportar_df_a_excel(df_resumen, "Resumen por Responsable", metadata_export, ruta_logo)
+                    st.download_button(label="📊 Exportar Responsables (Excel)", data=excel_resumen, file_name=f"Resumen_Responsables_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_resumen_excel", use_container_width=True)
 
         with col_g2:
             if not df_resumen.empty:
@@ -1707,23 +1849,83 @@ else:
                     df_resumen,
                     x="Carpeta",
                     y=columnas_grafico,
-                    title="Estado Documentario por Carpeta y Responsable",
+                    title="Distribución por Carpeta y Responsable",
                     barmode="group"
                 )
                 fig.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
                 st.plotly_chart(fig, use_container_width=True)
 
         st.markdown("---")
+
+        # ====================================================================
+        # --- RESUMEN 2: POR ESTADO DE LOS DOCUMENTOS ---
+        # ====================================================================
+        st.subheader(f"2. Resumen por Estado Documentario — {contrato_activo}")
+        st.markdown('<div class="bloque-guia">Agrupa los documentos según el valor registrado en su campo <b>ESTADO</b> en Autodesk ACC (por carpeta y total).</div>', unsafe_allow_html=True)
+
+        todos_estados_unicos = set()
+        for df_e in datos_pestanas.values():
+            if "ESTADO" in df_e.columns:
+                vals_est = df_e["ESTADO"].fillna("").astype(str).str.strip().str.upper()
+                vals_est = vals_est.replace({"": "SIN ESTADO", "NAN": "SIN ESTADO", "NONE": "SIN ESTADO", "NULL": "SIN ESTADO"})
+                todos_estados_unicos.update(vals_est.unique())
+
+        lista_estados_ord = sorted(list(todos_estados_unicos))
+        resumen_estado_lista = []
+
+        for nombre_carpeta, df_e in datos_pestanas.items():
+            fila_est = {"Carpeta": nombre_carpeta}
+            total_carp_est = len(df_e)
+            if "ESTADO" in df_e.columns:
+                vals_est = df_e["ESTADO"].fillna("").astype(str).str.strip().str.upper()
+                vals_est = vals_est.replace({"": "SIN ESTADO", "NAN": "SIN ESTADO", "NONE": "SIN ESTADO", "NULL": "SIN ESTADO"})
+                conteo_e = vals_est.value_counts().to_dict()
+                for est_key in lista_estados_ord:
+                    fila_est[est_key.title()] = int(conteo_e.get(est_key, 0))
+            else:
+                for est_key in lista_estados_ord:
+                    fila_est[est_key.title()] = 0
+            fila_est["Total"] = total_carp_est
+            resumen_estado_lista.append(fila_est)
+
+        df_resumen_estado = pd.DataFrame(resumen_estado_lista)
+
+        col_e1, col_e2 = st.columns([1.3, 1])
+        with col_e1:
+            st.dataframe(df_resumen_estado, use_container_width=True, hide_index=True)
+            if not df_resumen_estado.empty:
+                c_ebtn1, c_ebtn2 = st.columns(2)
+                with c_ebtn1:
+                    pdf_res_est = exportar_df_a_pdf(df_resumen_estado, "Resumen por Estado de Documentos", metadata_export, ruta_logo)
+                    st.download_button(label="📄 Exportar por Estado (PDF)", data=pdf_res_est, file_name=f"Resumen_Estados_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_estado_pdf", use_container_width=True)
+                with c_ebtn2:
+                    excel_res_est = exportar_df_a_excel(df_resumen_estado, "Resumen por Estado de Documentos", metadata_export, ruta_logo)
+                    st.download_button(label="📊 Exportar por Estado (Excel)", data=excel_res_est, file_name=f"Resumen_Estados_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_estado_excel", use_container_width=True)
+
+        with col_e2:
+            if not df_resumen_estado.empty and lista_estados_ord:
+                cols_graf_estado = [c for c in df_resumen_estado.columns if c not in ["Carpeta", "Total"]]
+                fig_estado = px.bar(
+                    df_resumen_estado,
+                    x="Carpeta",
+                    y=cols_graf_estado,
+                    title="Distribución por Carpeta y Estado",
+                    barmode="stack"
+                )
+                fig_estado.update_layout(height=300, margin=dict(t=30, b=10, l=10, r=10))
+                st.plotly_chart(fig_estado, use_container_width=True)
+
+        st.markdown("---")
         with st.expander("📧 Enviar Reporte de Contrato por Correo Electrónico"):
-            st.markdown("**Configura el envío de este resumen y gráficos detallados directamente desde la aplicación.**")
-            correo_destino = st.text_input("Ingresa el correo electrónico del destinatario (separa por comas si son varios):", key="email_contrato")
+            st.markdown("Incluye ambos resúmenes (por responsable y por estado) en el cuerpo del correo y adjunta el PDF del contrato.")
+            correo_destino = st.text_input("Destinatarios (separa múltiples correos con coma):", key="email_contrato")
 
             if st.button("🚀 Enviar Reporte Ahora"):
-                if not correo_destino:
+                if not correo_destino.strip():
                     st.error("Por favor, ingresa al menos un correo electrónico válido.")
                 else:
                     with st.spinner("Generando reporte con detalle y enviando correo..."):
-                        pdf_buffer = exportar_df_a_pdf(df_resumen, "Reporte de Contrato", metadata_export, url_logo_personal, col_pendiente)
+                        pdf_buffer = exportar_df_a_pdf(df_resumen, "Reporte de Contrato", metadata_export, ruta_logo, col_pendiente)
                         nombre_pdf = f"Reporte_Contrato_{contrato_activo.replace(' ', '_')}.pdf"
 
                         cuerpo_texto = (
@@ -1734,7 +1936,7 @@ else:
                             f"- Total de documentos: {total_cerrados + total_abiertos}\n"
                             f"- Documentos cerrados: {total_cerrados}\n"
                             f"- Documentos pendientes: {total_abiertos}\n\n"
-                            f"Para revisar en línea: https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/\n\n"
+                            f"Para revisar en línea: {URL_DASHBOARD_WEB}\n\n"
                             f"Atentamente,\nRoberto Cano\nControl Documentario - Shougang Hierro Perú"
                         )
 
@@ -1743,15 +1945,17 @@ else:
                         <body style="font-family: Arial, sans-serif; color: #333;">
                             <p>Estimados:</p>
                             <p>Adjunto encontrará el reporte documentario detallado actualizado al <b>{metadata_export['fecha']}</b> para el contrato: <b>{contrato_activo}</b>.</p>
-                            <p>A continuación, se muestra el resumen general por carpeta:</p>
+                            <p><b>1. Resumen por responsable:</b></p>
                             {generar_tabla_html(df_resumen)}
+                            <p><b>2. Resumen por estado del documento:</b></p>
+                            {generar_tabla_html(df_resumen_estado)}
                             <p><b>Resumen de estado global:</b></p>
                             <ul>
                                 <li>Total de documentos: {total_cerrados + total_abiertos}</li>
                                 <li>Documentos cerrados: {total_cerrados}</li>
                                 <li>Documentos pendientes: {total_abiertos}</li>
                             </ul>
-                            <p>Para revisar en mayor detalle, acceda a nuestro dashboard interactivo: <a href="https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a></p>
+                            <p>Para revisar en mayor detalle, acceda a nuestro dashboard interactivo: <a href="{URL_DASHBOARD_WEB}" style="color: #1A365D; font-weight: bold;">Control Documentario SHP</a></p>
                             <br>
                             <p>Atentamente,<br>
                             <b>Roberto Cano</b><br>
@@ -1775,7 +1979,12 @@ else:
                             st.error(mensaje)
         st.markdown("---")
 
-        st.subheader("Detalle por Carpeta / Disciplina")
+        # ====================================================================
+        # --- DETALLE POR CARPETA / DISCIPLINA ---
+        # ====================================================================
+        st.subheader("3. Detalle por Carpeta / Disciplina")
+        st.markdown('<div class="bloque-guia">Selecciona una carpeta para revisar documento por documento, filtrar por responsable y abrir el enlace directo en Autodesk ACC.</div>', unsafe_allow_html=True)
+
         nombres_carpetas = list(datos_pestanas.keys())
         pestana_seleccionada = st.selectbox("Seleccionar Carpeta:", nombres_carpetas)
 
@@ -1793,7 +2002,7 @@ else:
             roles_con_cerrado = roles_pendientes + ["CERRADO"]
             estados_disponibles = df_actual[col_pendiente].astype(str).unique().tolist()
 
-            st.markdown(f"**Modalidad de contrato activa:** `{tipo_contrato_val}` (Roles configurados: *{', '.join(roles_con_cerrado)}*)")
+            st.caption(f"Modalidad: **{tipo_contrato_val}** · Roles configurados: {', '.join(roles_con_cerrado)}")
             col_filtros, col_grafico = st.columns([1, 1])
 
             with col_filtros:
@@ -1832,7 +2041,7 @@ else:
                 df_vista = preparar_df_con_links(df_filtrado)
                 st.dataframe(
                     df_vista.style.apply(pintar_filas_streamlit, axis=1),
-                    width='stretch',
+                    use_container_width=True,
                     height=400,
                     hide_index=True,
                     column_config=config_columnas_detalle
@@ -1841,11 +2050,11 @@ else:
                 df_export_det = df_filtrado.drop(columns=["URL_DOC"], errors="ignore")
                 c_det1, c_det2 = st.columns(2)
                 with c_det1:
-                    pdf_detalle = exportar_df_a_pdf(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
-                    st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf")
+                    pdf_detalle = exportar_df_a_pdf(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, ruta_logo, col_pendiente)
+                    st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_pdf", use_container_width=True)
                 with c_det2:
-                    excel_detalle = exportar_df_a_excel(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal, col_pendiente)
-                    st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel")
+                    excel_detalle = exportar_df_a_excel(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, ruta_logo, col_pendiente)
+                    st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_excel", use_container_width=True)
             else:
                 st.info("No hay documentos que coincidan con el filtro seleccionado.")
 
@@ -1853,7 +2062,7 @@ else:
             df_vista = preparar_df_con_links(df_actual)
             st.dataframe(
                 df_vista,
-                width='stretch',
+                use_container_width=True,
                 height=400,
                 hide_index=True,
                 column_config=config_columnas_detalle
@@ -1863,8 +2072,136 @@ else:
                 df_export_det = df_actual.drop(columns=["URL_DOC"], errors="ignore")
                 c_det1, c_det2 = st.columns(2)
                 with c_det1:
-                    pdf_detalle = exportar_df_a_pdf(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
-                    st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_alt_pdf")
+                    pdf_detalle = exportar_df_a_pdf(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, ruta_logo)
+                    st.download_button(label="📄 Exportar Detalle (PDF)", data=pdf_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.pdf", mime="application/pdf", key="btn_descarga_detalle_alt_pdf", use_container_width=True)
                 with c_det2:
-                    excel_detalle = exportar_df_a_excel(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, url_logo_personal)
-                    st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_alt_excel")
+                    excel_detalle = exportar_df_a_excel(df_export_det, f"Detalle de Documentos: {pestana_seleccionada}", metadata_export, ruta_logo)
+                    st.download_button(label="📊 Exportar Detalle (Excel)", data=excel_detalle, file_name=f"{pestana_seleccionada}_{contrato_activo.replace(' ', '_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="btn_descarga_detalle_alt_excel", use_container_width=True)
+
+        # ====================================================================
+        # --- 4. CONSTRUCTOR DINÁMICO DE REPORTE (TODOS LOS CAMPOS Y DATOS) ---
+        # ====================================================================
+        st.markdown("---")
+        st.subheader("4. Constructor Dinámico de Reporte Personalizado")
+        st.markdown('<div class="bloque-guia">Arma un reporte a tu medida combinando carpetas, cualquier campo disponible en la data de Autodesk ACC y filtros exactos.</div>', unsafe_allow_html=True)
+
+        with st.expander("🛠️ Abrir Constructor Dinámico", expanded=True):
+            if datos_completos_pestanas:
+                carpetas_disp_pers = list(datos_completos_pestanas.keys())
+                carpetas_sel_pers = st.multiselect(
+                    "Paso 1 · Selecciona las carpetas a consolidar:",
+                    options=carpetas_disp_pers,
+                    default=carpetas_disp_pers,
+                    key="pers_carpetas"
+                )
+
+                if carpetas_sel_pers:
+                    df_full_unido = pd.concat(
+                        [datos_completos_pestanas[c] for c in carpetas_sel_pers if c in datos_completos_pestanas],
+                        ignore_index=True
+                    )
+
+                    cols_principales = [
+                        c for c in [
+                            "CARPETA", "CODIGO", "REV", "DESCRIPCION", "FECHA",
+                            "ESTADO", "PENDIENTE POR", "DIAS", "RUTA_EN_AUTODESK"
+                        ] if c in df_full_unido.columns
+                    ]
+                    cols_restantes = sorted([c for c in df_full_unido.columns if c not in cols_principales])
+                    todas_las_columnas = cols_principales + cols_restantes
+
+                    if "pers_cols_state" not in st.session_state:
+                        st.session_state["pers_cols_state"] = cols_principales
+
+                    # Asegurar que las columnas guardadas existan en el contrato actual
+                    st.session_state["pers_cols_state"] = [
+                        c for c in st.session_state["pers_cols_state"] if c in todas_las_columnas
+                    ]
+                    if not st.session_state["pers_cols_state"]:
+                        st.session_state["pers_cols_state"] = cols_principales
+
+                    b_sel1, b_sel2, b_sel3 = st.columns([1, 1, 2])
+                    with b_sel1:
+                        if st.button("✅ Todos los campos", key="btn_todos_campos", use_container_width=True):
+                            st.session_state["pers_cols_state"] = todas_las_columnas
+                            st.rerun()
+                    with b_sel2:
+                        if st.button("↩️ Campos esenciales", key="btn_esenciales_campos", use_container_width=True):
+                            st.session_state["pers_cols_state"] = cols_principales
+                            st.rerun()
+
+                    columnas_sel_pers = st.multiselect(
+                        f"Paso 2 · Elige los campos a incluir ({len(todas_las_columnas)} campos disponibles en toda la data):",
+                        options=todas_las_columnas,
+                        default=st.session_state["pers_cols_state"],
+                        key="pers_columnas"
+                    )
+                    st.session_state["pers_cols_state"] = columnas_sel_pers
+
+                    col_f_a, col_f_b = st.columns([1, 2])
+                    with col_f_a:
+                        col_filtro_pers = st.selectbox(
+                            "Paso 3 · Filtrar por campo (opcional):",
+                            options=["(Sin filtro)"] + todas_las_columnas,
+                            key="pers_col_filtro"
+                        )
+
+                    df_pers_resultado = df_full_unido.copy()
+
+                    with col_f_b:
+                        if col_filtro_pers != "(Sin filtro)":
+                            valores_unicos_filtro = sorted(df_pers_resultado[col_filtro_pers].fillna("").astype(str).unique().tolist())
+                            valores_sel_pers = st.multiselect(
+                                f"Valores permitidos en '{col_filtro_pers}':",
+                                options=valores_unicos_filtro,
+                                default=valores_unicos_filtro,
+                                key="pers_val_filtro"
+                            )
+                            df_pers_resultado = df_pers_resultado[df_pers_resultado[col_filtro_pers].fillna("").astype(str).isin(valores_sel_pers)]
+                        else:
+                            st.caption("Sin filtro adicional: se mostrarán todos los registros de las carpetas elegidas.")
+
+                    if columnas_sel_pers:
+                        df_pers_final = df_pers_resultado[columnas_sel_pers].copy()
+                        st.markdown(f"**Paso 4 · Vista previa:** **{len(df_pers_final)}** documentos · **{len(columnas_sel_pers)}** campos")
+                        st.dataframe(df_pers_final, use_container_width=True, height=380, hide_index=True)
+
+                        c_pbtn1, c_pbtn2 = st.columns(2)
+                        with c_pbtn1:
+                            excel_pers = exportar_df_a_excel(
+                                df_pers_final,
+                                f"Reporte Dinámico - {contrato_activo}",
+                                metadata_export,
+                                ruta_logo,
+                                col_pendiente if col_pendiente in df_pers_final.columns else None
+                            )
+                            st.download_button(
+                                label="📊 Descargar Reporte Dinámico (Excel)",
+                                data=excel_pers,
+                                file_name=f"Reporte_Dinamico_{contrato_activo.replace(' ', '_')}.xlsx",
+                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                key="btn_descarga_pers_excel",
+                                use_container_width=True
+                            )
+                        with c_pbtn2:
+                            pdf_pers = exportar_df_a_pdf(
+                                df_pers_final,
+                                f"Reporte Dinámico - {contrato_activo}",
+                                metadata_export,
+                                ruta_logo,
+                                col_pendiente if col_pendiente in df_pers_final.columns else None
+                            )
+                            st.download_button(
+                                label="📄 Descargar Reporte Dinámico (PDF)",
+                                data=pdf_pers,
+                                file_name=f"Reporte_Dinamico_{contrato_activo.replace(' ', '_')}.pdf",
+                                mime="application/pdf",
+                                key="btn_descarga_pers_pdf",
+                                use_container_width=True
+                            )
+                    else:
+                        st.warning("Selecciona al menos un campo para generar la vista previa y exportar.")
+                else:
+                    st.info("Selecciona al menos una carpeta para explorar los campos disponibles.")
+            else:
+                st.info("No hay datos extendidos disponibles para este contrato.")
