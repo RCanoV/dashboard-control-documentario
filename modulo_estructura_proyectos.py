@@ -8,30 +8,58 @@ GITHUB_REPO = "rcanov/dashboard-control-documentario"
 RUTA_ESTRUCTURA = "estructura_proyectos.json"
 
 
+def _obtener_github_token() -> str:
+    try:
+        if "GITHUB_TOKEN" in st.secrets:
+            return str(st.secrets["GITHUB_TOKEN"]).strip()
+    except Exception:
+        pass
+    try:
+        return str(st.secrets.get("GITHUB_TOKEN", "")).strip()
+    except Exception:
+        return ""
+
+
 def _get_headers():
-    return {
-        "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
-        "Accept": "application/vnd.github.v3+json"
-    }
+    token = _obtener_github_token()
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    if token:
+        headers["Authorization"] = f"token {token}"
+    return headers
 
 
 def cargar_estructura_github(estructura_respaldo: dict):
     """Carga la estructura desde GitHub; si aún no existe o está vacía, usa la de respaldo."""
-    if "GITHUB_TOKEN" not in st.secrets:
+    token = _obtener_github_token()
+    if not token:
         return estructura_respaldo, None
+
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_ESTRUCTURA}"
-    r = requests.get(url, headers=_get_headers())
+    try:
+        r = requests.get(url, headers=_get_headers(), timeout=20)
+    except Exception:
+        return estructura_respaldo, None
+
     if r.status_code == 200:
-        data = r.json()
-        contenido = base64.b64decode(data["content"]).decode("utf-8").strip()
-        if contenido:
+        try:
+            data = r.json()
+        except Exception:
+            return estructura_respaldo, None
+        if not isinstance(data, dict):
+            return estructura_respaldo, None
+
+        sha = data.get("sha")
+        b64_content = data.get("content")
+        if b64_content:
             try:
-                parsed = json.loads(contenido)
-                if parsed:
-                    return parsed, data["sha"]
-            except json.JSONDecodeError:
+                contenido = base64.b64decode(b64_content).decode("utf-8").strip()
+                if contenido:
+                    parsed = json.loads(contenido)
+                    if isinstance(parsed, dict) and parsed:
+                        return parsed, sha
+            except Exception:
                 pass
-        return estructura_respaldo, data["sha"]
+        return estructura_respaldo, sha
     return estructura_respaldo, None
 
 
@@ -42,19 +70,22 @@ def guardar_estructura_github(estructura_dict: dict, sha=None):
     ).decode("utf-8")
     payload = {
         "message": "Actualización completa de Estructura de Proyectos desde Streamlit",
-        "content": contenido_b64
+        "content": contenido_b64,
     }
     if sha:
         payload["sha"] = sha
-    return requests.put(url, headers=_get_headers(), json=payload)
+    return requests.put(url, headers=_get_headers(), json=payload, timeout=25)
 
 
 def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
     st.header("🏗️ Administrar Estructura de Proyectos y Contratos")
 
-    if "GITHUB_TOKEN" not in st.secrets:
+    if not _obtener_github_token():
         st.error("Falta configurar `GITHUB_TOKEN` en los Secrets de Streamlit.")
         return
+
+    if not isinstance(estructura_actual, dict):
+        estructura_actual = {}
 
     if "modo_editar_nombres" not in st.session_state:
         st.session_state["modo_editar_nombres"] = False
@@ -71,17 +102,23 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
         alcance_final = st.text_input("Nombre del nuevo Alcance:") if alc_sel == "➕ Nuevo Tipo de Alcance" else alc_sel
 
         subs_dict = estructura_actual.get(alcance_final, {}) if alcance_final in estructura_actual else {}
+        if not isinstance(subs_dict, dict):
+            subs_dict = {}
         subproyectos = [k for k in subs_dict.keys() if k != "config"] + ["➕ Nuevo Subproyecto"]
         sub_sel = st.selectbox("2. Subproyecto:", subproyectos)
         sub_final = st.text_input("Nombre del nuevo Subproyecto:") if sub_sel == "➕ Nuevo Subproyecto" else sub_sel
 
     with c2:
         sub_data = subs_dict.get(sub_final, {}) if sub_final in subs_dict else {}
+        if not isinstance(sub_data, dict):
+            sub_data = {}
         tipos_obra = [k for k in sub_data.keys() if k != "config"] + ["➕ Nuevo Tipo de Obra"]
         obra_sel = st.selectbox("3. Tipo de Obra:", tipos_obra)
         obra_final = st.text_input("Nombre del nuevo Tipo de Obra:") if obra_sel == "➕ Nuevo Tipo de Obra" else obra_sel
 
         contratos_dict = sub_data.get(obra_final, {}) if obra_final in sub_data else {}
+        if not isinstance(contratos_dict, dict):
+            contratos_dict = {}
         contratos = list(contratos_dict.keys()) + ["➕ Nuevo Contrato / Componente"]
         cont_sel = st.selectbox("4. Contrato / Componente:", contratos)
         cont_final = st.text_input("Nombre del nuevo Contrato / Componente:") if cont_sel == "➕ Nuevo Contrato / Componente" else cont_sel
@@ -112,18 +149,18 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                 nuevo_sub = st.text_input(
                     "Nuevo nombre de Subproyecto:",
                     value=sub_final if existe_sub else "",
-                    disabled=not existe_sub
+                    disabled=not existe_sub,
                 )
             with r2:
                 nueva_obra = st.text_input(
                     "Nuevo nombre de Tipo de Obra:",
                     value=obra_final if existe_obra else "",
-                    disabled=not existe_obra
+                    disabled=not existe_obra,
                 )
                 nuevo_cont = st.text_input(
                     "Nuevo nombre de Contrato / Componente:",
                     value=cont_final if existe_cont else "",
-                    disabled=not existe_cont
+                    disabled=not existe_cont,
                 )
 
             fg1, fg2 = st.columns(2)
@@ -196,16 +233,21 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                         st.rerun()
 
     info_cont = contratos_dict.get(cont_final, {}) if cont_final in contratos_dict else {}
+    if not isinstance(info_cont, dict):
+        info_cont = {}
+
     cfg_sub = sub_data.get("config", {
         "campos_personalizados": {
             "6011837": "REV",
             "6011840": "PENDIENTE POR",
             "6011839": "FECHA",
-            "6011838": "ESTADO"
+            "6011838": "ESTADO",
         },
         "id_campo_fecha": "6011839",
-        "id_campo_pendiente": "6011840"
+        "id_campo_pendiente": "6011840",
     })
+    if not isinstance(cfg_sub, dict):
+        cfg_sub = {}
 
     st.markdown("---")
 
@@ -216,27 +258,32 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
     st.caption("Edita los IDs y los nombres de columna, o agrega nuevas filas al final de la tabla.")
 
     campos_dict = cfg_sub.get("campos_personalizados", {})
-    df_campos_init = pd.DataFrame([
-        {"ID_CAMPO": str(k), "NOMBRE_COLUMNA": str(v)} for k, v in campos_dict.items()
-    ]) if campos_dict else pd.DataFrame(columns=["ID_CAMPO", "NOMBRE_COLUMNA"])
+    if not isinstance(campos_dict, dict):
+        campos_dict = {}
+
+    df_campos_init = (
+        pd.DataFrame([{"ID_CAMPO": str(k), "NOMBRE_COLUMNA": str(v)} for k, v in campos_dict.items()])
+        if campos_dict
+        else pd.DataFrame(columns=["ID_CAMPO", "NOMBRE_COLUMNA"])
+    )
 
     df_campos_edit = st.data_editor(
         df_campos_init,
         num_rows="dynamic",
         use_container_width=True,
-        key=f"editor_campos_{sub_final}"
+        key=f"editor_campos_{sub_final}",
     )
 
     col_id1, col_id2 = st.columns(2)
     with col_id1:
         id_campo_fecha = st.text_input(
             "ID del campo usado para FECHA (cálculo de días):",
-            value=str(cfg_sub.get("id_campo_fecha", "6011839"))
+            value=str(cfg_sub.get("id_campo_fecha", "6011839")),
         )
     with col_id2:
         id_campo_pendiente = st.text_input(
             "ID del campo usado para PENDIENTE POR (estados y colores):",
-            value=str(cfg_sub.get("id_campo_pendiente", "6011840"))
+            value=str(cfg_sub.get("id_campo_pendiente", "6011840")),
         )
 
     st.markdown("---")
@@ -248,35 +295,40 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
 
     f1, f2 = st.columns(2)
     with f1:
-        nombre_proy = st.text_input("Nombre del Proyecto:", value=info_cont.get("nombre_proyecto", ""))
+        nombre_proy = st.text_input("Nombre del Proyecto:", value=str(info_cont.get("nombre_proyecto", "")))
         tipos_c = ["Con Supervisión", "Contrato Directo", "Tripartito"]
         idx_tc = tipos_c.index(info_cont.get("tipo_contrato", "Con Supervisión")) if info_cont.get("tipo_contrato") in tipos_c else 0
         tipo_contrato = st.selectbox("Tipo de Contrato:", tipos_c, index=idx_tc)
-        supervisor = st.text_input("Nombre del Supervisor:", value=info_cont.get("nombre_supervisor", ""))
+        supervisor = st.text_input("Nombre del Supervisor:", value=str(info_cont.get("nombre_supervisor", "")))
     with f2:
-        coordinador = st.text_input("Coordinador SHP:", value=info_cont.get("coordinador_shp", ""))
-        admin_cont = st.text_input("Administrador de Contratos:", value=info_cont.get("administrador_contratos", ""))
+        coordinador = st.text_input("Coordinador SHP:", value=str(info_cont.get("coordinador_shp", "")))
+        admin_cont = st.text_input("Administrador de Contratos:", value=str(info_cont.get("administrador_contratos", "")))
         ruta_guardado_local = st.text_input(
             "Carpeta local donde se guardarán los reportes (PC):",
-            value=info_cont.get("ruta_guardado_local", ""),
-            placeholder=r"Ej: D:\Reportes_ACC\994440\C610"
+            value=str(info_cont.get("ruta_guardado_local", "")),
+            placeholder=r"Ej: D:\Reportes_ACC\994440\C610",
         )
 
     empresa_1, empresa_2 = "", ""
     if tipo_contrato == "Tripartito":
         t1, t2 = st.columns(2)
         with t1:
-            empresa_1 = st.text_input("Nombre Empresa 1 (Tripartito):", value=info_cont.get("nombre_empresa_1", ""))
+            empresa_1 = st.text_input("Nombre Empresa 1 (Tripartito):", value=str(info_cont.get("nombre_empresa_1", "")))
         with t2:
-            empresa_2 = st.text_input("Nombre Empresa 2 (Tripartito):", value=info_cont.get("nombre_empresa_2", ""))
+            empresa_2 = st.text_input("Nombre Empresa 2 (Tripartito):", value=str(info_cont.get("nombre_empresa_2", "")))
 
     st.markdown("---")
     st.subheader("4. Links de Carpetas a Buscar (`carpetas_config`)")
     st.caption("Agrega o edita cada carpeta del contrato con su URL de Autodesk ACC y la longitud máxima de subcarpeta.")
 
     carpetas_existentes = info_cont.get("carpetas_config", [])
-    df_carpetas_init = pd.DataFrame(carpetas_existentes) if carpetas_existentes else pd.DataFrame(
-        [{"nombre": "Construccion", "url": "", "longitud_maxima": 10}]
+    if not isinstance(carpetas_existentes, list):
+        carpetas_existentes = []
+
+    df_carpetas_init = (
+        pd.DataFrame(carpetas_existentes)
+        if carpetas_existentes
+        else pd.DataFrame([{"nombre": "Construccion", "url": "", "longitud_maxima": 10}])
     )
     for col_req, default_val in [("nombre", ""), ("url", ""), ("longitud_maxima", 10)]:
         if col_req not in df_carpetas_init.columns:
@@ -290,16 +342,19 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
         column_config={
             "nombre": st.column_config.TextColumn("Nombre Carpeta / Pestaña", required=True),
             "url": st.column_config.TextColumn("URL de Autodesk ACC", width="large", required=True),
-            "longitud_maxima": st.column_config.NumberColumn("Longitud Máx.", min_value=1, max_value=100, step=1, default=10)
+            "longitud_maxima": st.column_config.NumberColumn("Longitud Máx.", min_value=1, max_value=100, step=1, default=10),
         },
-        key=f"editor_carpetas_{cont_final}"
+        key=f"editor_carpetas_{cont_final}",
     )
 
     st.subheader("5. URLs Excluidas")
+    urls_excl_raw = info_cont.get("urls_excluidas", [])
+    if not isinstance(urls_excl_raw, list):
+        urls_excl_raw = []
     excluidas_txt = st.text_area(
         "Pega las URLs de carpetas a excluir del escaneo (una por línea):",
-        value="\n".join(info_cont.get("urls_excluidas", [])),
-        height=90
+        value="\n".join(str(u) for u in urls_excl_raw),
+        height=90,
     )
 
     st.markdown("---")
@@ -329,7 +384,7 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                         nuevas_carpetas.append({
                             "nombre": c_nom,
                             "url": c_url,
-                            "longitud_maxima": int(c_len) if pd.notna(c_len) else 10
+                            "longitud_maxima": int(c_len) if pd.notna(c_len) else 10,
                         })
 
                 datos_contrato = {
@@ -340,7 +395,7 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                     "administrador_contratos": admin_cont.strip(),
                     "ruta_guardado_local": ruta_guardado_local.strip(),
                     "urls_excluidas": [u.strip() for u in excluidas_txt.splitlines() if u.strip()],
-                    "carpetas_config": nuevas_carpetas
+                    "carpetas_config": nuevas_carpetas,
                 }
                 if tipo_contrato == "Tripartito":
                     datos_contrato["nombre_empresa_1"] = empresa_1.strip()
@@ -351,7 +406,7 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                 estructura_actual[alcance_final.strip()][sub_final.strip()]["config"] = {
                     "campos_personalizados": nuevos_campos,
                     "id_campo_fecha": id_campo_fecha.strip(),
-                    "id_campo_pendiente": id_campo_pendiente.strip()
+                    "id_campo_pendiente": id_campo_pendiente.strip(),
                 }
                 estructura_actual[alcance_final.strip()][sub_final.strip()].setdefault(obra_final.strip(), {})
                 estructura_actual[alcance_final.strip()][sub_final.strip()][obra_final.strip()][cont_final.strip()] = datos_contrato
@@ -386,6 +441,10 @@ try:
     ESTRUCTURA_PROYECTOS, _SHA_INICIAL = cargar_estructura_github(ESTRUCTURA_RESPALDO)
 except Exception:
     ESTRUCTURA_PROYECTOS = ESTRUCTURA_RESPALDO
+    _SHA_INICIAL = None
+
+if not isinstance(ESTRUCTURA_PROYECTOS, dict):
+    ESTRUCTURA_PROYECTOS = {}
 
 
 _CLAVES_NO_OBRA = {
@@ -458,6 +517,9 @@ def obtener_info_contrato(alcance: str, subproyecto: str, tipo_obra: str, contra
         return {}
     sub_data = ESTRUCTURA_PROYECTOS.get(alcance, {}).get(subproyecto, {})
     cfg_sub = sub_data.get("config", {}) if isinstance(sub_data, dict) else {}
+    if not isinstance(cfg_sub, dict):
+        cfg_sub = {}
+
     obra_data = _obtener_tipos_obra_dict(alcance, subproyecto).get(tipo_obra, {})
     contratos_dict = (
         obra_data.get("contratos", {})
@@ -468,14 +530,15 @@ def obtener_info_contrato(alcance: str, subproyecto: str, tipo_obra: str, contra
 
     carpetas_raw = raw_info.get("carpetas") or raw_info.get("carpetas_config") or []
     carpetas_norm = []
-    for c in carpetas_raw:
-        if isinstance(c, dict):
-            item_c = dict(c)
-            if "carpeta" not in item_c and "nombre" in item_c:
-                item_c["carpeta"] = item_c["nombre"]
-            if "nombre_pestana" not in item_c and "carpeta" in item_c:
-                item_c["nombre_pestana"] = item_c["carpeta"]
-            carpetas_norm.append(item_c)
+    if isinstance(carpetas_raw, list):
+        for c in carpetas_raw:
+            if isinstance(c, dict):
+                item_c = dict(c)
+                if "carpeta" not in item_c and "nombre" in item_c:
+                    item_c["carpeta"] = item_c["nombre"]
+                if "nombre_pestana" not in item_c and "carpeta" in item_c:
+                    item_c["nombre_pestana"] = item_c["carpeta"]
+                carpetas_norm.append(item_c)
 
     raw_info["carpetas"] = carpetas_norm
     raw_info.setdefault("campos_personalizados", cfg_sub.get("campos_personalizados", {}))
