@@ -604,7 +604,9 @@ def _procesar_carpeta_config(
 @st.cache_data(show_spinner=False, ttl=14400, max_entries=40)
 def extraer_datos_contrato_completo(
     contrato_key: str,
-    info_contrato_tuple: tuple,
+    info_contrato = _descongelar_estructura(info_contrato_tuple)
+if not isinstance(info_contrato, dict):
+    info_contrato = {}
     periodo_corte: str,
     version_cache: int = 0,
 ):
@@ -667,6 +669,13 @@ def _congelar_estructura(obj):
         return tuple(sorted((k, _congelar_estructura(v)) for k, v in obj.items()))
     if isinstance(obj, list):
         return tuple(_congelar_estructura(x) for x in obj)
+    return obj
+
+def _descongelar_estructura(obj):
+    if isinstance(obj, tuple):
+        if all(isinstance(x, tuple) and len(x) == 2 and isinstance(x[0], str) for x in obj):
+            return {k: _descongelar_estructura(v) for k, v in obj}
+        return [_descongelar_estructura(x) for x in obj]
     return obj
 
 
