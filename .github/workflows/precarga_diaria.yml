@@ -2,12 +2,10 @@ name: Precarga Diaria Dashboard (04:00 AM Perú)
 
 on:
   schedule:
-    # 08:17 UTC = 03:17 AM Perú (carga madrugada fuera de hora punta)
-    - cron: '17 8 * * *'
-    # 09:23 UTC = 04:23 AM Perú (respaldo madrugada)
-    - cron: '23 9 * * *'
-    # 12:45 UTC = 07:45 AM Perú (mantiene despierta la app antes de las 8:00 AM)
-    - cron: '45 12 * * 1-5'
+    # 09:05 UTC = 04:05 AM Perú (carga principal del corte 04AM del día)
+    - cron: '5 9 * * *'
+    # 10:30 UTC = 05:30 AM Perú (respaldo madrugada)
+    - cron: '30 10 * * *'
   workflow_dispatch:
 
 jobs:
@@ -16,59 +14,22 @@ jobs:
     timeout-minutes: 90
 
     steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v5
+
       - name: Configurar Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
-      - name: Instalar Playwright
+      - name: Instalar dependencias
         run: |
-          pip install playwright
-          playwright install chromium
+          python -m pip install --upgrade pip
+          pip install requests pandas psycopg2-binary pytz
 
-      - name: Ejecutar precarga en Streamlit
-        run: |
-          python -c "
-          import time
-          from playwright.sync_api import sync_playwright
-
-          url = 'https://dashboard-control-documentario-tpzxfmbgpfnz5amgqzsff2.streamlit.app/?preload=true'
-          with sync_playwright() as p:
-              browser = p.chromium.launch(headless=True)
-              page = browser.new_page()
-              print('Abriendo dashboard en modo preload...')
-              page.goto(url, wait_until='domcontentloaded', timeout=60000)
-
-              # 1. Si la app está dormida, hacer clic en el botón de reactivación
-              try:
-                  btn_despertar = page.locator('button:has-text(\"Yes, get this app back up\")')
-                  if btn_despertar.is_visible(timeout=8000):
-                      print('💤 App dormida detectada. Despertando...')
-                      btn_despertar.click()
-                      time.sleep(10)
-              except Exception:
-                  pass
-
-              # 2. Esperar hasta 25 minutos buscando el texto en la página o dentro de iframes
-              inicio = time.time()
-              exito = False
-              while time.time() - inicio < 1500:
-                  for frame in page.frames:
-                      try:
-                          if frame.locator('text=Data global precargada exitosamente').count() > 0:
-                              exito = True
-                              break
-                      except Exception:
-                          pass
-                  if exito:
-                      break
-                  time.sleep(10)
-
-              if exito:
-                  print(f'✅ Precarga completada con éxito en {int(time.time() - inicio)} segundos.')
-              else:
-                  print('❌ Tiempo agotado (25 min). URL actual:', page.url)
-                  raise TimeoutError('No se detectó el mensaje de precarga completada.')
-
-              browser.close()
-          "
+      - name: Ejecutar precarga directa a Supabase
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python precargar_bd.py
