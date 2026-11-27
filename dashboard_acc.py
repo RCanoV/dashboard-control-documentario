@@ -601,6 +601,22 @@ def _procesar_carpeta_config(
     return nombre_pestana, df_vista, df_todo, diagnostico
 
 
+def _congelar_estructura(obj):
+    if isinstance(obj, dict):
+        return tuple(sorted((k, _congelar_estructura(v)) for k, v in obj.items()))
+    if isinstance(obj, list):
+        return tuple(_congelar_estructura(x) for x in obj)
+    return obj
+
+
+def _descongelar_estructura(obj):
+    if isinstance(obj, tuple):
+        if all(isinstance(x, tuple) and len(x) == 2 and isinstance(x[0], str) for x in obj):
+            return {k: _descongelar_estructura(v) for k, v in obj}
+        return [_descongelar_estructura(x) for x in obj]
+    return obj
+
+
 @st.cache_data(show_spinner=False, ttl=14400, max_entries=40)
 def extraer_datos_contrato_completo(
     contrato_key: str,
@@ -611,30 +627,44 @@ def extraer_datos_contrato_completo(
     info_contrato = _descongelar_estructura(info_contrato_tuple)
     if not isinstance(info_contrato, dict):
         info_contrato = {}
-    
-    info_contrato = dict(info_contrato_tuple)
+
     alcance_ctx = str(info_contrato.get("_alcance", "")).strip()
     subproyecto_ctx = str(info_contrato.get("_subproyecto", "")).strip()
     tipo_obra_ctx = str(info_contrato.get("_tipo_obra", "")).strip()
     contrato_ctx = str(info_contrato.get("_contrato") or contrato_key).strip()
 
+    urls_excl = info_contrato.get("urls_excluidas", [])
+    if not isinstance(urls_excl, list):
+        urls_excl = []
     ids_excluidos = {
         extraer_project_y_folder_id(u)[1]
-        for u in info_contrato.get("urls_excluidas", [])
+        for u in urls_excl
         if u
     }
-    campos_personalizados = info_contrato.get("campos_personalizados", {}) or {}
+
+    campos_personalizados = info_contrato.get("campos_personalizados") or {}
+    if not isinstance(campos_personalizados, dict):
+        campos_personalizados = {}
+
     id_campo_fecha = str(info_contrato.get("id_campo_fecha", ""))
     id_campo_pendiente = str(info_contrato.get("id_campo_pendiente", ""))
     col_pendiente = campos_personalizados.get(id_campo_pendiente, "PENDIENTE POR")
-    orden_cols = info_contrato.get("columnas_visibles") or ORDEN_COLUMNAS_DASHBOARD
+
+    orden_cols = info_contrato.get("columnas_visibles")
+    if not isinstance(orden_cols, list) or not orden_cols:
+        orden_cols = ORDEN_COLUMNAS_DASHBOARD
 
     carpetas_cfg = info_contrato.get("carpetas") or info_contrato.get("carpetas_config") or []
+    if not isinstance(carpetas_cfg, list):
+        carpetas_cfg = []
+
     resultados_vista = {}
     resultados_todo = {}
     diagnosticos = {}
 
     for cfg_c in carpetas_cfg:
+        if not isinstance(cfg_c, dict):
+            continue
         cfg_c_enriquecida = dict(cfg_c)
         if "carpeta" not in cfg_c_enriquecida and "nombre" in cfg_c_enriquecida:
             cfg_c_enriquecida["carpeta"] = cfg_c_enriquecida["nombre"]
@@ -664,21 +694,6 @@ def extraer_datos_contrato_completo(
         "col_pendiente": col_pendiente,
         "diagnosticos": diagnosticos,
     }
-
-
-def _congelar_estructura(obj):
-    if isinstance(obj, dict):
-        return tuple(sorted((k, _congelar_estructura(v)) for k, v in obj.items()))
-    if isinstance(obj, list):
-        return tuple(_congelar_estructura(x) for x in obj)
-    return obj
-
-def _descongelar_estructura(obj):
-    if isinstance(obj, tuple):
-        if all(isinstance(x, tuple) and len(x) == 2 and isinstance(x[0], str) for x in obj):
-            return {k: _descongelar_estructura(v) for k, v in obj}
-        return [_descongelar_estructura(x) for x in obj]
-    return obj
 
 
 def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict:
