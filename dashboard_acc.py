@@ -1,6 +1,7 @@
 import os
 import time
 import io
+import threading
 import requests
 import pandas as pd
 import numpy as np
@@ -8,6 +9,7 @@ import urllib.parse
 from datetime import datetime, timedelta
 import pytz
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from requests.adapters import HTTPAdapter
 import streamlit as st
 import plotly.express as px
 import matplotlib.pyplot as plt
@@ -1047,29 +1049,86 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
 
 
 # ====================================================================
-# --- 4. LÓGICA DE API AUTODESK Y PRE-CARGA GLOBAL ---
+# --- 4. LÓGICA DE API AUTODESK (SESIÓN REUTILIZABLE + PARALELA) ---
 # ====================================================================
+_TOKEN_LOCK = threading.Lock()
+_TOKEN_CACHE = {"value": None, "expires_at": 0.0}
+_LOCAL_HTTP = threading.local()
+
+
+def _get_session() -> requests.Session:
+    sess = getattr(_LOCAL_HTTP, "session", None)
+    if sess is None:
+        sess = requests.Session()
+        adapter = HTTPAdapter(pool_connections=16, pool_maxsize=16, max_retries=1)
+        sess.mount("https://", adapter)
+        sess.mount("http://", adapter)
+        _LOCAL_HTTP.session = sess
+    return sess
+
+
 def obtener_periodo_actual():
     tz_peru = pytz.timezone('America/Lima')
     ahora = datetime.now(tz_peru)
     fecha_corte = (ahora - timedelta(hours=4)).strftime("%Y-%m-%d")
     return f"{fecha_corte}_04AM"
 
+
 def obtener_ids_excluidos(urls):
     ids = set()
     for url in urls:
         if "folderUrn=" in url:
-            ids.add(url.split("folderUrn=")[1].split("&")[0].replace("%3A", ":"))
+            ids.add(urllib.parse.unquote(url.split("folderUrn=")[1].split("&")[0]).replace("%3A", ":"))
         elif "folders/" in url:
-            ids.add(url.split("folders/")[1].split("/")[0].replace("%3A", ":"))
+            ids.add(urllib.parse.unquote(url.split("folders/")[1].split("/")[0].split("?")[0]).replace("%3A", ":"))
     return ids
 
-def obtener_token():
-    url = "https://developer.api.autodesk.com/authentication/v2/token"
-    headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
-    data = {"grant_type": "client_credentials", "scope": "data:read"}
-    response = requests.post(url, headers=headers, data=data, auth=(CLIENT_ID, CLIENT_SECRET))
-    return response.json().get("access_token") if response.status_code == 200 else None
+
+def obtener_token(forzar_renovacion: bool = False):
+    ahora = time.time()
+    with _TOKEN_LOCK:
+        if not forzar_renovacion and _TOKEN_CACHE["value"] and ahora < _TOKEN_CACHE["expires_at"]:
+            return _TOKEN_CACHE["value"]
+
+        url = "https://developer.api.autodesk.com/authentication/v2/token"
+        headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
+        data = {"grant_type": "client_credentials", "scope": "data:read"}
+        response = _get_session().post(url, headers=headers, data=data, auth=(CLIENT_ID, CLIENT_SECRET), timeout=20)
+        if response.status_code == 200:
+            payload = response.json()
+            tok = payload.get("access_token")
+            ttl = float(payload.get("expires_in", 3599))
+            _TOKEN_CACHE["value"] = tok
+            _TOKEN_CACHE["expires_at"] = time.time() + max(60.0, ttl - 120.0)
+            return tok
+        return None
+
+
+def _request_ads_get(url: str, region_inicial: str = "US", timeout: int = 25):
+    session = _get_session()
+    token = obtener_token()
+    region = region_inicial
+
+    for intento in range(6):
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "x-ads-region": region
+        }
+        resp = session.get(url, headers=headers, timeout=timeout)
+        if resp.status_code == 429:
+            retry_after = float(resp.headers.get("Retry-After", 2 * (intento + 1)))
+            time.sleep(min(retry_after, 10.0))
+            continue
+        if resp.status_code == 401:
+            token = obtener_token(forzar_renovacion=True)
+            continue
+        if resp.status_code != 200 and region == "US" and intento == 0:
+            region = "EMEA"
+            continue
+        return resp
+    return resp
+
 
 def deconstruir_diccionario(datos, prefijo, resultado):
     if isinstance(datos, dict):
@@ -1092,34 +1151,17 @@ def deconstruir_diccionario(datos, prefijo, resultado):
     else:
         resultado[prefijo] = datos
 
+
 def obtener_tip_version_metadata(token, project_id, item_id):
     clean_item_id = item_id.split("?version=")[0]
     url = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/items/{urllib.parse.quote(clean_item_id, safe='')}/tip"
-    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json", "x-ads-region": "US"}
-
-    while True:
-        headers["x-ads-region"] = "US"
-        response = requests.get(url, headers=headers)
-        if response.status_code == 429:
-            time.sleep(2)
-            continue
-        elif response.status_code == 401:
-            nuevo_token = obtener_token()
-            if nuevo_token:
-                headers["Authorization"] = f"Bearer {nuevo_token}"
-                continue
-        elif response.status_code != 200:
-            headers["x-ads-region"] = "EMEA"
-            response = requests.get(url, headers=headers)
-            if response.status_code == 429:
-                time.sleep(2)
-                continue
-        break
+    response = _request_ads_get(url, region_inicial="US", timeout=20)
     return response.json().get("data", {}) if response.status_code == 200 else {}
+
 
 def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_personalizados):
     item_id = item.get("id", "")
-    token_val = headers["Authorization"].split(" ")[1]
+    token_val = headers.get("Authorization", "").replace("Bearer ", "") or obtener_token()
 
     registro_plano = {
         "NOMBRE_DEL_ARCHIVO": name,
@@ -1136,21 +1178,14 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
     if vid:
         vid_encoded = urllib.parse.quote(vid, safe='')
         url_attr = f"https://developer.api.autodesk.com/bim360/docs/v1/projects/{project_id.replace('b.', '')}/versions/{vid_encoded}/custom-attributes"
-
-        while True:
-            res_attr = requests.get(url_attr, headers={"Authorization": headers["Authorization"], "Content-Type": "application/json"})
-            if res_attr.status_code == 429:
-                time.sleep(2)
-                continue
-            elif res_attr.status_code == 401:
-                nuevo_token_attr = obtener_token()
-                if nuevo_token_attr:
-                    headers["Authorization"] = f"Bearer {nuevo_token_attr}"
-                    continue
-            break
+        res_attr = _request_ads_get(url_attr, region_inicial="US", timeout=20)
 
         if res_attr.status_code == 200:
-            for attr in res_attr.json():
+            try:
+                attrs = res_attr.json()
+            except Exception:
+                attrs = []
+            for attr in attrs:
                 attr_id = str(attr.get("id"))
                 attr_name = str(attr.get("name", "")).strip()
                 attr_val = str(attr.get("value", "")).strip()
@@ -1174,30 +1209,18 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
 
     return registro_plano
 
+
 def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
     if folder_id.replace("%3A", ":") in ids_excluidos:
         return
 
-    url_api = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/folders/{folder_id}/contents"
-    while url_api:
-        headers["x-ads-region"] = "US"
-        res = requests.get(url_api, headers=headers)
+    encoded_fid = urllib.parse.quote(urllib.parse.unquote(folder_id), safe="")
+    url_api = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/folders/{encoded_fid}/contents"
 
-        if res.status_code == 401:
-            nuevo_token = obtener_token()
-            if nuevo_token:
-                headers["Authorization"] = f"Bearer {nuevo_token}"
-                continue
-            else:
-                break
-        elif res.status_code == 429:
-            time.sleep(5)
-            continue
-        elif res.status_code != 200:
-            headers["x-ads-region"] = "EMEA"
-            res = requests.get(url_api, headers=headers)
-            if res.status_code != 200:
-                break
+    while url_api:
+        res = _request_ads_get(url_api, region_inicial="US", timeout=25)
+        if res.status_code != 200:
+            break
 
         data = res.json()
         items_pdf = []
@@ -1208,20 +1231,26 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
             name = str(attributes.get("displayName", "Sin Nombre")).strip()
 
             if tipo == "folders":
-                sub_urn_raw = item["id"].replace("%3A", ":")
+                sub_urn_raw = urllib.parse.unquote(item["id"]).replace("%3A", ":")
                 if sub_urn_raw in ids_excluidos:
                     continue
                 if len(name) <= longitud_maxima:
-                    sub_urn = urllib.parse.quote(item["id"], safe='')
-                    escanear_recursivo(project_id, sub_urn, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, f"{ruta_actual} > {name}")
+                    escanear_recursivo(
+                        project_id, sub_urn_raw, headers, lista_datos,
+                        longitud_maxima, ids_excluidos, campos_personalizados,
+                        f"{ruta_actual} > {name}"
+                    )
 
             elif tipo == "items":
                 if ".pdf" in name.lower():
                     items_pdf.append((item, name))
 
         if items_pdf:
-            with ThreadPoolExecutor(max_workers=5) as executor:
-                futures = [executor.submit(procesar_archivo_pdf, i[0], project_id, headers, ruta_actual, i[1], campos_personalizados) for i in items_pdf]
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                futures = [
+                    executor.submit(procesar_archivo_pdf, i[0], project_id, headers, ruta_actual, i[1], campos_personalizados)
+                    for i in items_pdf
+                ]
                 for future in as_completed(futures):
                     res_item = future.result()
                     if res_item:
@@ -1230,13 +1259,90 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
         enlaces = data.get("links", {})
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
+
+def _procesar_carpeta_config(config_carpeta, ids_excluidos, campos_personalizados, id_campo_fecha, id_campo_pendiente, col_pendiente, orden_columnas_deseado):
+    url_carpeta = config_carpeta.get("url")
+    nombre_pestana = config_carpeta.get("nombre", "Sin_Nombre")
+    longitud_maxima = config_carpeta.get("longitud_maxima", 10)
+
+    if not url_carpeta:
+        return nombre_pestana, None, None
+
+    try:
+        project_id_raw = url_carpeta.split("projects/")[1].split("?")[0].split("/")[0]
+        project_id = project_id_raw if project_id_raw.startswith("b.") else "b." + project_id_raw
+
+        if "folderUrn=" in url_carpeta:
+            folder_id = urllib.parse.unquote(url_carpeta.split("folderUrn=")[1].split("&")[0]).replace("%3A", ":")
+        elif "folders/" in url_carpeta:
+            folder_id = urllib.parse.unquote(url_carpeta.split("folders/")[1].split("/")[0].split("?")[0]).replace("%3A", ":")
+        else:
+            return nombre_pestana, None, None
+
+        datos_filtrados = []
+        headers = {"Authorization": f"Bearer {obtener_token() or ''}", "x-ads-region": "US"}
+        escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos, campos_personalizados, nombre_pestana)
+
+        if not datos_filtrados:
+            return nombre_pestana, None, None
+
+        df_completo = pd.DataFrame(datos_filtrados)
+
+        if "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION" not in df_completo.columns:
+            df_completo["ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] = ""
+        if "URL_DOC" not in df_completo.columns:
+            df_completo["URL_DOC"] = ""
+
+        for campo_id in campos_personalizados.keys():
+            col_name = f"CAMPO_CUSTOM_{campo_id}"
+            if col_name not in df_completo.columns:
+                df_completo[col_name] = pd.NaT if campo_id == id_campo_fecha else ""
+
+        fechas_convertidas = pd.to_datetime(df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"], errors='coerce')
+        if fechas_convertidas.dt.tz is not None:
+            fechas_convertidas = fechas_convertidas.dt.tz_localize(None)
+
+        fecha_hoy = pd.Timestamp.now().normalize()
+        df_completo["DIAS"] = (fecha_hoy - fechas_convertidas).dt.days
+        df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
+        df_completo["DIAS"] = df_completo["DIAS"].fillna("")
+
+        diccionario_renombres = {
+            "NOMBRE_DEL_ARCHIVO": COL_CODIGO,
+            "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": COL_DESCRIPCION,
+        }
+        for campo_id, nombre_columna in campos_personalizados.items():
+            diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
+
+        df_todo = df_completo.rename(columns=diccionario_renombres).copy()
+        if col_pendiente in df_todo.columns:
+            df_todo.loc[df_todo[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
+        df_todo.insert(0, "CARPETA", nombre_pestana)
+
+        columnas_finales = (
+            ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"]
+            + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()]
+            + ["DIAS", "URL_DOC"]
+        )
+        df = df_completo[columnas_finales].copy()
+        df = df.rename(columns=diccionario_renombres)
+        columnas_existentes = [col for col in orden_columnas_deseado if col in df.columns]
+        df = df[columnas_existentes]
+
+        if col_pendiente in df.columns:
+            df.loc[df[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
+
+        return nombre_pestana, df, df_todo
+    except Exception:
+        return nombre_pestana, None, None
+
+
 @st.cache_data(show_spinner=False)
 def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personalizados, id_campo_fecha, id_campo_pendiente, periodo_cache):
     token = obtener_token()
     if not token:
-        return {}
+        return {"datos": {}, "datos_completos": {}, "hora_actualizacion": "Sin token"}
 
-    headers = {"Authorization": f"Bearer {token}", "x-ads-region": "US"}
     urls_excluidas_raw = info_contrato.get("urls_excluidas", [])
     ids_excluidos = obtener_ids_excluidos(urls_excluidas_raw)
     carpetas_config = info_contrato.get("carpetas_config", [])
@@ -1246,84 +1352,22 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     col_pendiente = campos_personalizados.get(id_campo_pendiente)
     orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS", "URL_DOC"]
 
-    for config_carpeta in carpetas_config:
-        url_carpeta = config_carpeta.get("url")
-        nombre_pestana = config_carpeta.get("nombre", "Sin_Nombre")
-        longitud_maxima = config_carpeta.get("longitud_maxima", 10)
-
-        if not url_carpeta:
-            continue
-
-        try:
-            project_id_raw = url_carpeta.split("projects/")[1].split("?")[0].split("/")[0]
-            project_id = project_id_raw if project_id_raw.startswith("b.") else "b." + project_id_raw
-
-            if "folderUrn=" in url_carpeta:
-                folder_id = url_carpeta.split("folderUrn=")[1].split("&")[0].replace("%3A", ":")
-            elif "folders/" in url_carpeta:
-                folder_id = url_carpeta.split("folders/")[1].split("/")[0].replace("%3A", ":")
-            else:
-                continue
-
-            datos_filtrados = []
-            escanear_recursivo(project_id, folder_id, headers, datos_filtrados, longitud_maxima, ids_excluidos, campos_personalizados, nombre_pestana)
-
-            if not datos_filtrados:
-                continue
-
-            df_completo = pd.DataFrame(datos_filtrados)
-
-            if "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION" not in df_completo.columns:
-                df_completo["ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"] = ""
-            if "URL_DOC" not in df_completo.columns:
-                df_completo["URL_DOC"] = ""
-
-            for campo_id in campos_personalizados.keys():
-                col_name = f"CAMPO_CUSTOM_{campo_id}"
-                if col_name not in df_completo.columns:
-                    df_completo[col_name] = pd.NaT if campo_id == id_campo_fecha else ""
-
-            fechas_convertidas = pd.to_datetime(df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"], errors='coerce')
-            if fechas_convertidas.dt.tz is not None:
-                fechas_convertidas = fechas_convertidas.dt.tz_localize(None)
-
-            fecha_hoy = pd.Timestamp.now().normalize()
-            df_completo["DIAS"] = (fecha_hoy - fechas_convertidas).dt.days
-            df_completo[f"CAMPO_CUSTOM_{id_campo_fecha}"] = fechas_convertidas.dt.strftime('%d/%m/%Y').fillna("")
-            df_completo["DIAS"] = df_completo["DIAS"].fillna("")
-
-            diccionario_renombres = {
-                "NOMBRE_DEL_ARCHIVO": COL_CODIGO,
-                "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": COL_DESCRIPCION,
-            }
-            for campo_id, nombre_columna in campos_personalizados.items():
-                diccionario_renombres[f"CAMPO_CUSTOM_{campo_id}"] = nombre_columna
-
-            # DataFrame íntegro con todos los metadatos y atributos extraídos
-            df_todo = df_completo.rename(columns=diccionario_renombres).copy()
-            if col_pendiente in df_todo.columns:
-                df_todo.loc[df_todo[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
-            df_todo.insert(0, "CARPETA", nombre_pestana)
-            dataframes_completos_por_pestana[nombre_pestana] = df_todo
-
-            # DataFrame estándar para las tablas principales
-            columnas_finales = (
-                ["NOMBRE_DEL_ARCHIVO", "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION"]
-                + [f"CAMPO_CUSTOM_{c}" for c in campos_personalizados.keys()]
-                + ["DIAS", "URL_DOC"]
-            )
-            df = df_completo[columnas_finales].copy()
-            df = df.rename(columns=diccionario_renombres)
-            columnas_existentes = [col for col in orden_columnas_deseado if col in df.columns]
-            df = df[columnas_existentes]
-
-            if col_pendiente in df.columns:
-                df.loc[df[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO", "DIAS"] = 0
-
-            dataframes_por_pestana[nombre_pestana] = df
-
-        except Exception:
-            continue
+    if carpetas_config:
+        with ThreadPoolExecutor(max_workers=min(6, len(carpetas_config))) as executor:
+            futures = [
+                executor.submit(
+                    _procesar_carpeta_config,
+                    cfg_c, ids_excluidos, campos_personalizados,
+                    id_campo_fecha, id_campo_pendiente, col_pendiente, orden_columnas_deseado
+                )
+                for cfg_c in carpetas_config
+            ]
+            for fut in as_completed(futures):
+                pest, df_p, df_t = fut.result()
+                if df_p is not None:
+                    dataframes_por_pestana[pest] = df_p
+                if df_t is not None:
+                    dataframes_completos_por_pestana[pest] = df_t
 
     tz_pe = pytz.timezone('America/Lima')
     hora_cache = datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M')
@@ -1334,10 +1378,16 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
         "hora_actualizacion": hora_cache
     }
 
-def precargar_todos_los_contratos(periodo):
+
+def precargar_todos_los_contratos(periodo, progress_bar=None, status_text=None):
+    obtener_token(forzar_renovacion=True)
+    tareas = []
+
     for alcance, sub_dict in ESTRUCTURA_MAESTRA.items():
+        if not isinstance(sub_dict, dict):
+            continue
         for sub_nom, sub_data in sub_dict.items():
-            if sub_nom == "config":
+            if sub_nom == "config" or not isinstance(sub_data, dict):
                 continue
 
             config_sub = sub_data.get("config", {})
@@ -1346,11 +1396,33 @@ def precargar_todos_los_contratos(periodo):
             id_pen = config_sub.get("id_campo_pendiente", "")
 
             for tipo_obra, contratos_dict in sub_data.items():
-                if tipo_obra == "config":
+                if tipo_obra == "config" or not isinstance(contratos_dict, dict):
                     continue
 
                 for cont_nom, info_cont in contratos_dict.items():
-                    extraer_datos_contrato_completo(cont_nom, info_cont, campos, id_fec, id_pen, periodo)
+                    if isinstance(info_cont, dict) and info_cont.get("carpetas_config"):
+                        tareas.append((cont_nom, info_cont, campos, id_fec, id_pen, periodo))
+
+    total_tareas = max(1, len(tareas))
+    completadas = 0
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = {
+            executor.submit(extraer_datos_contrato_completo, *t): t[0]
+            for t in tareas
+        }
+        for fut in as_completed(futures):
+            nombre_c = futures[fut]
+            try:
+                fut.result()
+            except Exception:
+                pass
+            completadas += 1
+            if progress_bar:
+                progress_bar.progress(min(1.0, completadas / total_tareas))
+            if status_text:
+                status_text.caption(f"Procesados {completadas}/{total_tareas}: {nombre_c}")
+
 
 def preparar_df_con_links(df_in: pd.DataFrame) -> pd.DataFrame:
     """Incrusta el enlace de ACC en la columna CODIGO para mostrarlo como LinkColumn."""
@@ -1515,9 +1587,10 @@ st.sidebar.markdown("---")
 
 if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=True):
     extraer_datos_contrato_completo.clear()
-    st.sidebar.warning("Descargando data global (Autodesk API)... Por favor, espera.")
-    with st.spinner("Descargando data global (Autodesk API)... Por favor, espera."):
-        precargar_todos_los_contratos(periodo_actual)
+    st.sidebar.warning("Descargando data global en paralelo (Autodesk API)...")
+    barra_p = st.sidebar.progress(0.0)
+    texto_p = st.sidebar.empty()
+    precargar_todos_los_contratos(periodo_actual, progress_bar=barra_p, status_text=texto_p)
     st.sidebar.success("¡Data global actualizada exitosamente!")
 
 st.sidebar.caption(f"Corte activo: {periodo_actual.split('_')[-1].upper()} · {periodo_actual.split('_')[0]}")
@@ -1531,8 +1604,10 @@ metadata_export = {
 
 if "preload" in st.query_params and st.query_params["preload"] == "true":
     st.title("🤖 Modo Bot: Actualizando Caché Global")
-    st.warning("Descargando absolutamente toda la data de Autodesk en segundo plano. Esto tomará varios minutos...")
-    precargar_todos_los_contratos(periodo_actual)
+    st.warning("Descargando toda la data de Autodesk en paralelo...")
+    barra_bot = st.progress(0.0)
+    texto_bot = st.empty()
+    precargar_todos_los_contratos(periodo_actual, progress_bar=barra_bot, status_text=texto_bot)
     st.success("¡Data global precargada exitosamente!")
     st.stop()
 
@@ -2113,7 +2188,6 @@ else:
                     if "pers_cols_state" not in st.session_state:
                         st.session_state["pers_cols_state"] = cols_principales
 
-                    # Asegurar que las columnas guardadas existan en el contrato actual
                     st.session_state["pers_cols_state"] = [
                         c for c in st.session_state["pers_cols_state"] if c in todas_las_columnas
                     ]
