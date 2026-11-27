@@ -1,6 +1,8 @@
 import os
 import re
+import json
 import time
+import base64
 import urllib.parse
 from io import BytesIO
 from datetime import datetime, timedelta, timezone
@@ -23,9 +25,14 @@ from reportlab.platypus import Image as RLImage
 
 from modulo_estructura_proyectos import (
     ESTRUCTURA_PROYECTOS,
+    _SHA_INICIAL,
     obtener_subproyectos,
+    obtener_tipos_obra,
     obtener_contratos,
     obtener_info_contrato,
+    cargar_estructura_github,
+    guardar_estructura_github,
+    mostrar_editor_estructura,
 )
 
 try:
@@ -43,6 +50,9 @@ st.set_page_config(
 )
 
 RUTA_LOGO = "logoshp.jpeg"
+GITHUB_REPO = "rcanov/dashboard-control-documentario"
+RUTA_CONFIG_REPORTES = "config_reportes.json"
+DIAS_SEMANA_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 ORDEN_COLUMNAS_DASHBOARD = [
     "CODIGO",
     "REV",
@@ -64,7 +74,7 @@ def obtener_periodo_actual() -> str:
     return f"{fecha_corte}_04AM"
 
 
-def _leer_credencial_acc(clave: str) -> str:
+def _leer_secreto_o_env(clave: str) -> str:
     try:
         if clave in st.secrets:
             val = str(st.secrets[clave]).strip()
@@ -75,8 +85,107 @@ def _leer_credencial_acc(clave: str) -> str:
     return str(os.environ.get(clave, "")).strip()
 
 
-CLIENT_ID = _leer_credencial_acc("CLIENT_ID")
-CLIENT_SECRET = _leer_credencial_acc("CLIENT_SECRET")
+CLIENT_ID = _leer_secreto_o_env("CLIENT_ID")
+CLIENT_SECRET = _leer_secreto_o_env("CLIENT_SECRET")
+GITHUB_TOKEN = _leer_secreto_o_env("GITHUB_TOKEN")
+
+
+def _headers_github() -> dict:
+    return {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+
+
+def cargar_reportes_github() -> tuple[dict, str | None]:
+    if GITHUB_TOKEN:
+        try:
+            url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_CONFIG_REPORTES}"
+            r = requests.get(url, headers=_headers_github(), timeout=20)
+            if r.status_code == 200:
+                data = r.json()
+                raw = base64.b64decode(data.get("content", "")).decode("utf-8").strip()
+                parsed = json.loads(raw) if raw else {}
+                if isinstance(parsed, dict):
+                    return parsed, data.get("sha")
+        except Exception:
+            pass
+
+    if os.path.exists(RUTA_CONFIG_REPORTES):
+        try:
+            with open(RUTA_CONFIG_REPORTES, "r", encoding="utf-8") as f:
+                raw = f.read().strip()
+                parsed = json.loads(raw) if raw else {}
+                if isinstance(parsed, dict):
+                    return parsed, None
+        except Exception:
+            pass
+    return {}, None
+
+
+def guardar_reportes_github(reportes_dict: dict, sha: str | None = None):
+    if not GITHUB_TOKEN:
+        return None
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_CONFIG_REPORTES}"
+    contenido_b64 = base64.b64encode(
+        json.dumps(reportes_dict, indent=4, ensure_ascii=False).encode("utf-8")
+    ).decode("utf-8")
+    payload = {
+        "message": "Actualización de configuración de reportes diarios desde Dashboard",
+        "content": contenido_b64,
+    }
+    if sha:
+        payload["sha"] = sha
+    return requests.put(url, headers=_headers_github(), json=payload, timeout=25)
+
+
+def listar_carpetas_de_estructura(estructura: dict) -> list[dict]:
+    items = []
+    if not isinstance(estructura, dict):
+        return items
+
+    for alcance, subs in estructura.items():
+        if not isinstance(subs, dict):
+            continue
+        for sub_nom, info_sub in subs.items():
+            if sub_nom == "config" or not isinstance(info_sub, dict):
+                continue
+            cfg_sub = info_sub.get("config", {}) if isinstance(info_sub.get("config"), dict) else {}
+            obras_dict = (
+                info_sub.get("tipos_obra")
+                if isinstance(info_sub.get("tipos_obra"), dict)
+                else {k: v for k, v in info_sub.items() if k != "config" and isinstance(v, dict)}
+            )
+            for tipo_obra, contratos_dict in obras_dict.items():
+                if not isinstance(contratos_dict, dict):
+                    continue
+                for cont_nom, info_cont in contratos_dict.items():
+                    if not isinstance(info_cont, dict):
+                        continue
+                    carpetas_raw = info_cont.get("carpetas") or info_cont.get("carpetas_config") or []
+                    for c in carpetas_raw:
+                        if not isinstance(c, dict):
+                            continue
+                        carp_nom = str(c.get("carpeta") or c.get("nombre") or "Carpeta").strip()
+                        url_c = str(c.get("url", "")).strip()
+                        len_max = int(c.get("longitud_maxima", 10) or 10)
+                        items.append({
+                            "etiqueta": f"{sub_nom} | {cont_nom} | {carp_nom}",
+                            "alcance": alcance,
+                            "subproyecto": sub_nom,
+                            "tipo_obra": tipo_obra,
+                            "contrato": cont_nom,
+                            "carpeta": carp_nom,
+                            "url": url_c,
+                            "longitud_maxima": len_max,
+                            "urls_excluidas": info_cont.get("urls_excluidas", []),
+                            "config_sub": {
+                                "campos_personalizados": info_cont.get("campos_personalizados") or cfg_sub.get("campos_personalizados", {}),
+                                "id_campo_fecha": info_cont.get("id_campo_fecha") or cfg_sub.get("id_campo_fecha", "6011839"),
+                                "id_campo_pendiente": info_cont.get("id_campo_pendiente") or cfg_sub.get("id_campo_pendiente", "6011840"),
+                            },
+                        })
+    return items
 
 
 @st.cache_data(show_spinner=False, ttl=2800, max_entries=4)
@@ -394,12 +503,18 @@ def _procesar_carpeta_config(
     periodo_corte: str = "",
     forzar_api: bool = False,
 ):
-    nombre_pestana = str(config_carpeta.get("nombre_pestana") or config_carpeta.get("carpeta") or "Carpeta").strip()
+    nombre_pestana = str(
+        config_carpeta.get("nombre_pestana")
+        or config_carpeta.get("carpeta")
+        or config_carpeta.get("nombre")
+        or "Carpeta"
+    ).strip()
     alcance = str(config_carpeta.get("_alcance", "")).strip()
     subproyecto = str(config_carpeta.get("_subproyecto", "")).strip()
     tipo_obra = str(config_carpeta.get("_tipo_obra", "")).strip()
     contrato = str(config_carpeta.get("_contrato", "")).strip()
     corte = periodo_corte or obtener_periodo_actual()
+    diagnostico = ""
 
     if not forzar_api and bd_disponible() and contrato:
         try:
@@ -422,12 +537,19 @@ def _procesar_carpeta_config(
                 if not cols_vista:
                     cols_vista = [c for c in ORDEN_COLUMNAS_DASHBOARD if c in df_todo_bd.columns]
                 df_vista_bd = df_todo_bd[cols_vista].copy()
-                return nombre_pestana, df_vista_bd, df_todo_bd
-        except Exception:
-            pass
+                return nombre_pestana, df_vista_bd, df_todo_bd, "Cargado desde Supabase PostgreSQL"
+        except Exception as e_bd:
+            diagnostico = f"Error leyendo BD: {e_bd}"
 
+    url_carp = str(config_carpeta.get("url", "")).strip()
+    project_id, fid = extraer_project_y_folder_id(url_carp)
     token = obtener_token_acc(CLIENT_ID, CLIENT_SECRET)
-    project_id, fid = extraer_project_y_folder_id(config_carpeta.get("url", ""))
+
+    if not token:
+        diagnostico = "Falta configurar CLIENT_ID o CLIENT_SECRET válidos para consultar Autodesk ACC."
+    elif not project_id or not fid:
+        diagnostico = f"URL de carpeta inválida o vacía en '{nombre_pestana}'."
+
     datos_carpeta = []
     if token and project_id and fid:
         escanear_recursivo_acc(
@@ -440,6 +562,13 @@ def _procesar_carpeta_config(
             campos_personalizados=campos_personalizados or {},
             ruta_actual=nombre_pestana,
         )
+        if not datos_carpeta:
+            diagnostico = (
+                f"No se encontraron archivos PDF en '{nombre_pestana}' (revisa URL, "
+                f"longitud máxima de subcarpeta o URLs excluidas)."
+            )
+        else:
+            diagnostico = f"Consultado en vivo desde Autodesk ACC ({len(datos_carpeta)} PDFs)"
 
     df_vista, df_todo = _normalizar_df_carpeta(
         datos_carpeta=datos_carpeta,
@@ -469,7 +598,7 @@ def _procesar_carpeta_config(
         except Exception:
             pass
 
-    return nombre_pestana, df_vista, df_todo
+    return nombre_pestana, df_vista, df_todo, diagnostico
 
 
 @st.cache_data(show_spinner=False, ttl=14400, max_entries=40)
@@ -496,18 +625,21 @@ def extraer_datos_contrato_completo(
     col_pendiente = campos_personalizados.get(id_campo_pendiente, "PENDIENTE POR")
     orden_cols = info_contrato.get("columnas_visibles") or ORDEN_COLUMNAS_DASHBOARD
 
-    carpetas_cfg = info_contrato.get("carpetas", [])
+    carpetas_cfg = info_contrato.get("carpetas") or info_contrato.get("carpetas_config") or []
     resultados_vista = {}
     resultados_todo = {}
+    diagnosticos = {}
 
     for cfg_c in carpetas_cfg:
         cfg_c_enriquecida = dict(cfg_c)
+        if "carpeta" not in cfg_c_enriquecida and "nombre" in cfg_c_enriquecida:
+            cfg_c_enriquecida["carpeta"] = cfg_c_enriquecida["nombre"]
         cfg_c_enriquecida["_alcance"] = alcance_ctx
         cfg_c_enriquecida["_subproyecto"] = subproyecto_ctx
         cfg_c_enriquecida["_tipo_obra"] = tipo_obra_ctx
         cfg_c_enriquecida["_contrato"] = contrato_ctx
 
-        pest, df_p, df_t = _procesar_carpeta_config(
+        pest, df_p, df_t, diag = _procesar_carpeta_config(
             config_carpeta=cfg_c_enriquecida,
             ids_excluidos=ids_excluidos,
             campos_personalizados=campos_personalizados,
@@ -520,11 +652,13 @@ def extraer_datos_contrato_completo(
         )
         resultados_vista[pest] = df_p
         resultados_todo[pest] = df_t
+        diagnosticos[pest] = diag
 
     return {
         "datos": resultados_vista,
         "datos_completos": resultados_todo,
         "col_pendiente": col_pendiente,
+        "diagnosticos": diagnosticos,
     }
 
 
@@ -536,24 +670,41 @@ def _congelar_estructura(obj):
     return obj
 
 
-def precargar_todos_los_contratos(periodo_corte: str, version_cache: int = 0) -> dict:
-    cache_global = {}
-    for alcance, subs in ESTRUCTURA_PROYECTOS.items():
-        for sub_nom, info_sub in subs.items():
-            for tipo_obra, contratos_dict in info_sub.get("tipos_obra", {}).items():
-                for cont_nom, info_cont in contratos_dict.items():
-                    info_cont_ctx = dict(info_cont)
-                    info_cont_ctx["_alcance"] = alcance
-                    info_cont_ctx["_subproyecto"] = sub_nom
-                    info_cont_ctx["_tipo_obra"] = tipo_obra
-                    info_cont_ctx["_contrato"] = cont_nom
-                    cache_global[cont_nom] = extraer_datos_contrato_completo(
-                        contrato_key=cont_nom,
-                        info_contrato_tuple=_congelar_estructura(info_cont_ctx),
-                        periodo_corte=periodo_corte,
-                        version_cache=version_cache,
-                    )
-    return cache_global
+def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict:
+    total = len(df_full) if df_full is not None else 0
+    if total == 0:
+        return {"Cerrados": 0, "Pendientes": 0, "Total": 0, "Avance (%)": 0.0}
+
+    cerrados = 0
+    if col_pendiente and col_pendiente in df_full.columns:
+        est_u = df_full[col_pendiente].astype(str).str.strip().str.upper()
+        cerrados = int((est_u == "CERRADO").sum())
+
+    pendientes = total - cerrados
+    avance = round((cerrados / total * 100), 1) if total > 0 else 0.0
+    return {
+        "Cerrados": cerrados,
+        "Pendientes": pendientes,
+        "Total": total,
+        "Avance (%)": avance,
+    }
+
+
+def construir_tabla_resumen_por_estado(df_full: pd.DataFrame) -> pd.DataFrame:
+    if df_full is None or df_full.empty or "ESTADO" not in df_full.columns:
+        return pd.DataFrame(columns=["Estado", "Cantidad", "Porcentaje (%)"])
+    s = df_full["ESTADO"].fillna("").astype(str).str.strip()
+    s = s.replace({"": "Sin Estado", "nan": "Sin Estado", "None": "Sin Estado"})
+    vc = s.value_counts()
+    total = max(1, len(df_full))
+    return pd.DataFrame([
+        {
+            "Estado": k,
+            "Cantidad": int(v),
+            "Porcentaje (%)": round(int(v) / total * 100, 1),
+        }
+        for k, v in vc.items()
+    ])
 
 
 def obtener_colores_estado(estado):
@@ -742,6 +893,148 @@ def exportar_df_a_pdf(
     return buf.getvalue()
 
 
+def _render_modo_administrador(estructura_actual: dict, sha_estructura):
+    st.subheader("⚙️ Modo Administrador — Estructura y Reportes Diarios")
+    tab_est, tab_rep = st.tabs(["🏗️ Estructura de Proyectos", "✉️ Crear / Editar Reportes Diarios"])
+
+    with tab_est:
+        mostrar_editor_estructura(estructura_actual, sha_estructura)
+
+    with tab_rep:
+        reportes_dict, sha_rep = cargar_reportes_github()
+        if not GITHUB_TOKEN:
+            st.warning("Configura `GITHUB_TOKEN` en Secrets de Streamlit para guardar cambios en `config_reportes.json`.")
+
+        nombres_existentes = list(reportes_dict.keys())
+        opciones_rep = ["➕ Nuevo Reporte Diario"] + nombres_existentes
+        rep_sel = st.selectbox("Selecciona un reporte para editar o crea uno nuevo:", opciones_rep)
+
+        es_nuevo = rep_sel == "➕ Nuevo Reporte Diario"
+        cfg_base = {} if es_nuevo else dict(reportes_dict.get(rep_sel, {}))
+
+        nombre_rep = st.text_input(
+            "Nombre del Reporte Diario:",
+            value="" if es_nuevo else rep_sel,
+            placeholder="Ej: 998316 Nuevo Muelle - Pendientes Diarios",
+        ).strip()
+
+        c_a1, c_a2, c_a3 = st.columns(3)
+        activo_rep = c_a1.checkbox("Reporte activo", value=bool(cfg_base.get("activo", True)))
+        incluir_est_rep = c_a2.checkbox("Incluir resumen por estado", value=bool(cfg_base.get("incluir_resumen_estado", True)))
+        modo_envio_rep = c_a3.selectbox(
+            "Modo de envío",
+            ["☁️ Nube (GitHub + Gmail)", "💻 Local (PC)"],
+            index=0 if "Local" not in str(cfg_base.get("modo_envio", "")) else 1,
+        )
+
+        c_d1, c_d2 = st.columns(2)
+        dias_sel = c_d1.multiselect(
+            "Días de envío",
+            DIAS_SEMANA_ES,
+            default=cfg_base.get("dias_semana", ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]),
+        )
+        horarios_default = ", ".join(cfg_base.get("horarios", ["10:00", "14:00"]))
+        horarios_txt = c_d2.text_input("Horarios (HH:MM separados por coma)", value=horarios_default)
+
+        c_m1, c_m2 = st.columns(2)
+        para_default = ", ".join(cfg_base.get("para", [])) if isinstance(cfg_base.get("para"), list) else str(cfg_base.get("para", ""))
+        cc_default = ", ".join(cfg_base.get("cc", [])) if isinstance(cfg_base.get("cc"), list) else str(cfg_base.get("cc", ""))
+        para_txt = c_m1.text_area("Para (correos separados por coma o punto y coma)", value=para_default, height=70)
+        cc_txt = c_m2.text_area("CC (opcional)", value=cc_default, height=70)
+
+        asunto_txt = st.text_input(
+            "Asunto del correo",
+            value=cfg_base.get("asunto", "Reporte Control Documentario - {nombre_reporte} ({fecha})"),
+        )
+        cuerpo_txt = st.text_area(
+            "Cuerpo del correo",
+            value=cfg_base.get(
+                "cuerpo",
+                "Estimados,\n\nSe remite el reporte {nombre_reporte} al {fecha} ({total_registros} registros).",
+            ),
+            height=90,
+        )
+
+        carpetas_catalogo = listar_carpetas_de_estructura(estructura_actual)
+        mapa_etiquetas = {item["etiqueta"]: item for item in carpetas_catalogo}
+
+        prev_sel = []
+        for c_prev in cfg_base.get("carpetas_seleccionadas", []):
+            etq = f"{c_prev.get('subproyecto', '')} | {c_prev.get('contrato', '')} | {c_prev.get('carpeta', '')}"
+            if etq in mapa_etiquetas:
+                prev_sel.append(etq)
+
+        carpetas_elegidas = st.multiselect(
+            "Carpetas incluidas en el reporte",
+            list(mapa_etiquetas.keys()),
+            default=prev_sel,
+        )
+
+        cols_elegidas = st.multiselect(
+            "Columnas a exportar en Excel / PDF",
+            ORDEN_COLUMNAS_DASHBOARD,
+            default=[c for c in cfg_base.get("columnas_excel", ORDEN_COLUMNAS_DASHBOARD) if c in ORDEN_COLUMNAS_DASHBOARD] or ORDEN_COLUMNAS_DASHBOARD,
+        )
+
+        b_save, b_del = st.columns([2, 1])
+        with b_save:
+            if st.button("💾 Guardar Reporte Diario en GitHub", type="primary", use_container_width=True):
+                if not nombre_rep:
+                    st.warning("Ingresa un nombre para el reporte diario.")
+                else:
+                    if not es_nuevo and rep_sel != nombre_rep and rep_sel in reportes_dict:
+                        del reportes_dict[rep_sel]
+
+                    lista_carpetas_cfg = []
+                    for etq in carpetas_elegidas:
+                        src = mapa_etiquetas[etq]
+                        lista_carpetas_cfg.append({
+                            "alcance": src["alcance"],
+                            "subproyecto": src["subproyecto"],
+                            "tipo_obra": src["tipo_obra"],
+                            "contrato": src["contrato"],
+                            "carpeta": src["carpeta"],
+                            "url": src["url"],
+                            "longitud_maxima": src["longitud_maxima"],
+                            "urls_excluidas": src["urls_excluidas"],
+                            "config_sub": src["config_sub"],
+                        })
+
+                    reportes_dict[nombre_rep] = {
+                        "activo": activo_rep,
+                        "incluir_resumen_estado": incluir_est_rep,
+                        "modo_envio": modo_envio_rep,
+                        "dias_semana": dias_sel,
+                        "horarios": [h.strip() for h in horarios_txt.split(",") if h.strip()],
+                        "para": [c.strip() for c in re.split(r"[;,]", para_txt) if c.strip()],
+                        "cc": [c.strip() for c in re.split(r"[;,]", cc_txt) if c.strip()],
+                        "asunto": asunto_txt.strip(),
+                        "cuerpo": cuerpo_txt,
+                        "carpetas_seleccionadas": lista_carpetas_cfg,
+                        "columnas_excel": cols_elegidas or ORDEN_COLUMNAS_DASHBOARD,
+                        "condiciones_filtro": cfg_base.get("condiciones_filtro", []),
+                    }
+
+                    res = guardar_reportes_github(reportes_dict, sha_rep)
+                    if res is not None and res.status_code in (200, 201):
+                        st.success(f"✅ Reporte '{nombre_rep}' guardado en {RUTA_CONFIG_REPORTES}.")
+                        st.rerun()
+                    else:
+                        detalle = res.text if res is not None else "No se encontró GITHUB_TOKEN."
+                        st.error(f"No se pudo guardar en GitHub: {detalle}")
+
+        with b_del:
+            if not es_nuevo and rep_sel in reportes_dict:
+                if st.button("🗑️ Eliminar Reporte", use_container_width=True):
+                    del reportes_dict[rep_sel]
+                    res = guardar_reportes_github(reportes_dict, sha_rep)
+                    if res is not None and res.status_code in (200, 201):
+                        st.success(f"Reporte '{rep_sel}' eliminado.")
+                        st.rerun()
+                    else:
+                        st.error("No se pudo eliminar el reporte en GitHub.")
+
+
 # --- Estado inicial de sesión ---
 if "version_cache" not in st.session_state:
     st.session_state.version_cache = 0
@@ -767,14 +1060,14 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
-    alcances = list(ESTRUCTURA_PROYECTOS.keys())
+    alcances = list(ESTRUCTURA_PROYECTOS.keys()) if isinstance(ESTRUCTURA_PROYECTOS, dict) else []
     alcance_sel = st.selectbox("Alcance", alcances, index=0 if alcances else None)
 
     subproyectos = obtener_subproyectos(alcance_sel) if alcance_sel else []
     sub_sel = st.selectbox("Subproyecto", subproyectos, index=0 if subproyectos else None)
 
-    info_sub = ESTRUCTURA_PROYECTOS.get(alcance_sel, {}).get(sub_sel, {})
-    tipos_obra = list(info_sub.get("tipos_obra", {}).keys())
+    info_sub = ESTRUCTURA_PROYECTOS.get(alcance_sel, {}).get(sub_sel, {}) if (alcance_sel and sub_sel) else {}
+    tipos_obra = obtener_tipos_obra(alcance_sel, sub_sel) if (alcance_sel and sub_sel) else []
     tipo_sel = st.selectbox("Tipo de Obra", tipos_obra, index=0 if tipos_obra else None)
 
     contratos = obtener_contratos(alcance_sel, sub_sel, tipo_sel) if (alcance_sel and sub_sel and tipo_sel) else []
@@ -788,14 +1081,22 @@ with st.sidebar:
             "Consolidado de Subproyecto",
             "Reporte Global",
             "Constructor Dinámico",
+            "Modo Administrador",
         ],
     )
 
 # --- Cabecera principal ---
 st.title("📊 Tablero de Control Documentario - Shougang Hierro Perú")
 
+if modo_vista == "Modo Administrador":
+    _render_modo_administrador(ESTRUCTURA_PROYECTOS, _SHA_INICIAL)
+    st.stop()
+
 if not alcance_sel or not sub_sel or not tipo_sel or not contrato_sel:
-    st.warning("Selecciona un Alcance, Subproyecto, Tipo de Obra y Contrato en la barra lateral.")
+    st.warning(
+        "Selecciona un Alcance, Subproyecto, Tipo de Obra y Contrato en la barra lateral "
+        "(o entra a **Modo Administrador** para configurar la estructura)."
+    )
     st.stop()
 
 info_contrato_raw = obtener_info_contrato(alcance_sel, sub_sel, tipo_sel, contrato_sel) or {}
@@ -816,6 +1117,7 @@ with st.spinner(f"Cargando datos de {contrato_sel}..."):
 datos_vista = paquete_contrato.get("datos", {})
 datos_completos = paquete_contrato.get("datos_completos", {})
 col_pendiente = paquete_contrato.get("col_pendiente", "PENDIENTE POR")
+diagnosticos = paquete_contrato.get("diagnosticos", {})
 
 fecha_export_str = obtener_hora_peru().strftime("%d/%m/%Y %H:%M")
 metadata_base = {
@@ -830,13 +1132,26 @@ metadata_base = {
 if modo_vista == "Detalle de Contrato":
     st.subheader(f"📁 Detalle de Contrato: {contrato_sel}")
     if not datos_vista:
-        st.info("No hay carpetas configuradas para este contrato.")
+        st.info("No hay carpetas configuradas para este contrato en `estructura_proyectos.json`.")
     else:
         pestanas = st.tabs(list(datos_vista.keys()))
         for tab, nombre_carpeta in zip(pestanas, datos_vista.keys()):
             with tab:
                 df_c = datos_vista[nombre_carpeta]
                 df_t = datos_completos.get(nombre_carpeta, df_c)
+                diag_carp = diagnosticos.get(nombre_carpeta, "")
+                if diag_carp:
+                    st.caption(f"Estado fuente: {diag_carp}")
+
+                res_k = construir_resumen_carpeta(df_t, col_pendiente)
+                k1, k2, k3, k4 = st.columns(4)
+                k1.metric("Total Documentos", res_k["Total"])
+                k2.metric("Cerrados", res_k["Cerrados"])
+                k3.metric("Pendientes", res_k["Pendientes"])
+                k4.metric("Avance (%)", f"{res_k['Avance (%)']}%")
+
+                with st.expander("📌 Resumen por Estado del Documento"):
+                    st.dataframe(construir_tabla_resumen_por_estado(df_t), use_container_width=True, hide_index=True)
 
                 col_f1, col_f2, col_f3 = st.columns(3)
                 estados_disp = ["Todos"]
@@ -867,7 +1182,10 @@ if modo_vista == "Detalle de Contrato":
                     df_filtrado = df_filtrado[mask_b]
 
                 st.caption(f"Mostrando {len(df_filtrado)} de {len(df_c)} documentos en {nombre_carpeta}")
-                st.dataframe(estilizar_tabla_streamlit(df_filtrado, col_pendiente), use_container_width=True, hide_index=True)
+                if df_filtrado.empty:
+                    st.warning("No hay registros para mostrar en esta carpeta con el filtro o corte actual.")
+                else:
+                    st.dataframe(estilizar_tabla_streamlit(df_filtrado, col_pendiente), use_container_width=True, hide_index=True)
 
                 c_b1, c_b2 = st.columns(2)
                 excel_bytes = exportar_df_a_excel(
@@ -906,8 +1224,17 @@ if modo_vista == "Detalle de Contrato":
 elif modo_vista == "Consolidado de Subproyecto":
     st.subheader(f"🗂️ Consolidado de Subproyecto: {sub_sel}")
     filas_cons = []
-    for t_obra, c_dict in info_sub.get("tipos_obra", {}).items():
+    obras_sub = (
+        info_sub.get("tipos_obra")
+        if isinstance(info_sub.get("tipos_obra"), dict)
+        else {k: v for k, v in info_sub.items() if k != "config" and isinstance(v, dict)}
+    )
+    for t_obra, c_dict in obras_sub.items():
+        if not isinstance(c_dict, dict):
+            continue
         for c_nom, c_info in c_dict.items():
+            if not isinstance(c_info, dict):
+                continue
             c_ctx = dict(c_info)
             c_ctx["_alcance"] = alcance_sel
             c_ctx["_subproyecto"] = sub_sel
@@ -921,22 +1248,12 @@ elif modo_vista == "Consolidado de Subproyecto":
             )
             cp = res_c.get("col_pendiente", "PENDIENTE POR")
             for carp_nom, df_full in res_c.get("datos_completos", {}).items():
-                total_d = len(df_full)
-                cerrados_d = 0
-                pendientes_d = total_d
-                if cp in df_full.columns and total_d > 0:
-                    est_u = df_full[cp].astype(str).str.strip().str.upper()
-                    cerrados_d = int((est_u == "CERRADO").sum())
-                    pendientes_d = total_d - cerrados_d
-                avance_d = (cerrados_d / total_d * 100) if total_d > 0 else 0.0
+                rk = construir_resumen_carpeta(df_full, cp)
                 filas_cons.append({
                     "Tipo de Obra": t_obra,
                     "Contrato": c_nom,
                     "Carpeta": carp_nom,
-                    "Cerrados": cerrados_d,
-                    "Pendientes": pendientes_d,
-                    "Total": total_d,
-                    "Avance (%)": round(avance_d, 1),
+                    **rk,
                 })
 
     df_cons = pd.DataFrame(filas_cons)
@@ -956,26 +1273,39 @@ elif modo_vista == "Consolidado de Subproyecto":
 elif modo_vista == "Reporte Global":
     st.subheader("🌐 Reporte Global de Contratos")
     if st.button("Cargar Todos los Contratos Configurados", key="btn_cargar_global"):
-        with st.spinner("Precargando todos los contratos..."):
-            cache_all = precargar_todos_los_contratos(
-                periodo_corte=periodo_actual,
-                version_cache=st.session_state.version_cache,
-            )
         filas_glob = []
-        for c_nom, paq in cache_all.items():
-            cp = paq.get("col_pendiente", "PENDIENTE POR")
-            for carp_nom, df_full in paq.get("datos_completos", {}).items():
-                tot = len(df_full)
-                cer = 0
-                if cp in df_full.columns and tot > 0:
-                    cer = int((df_full[cp].astype(str).str.strip().str.upper() == "CERRADO").sum())
+        with st.spinner("Cargando todos los contratos configurados..."):
+            for item_c in listar_carpetas_de_estructura(ESTRUCTURA_PROYECTOS):
+                c_ctx = {
+                    "_alcance": item_c["alcance"],
+                    "_subproyecto": item_c["subproyecto"],
+                    "_tipo_obra": item_c["tipo_obra"],
+                    "_contrato": item_c["contrato"],
+                    "carpetas": [{
+                        "carpeta": item_c["carpeta"],
+                        "nombre_pestana": item_c["carpeta"],
+                        "url": item_c["url"],
+                        "longitud_maxima": item_c["longitud_maxima"],
+                    }],
+                    "urls_excluidas": item_c["urls_excluidas"],
+                    "campos_personalizados": item_c["config_sub"].get("campos_personalizados", {}),
+                    "id_campo_fecha": item_c["config_sub"].get("id_campo_fecha", "6011839"),
+                    "id_campo_pendiente": item_c["config_sub"].get("id_campo_pendiente", "6011840"),
+                }
+                paq = extraer_datos_contrato_completo(
+                    contrato_key=f"{item_c['contrato']}::{item_c['carpeta']}",
+                    info_contrato_tuple=_congelar_estructura(c_ctx),
+                    periodo_corte=periodo_actual,
+                    version_cache=st.session_state.version_cache,
+                )
+                cp = paq.get("col_pendiente", "PENDIENTE POR")
+                df_full = paq.get("datos_completos", {}).get(item_c["carpeta"], pd.DataFrame())
+                rk = construir_resumen_carpeta(df_full, cp)
                 filas_glob.append({
-                    "Contrato": c_nom,
-                    "Carpeta": carp_nom,
-                    "Cerrados": cer,
-                    "Pendientes": tot - cer,
-                    "Total": tot,
-                    "Avance (%)": round((cer / tot * 100) if tot > 0 else 0.0, 1),
+                    "Subproyecto": item_c["subproyecto"],
+                    "Contrato": item_c["contrato"],
+                    "Carpeta": item_c["carpeta"],
+                    **rk,
                 })
         df_glob = pd.DataFrame(filas_glob)
         if not df_glob.empty:
