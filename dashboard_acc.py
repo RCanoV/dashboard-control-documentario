@@ -273,7 +273,7 @@ def procesar_archivo_pdf_acc(
             f"https://developer.api.autodesk.com/bim360/docs/v1/projects/"
             f"{project_id.replace('b.', '')}/versions/{vid_encoded}/custom-attributes"
         )
-        for _ in range(3):
+        for intento in range(4):
             res_attr = requests.get(
                 url_attr,
                 headers={
@@ -283,7 +283,7 @@ def procesar_archivo_pdf_acc(
                 timeout=25,
             )
             if res_attr.status_code == 429:
-                time.sleep(2)
+                time.sleep(2 * (intento + 1))
                 continue
             if res_attr.status_code == 200:
                 campos_objetivo = set(str(k) for k in campos_personalizados.keys())
@@ -661,43 +661,39 @@ def extraer_datos_contrato_completo(
     }
 
 
-def ejecutar_actualizacion_global_acc(estructura: dict, periodo_corte: str):
-    items_carpetas = listar_carpetas_de_estructura(estructura)
-    if not items_carpetas:
-        st.warning("No hay carpetas configuradas para actualizar.")
+def ejecutar_actualizacion_contrato_actual(info_contrato_ctx: dict, periodo_corte: str):
+    carpetas = info_contrato_ctx.get("carpetas") or info_contrato_ctx.get("carpetas_config") or []
+    if not carpetas:
+        st.warning("Este contrato no tiene carpetas configuradas.")
         return
 
-    st.session_state.version_cache += 1
-    total_items = len(items_carpetas)
-    barra = st.progress(0, text="Iniciando sincronización con Autodesk ACC...")
+    total = len(carpetas)
+    contrato_nom = info_contrato_ctx.get("_contrato", "")
+    barra = st.progress(0, text=f"Sincronizando {contrato_nom}...")
     estado_txt = st.empty()
 
-    for idx, item_c in enumerate(items_carpetas, start=1):
-        estado_txt.info(
-            f"🔄 ({idx}/{total_items}) Actualizando **{item_c['contrato']}** → `{item_c['carpeta']}`..."
-        )
-        cfg_sub = item_c["config_sub"]
-        campos_pers = cfg_sub.get("campos_personalizados", {})
-        id_fecha = str(cfg_sub.get("id_campo_fecha", "6011839"))
-        id_pend = str(cfg_sub.get("id_campo_pendiente", "6011840"))
-        col_pen = campos_pers.get(id_pend, "PENDIENTE POR")
-        ids_excl = {
-            extraer_project_y_folder_id(u)[1]
-            for u in item_c.get("urls_excluidas", [])
-            if u
-        }
+    campos_pers = info_contrato_ctx.get("campos_personalizados") or {}
+    id_fecha = str(info_contrato_ctx.get("id_campo_fecha", "6011839"))
+    id_pend = str(info_contrato_ctx.get("id_campo_pendiente", "6011840"))
+    col_pen = campos_pers.get(id_pend, "PENDIENTE POR")
+    ids_excl = {
+        extraer_project_y_folder_id(u)[1]
+        for u in info_contrato_ctx.get("urls_excluidas", [])
+        if u
+    }
 
-        cfg_c = {
-            "carpeta": item_c["carpeta"],
-            "nombre_pestana": item_c["carpeta"],
-            "url": item_c["url"],
-            "longitud_maxima": item_c["longitud_maxima"],
-            "_alcance": item_c["alcance"],
-            "_subproyecto": item_c["subproyecto"],
-            "_tipo_obra": item_c["tipo_obra"],
-            "_contrato": item_c["contrato"],
-        }
-        _procesar_carpeta_config(
+    for idx, c in enumerate(carpetas, start=1):
+        nom_c = str(c.get("carpeta") or c.get("nombre") or "Carpeta").strip()
+        estado_txt.info(f"🔄 ({idx}/{total}) Escaneando **{contrato_nom}** → `{nom_c}`...")
+        cfg_c = dict(c)
+        cfg_c["carpeta"] = nom_c
+        cfg_c["nombre_pestana"] = nom_c
+        cfg_c["_alcance"] = info_contrato_ctx.get("_alcance", "")
+        cfg_c["_subproyecto"] = info_contrato_ctx.get("_subproyecto", "")
+        cfg_c["_tipo_obra"] = info_contrato_ctx.get("_tipo_obra", "")
+        cfg_c["_contrato"] = contrato_nom
+
+        _, _, df_t, _ = _procesar_carpeta_config(
             config_carpeta=cfg_c,
             ids_excluidos=ids_excl,
             campos_personalizados=campos_pers,
@@ -708,12 +704,12 @@ def ejecutar_actualizacion_global_acc(estructura: dict, periodo_corte: str):
             periodo_corte=periodo_corte,
             forzar_api=True,
         )
-        barra.progress(idx / total_items, text=f"Progreso: {idx}/{total_items} carpetas sincronizadas")
+        barra.progress(idx / total, text=f"{idx}/{total} carpetas actualizadas ({len(df_t)} docs en {nom_c})")
 
     st.cache_data.clear()
     st.session_state.ultima_actualizacion = obtener_hora_peru().strftime("%d/%m/%Y %H:%M")
-    estado_txt.success(f"✅ Sincronización completada ({total_items} carpetas actualizadas).")
-    time.sleep(1.2)
+    estado_txt.success(f"✅ Contrato **{contrato_nom}** actualizado en Supabase.")
+    time.sleep(1.0)
     st.rerun()
 
 
@@ -836,7 +832,7 @@ def renderizar_graficos_carpeta(df_t: pd.DataFrame, col_pendiente: str, nombre_c
                 xaxis_title="",
                 yaxis_title="Documentos",
             )
-            st.plotly_chart(fig_p, use_container_width=True, key=f"graf_pen_{nombre_carpeta}")
+            st.plotly_chart(fig_p, width="stretch", key=f"graf_pen_{nombre_carpeta}")
 
     with g2:
         df_est = construir_tabla_resumen_por_estado(df_t, incluir_total=False)
@@ -857,7 +853,7 @@ def renderizar_graficos_carpeta(df_t: pd.DataFrame, col_pendiente: str, nombre_c
                 xaxis_title="",
                 yaxis_title="Documentos",
             )
-            st.plotly_chart(fig_e, use_container_width=True, key=f"graf_est_{nombre_carpeta}")
+            st.plotly_chart(fig_e, width="stretch", key=f"graf_est_{nombre_carpeta}")
 
 
 def preparar_df_con_links(df_vista: pd.DataFrame, df_full: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
@@ -869,7 +865,7 @@ def preparar_df_con_links(df_vista: pd.DataFrame, df_full: pd.DataFrame) -> tupl
         col_cfg["DIAS"] = st.column_config.NumberColumn("DIAS", format="%d")
 
     if "CODIGO" in df_out.columns and df_full is not None and "URL_DOC" in df_full.columns:
-        urls_serie = df_full.loc[df_out.index, "URL_DOC"].fillna("").astype(str).str.strip()
+        urls_serie = df_full["URL_DOC"].reindex(df_out.index).fillna("").astype(str).str.strip()
         tiene_links = urls_serie.str.startswith("http").any()
         if tiene_links:
             codigos_link = []
@@ -1086,7 +1082,7 @@ def _render_modo_administrador():
     with col_adm_info:
         st.success(f"✅ Sesión de administrador activa ({ADMIN_USER}).")
     with col_adm_logout:
-        if st.button("🔒 Cerrar Sesión", use_container_width=True):
+        if st.button("🔒 Cerrar Sesión", width="stretch"):
             st.session_state["admin_autenticado"] = False
             st.rerun()
 
@@ -1131,7 +1127,7 @@ def _render_vista_carpeta(
     with st.expander("📌 Tabla Resumen por Estado del Documento", expanded=True):
         st.dataframe(
             construir_tabla_resumen_por_estado(df_t, incluir_total=True),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -1182,13 +1178,6 @@ def _render_vista_carpeta(
             .replace({"": "Sin Asignar", "nan": "Sin Asignar", "None": "Sin Asignar"})
         )
         df_filtrado = df_filtrado[pen_f == f_pend]
-    f_busq = col_f3.text_input("Buscar código o descripción", key=f"busq_{nombre_carpeta}").strip()
-
-    df_filtrado = df_c.copy()
-    if f_estado != "Todos" and "ESTADO" in df_filtrado.columns:
-        df_filtrado = df_filtrado[df_filtrado["ESTADO"].astype(str).str.strip() == f_estado]
-    if f_pend != "Todos" and col_pendiente in df_filtrado.columns:
-        df_filtrado = df_filtrado[df_filtrado[col_pendiente].astype(str).str.strip() == f_pend]
     if f_busq:
         mask_b = pd.Series(False, index=df_filtrado.index)
         for col_b in ["CODIGO", "DESCRIPCION"]:
@@ -1203,7 +1192,7 @@ def _render_vista_carpeta(
         df_display, col_cfg = preparar_df_con_links(df_filtrado, df_t)
         st.dataframe(
             estilizar_tabla_streamlit(df_display, col_pendiente),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config=col_cfg,
         )
@@ -1222,7 +1211,7 @@ def _render_vista_carpeta(
         file_name=f"{contrato_sel}_{nombre_carpeta}.xlsx".replace(" ", "_"),
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         key=f"dl_xlsx_{nombre_carpeta}",
-        use_container_width=True,
+        width="stretch",
     )
 
     pdf_bytes = exportar_df_a_pdf(
@@ -1238,7 +1227,7 @@ def _render_vista_carpeta(
         file_name=f"{contrato_sel}_{nombre_carpeta}.pdf".replace(" ", "_"),
         mime="application/pdf",
         key=f"dl_pdf_{nombre_carpeta}",
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -1263,7 +1252,7 @@ with st.sidebar:
     estado_bd = "🟢 Supabase PostgreSQL activo" if bd_disponible() else "⚪ Caché en memoria (sin BD)"
     st.info(estado_bd)
 
-    if st.button("🔄 Actualizar Datos desde ACC", use_container_width=True):
+    if st.button("🔄 Actualizar Datos desde ACC", width="stretch"):
         st.session_state.ejecutar_sync_acc = True
         st.rerun()
 
@@ -1296,10 +1285,6 @@ with st.sidebar:
 # --- Cabecera principal ---
 st.title("📊 Tablero de Control Documentario - Shougang Hierro Perú")
 
-if st.session_state.ejecutar_sync_acc:
-    st.session_state.ejecutar_sync_acc = False
-    ejecutar_actualizacion_global_acc(ESTRUCTURA_PROYECTOS, periodo_actual)
-
 if modo_vista == "🔐 Modo Administrador":
     _render_modo_administrador()
     st.stop()
@@ -1317,6 +1302,10 @@ info_contrato_ctx["_alcance"] = alcance_sel
 info_contrato_ctx["_subproyecto"] = sub_sel
 info_contrato_ctx["_tipo_obra"] = tipo_sel
 info_contrato_ctx["_contrato"] = contrato_sel
+
+if st.session_state.ejecutar_sync_acc:
+    st.session_state.ejecutar_sync_acc = False
+    ejecutar_actualizacion_contrato_actual(info_contrato_ctx, periodo_actual)
 
 with st.spinner(f"Cargando datos de {contrato_sel}..."):
     paquete_contrato = extraer_datos_contrato_completo(
@@ -1373,7 +1362,11 @@ if modo_vista == "📁 Detalle de Contrato":
                 if not df_ti.empty:
                     dfs_t_all.append(df_ti)
 
-            df_v_todas = pd.concat(dfs_v_all, ignore_index=True) if dfs_v_all else pd.DataFrame(columns=["CARPETA"] + ORDEN_COLUMNAS_DASHBOARD)
+            df_v_todas = (
+                pd.concat(dfs_v_all, ignore_index=True)
+                if dfs_v_all
+                else pd.DataFrame(columns=["CARPETA"] + ORDEN_COLUMNAS_DASHBOARD)
+            )
             df_t_todas = pd.concat(dfs_t_all, ignore_index=True) if dfs_t_all else df_v_todas.copy()
             _render_vista_carpeta(
                 nombre_carpeta="Todas las Carpetas",
@@ -1457,9 +1450,9 @@ elif modo_vista == "🗂️ Consolidado de Subproyecto":
             title=f"📊 Avance por Contrato — {sub_sel}",
         )
         fig_s.update_layout(height=360, xaxis_title="", yaxis_title="Documentos")
-        st.plotly_chart(fig_s, use_container_width=True)
+        st.plotly_chart(fig_s, width="stretch")
 
-        st.dataframe(df_cons, use_container_width=True, hide_index=True)
+        st.dataframe(df_cons, width="stretch", hide_index=True)
         st.download_button(
             label="📥 Descargar Consolidado (Excel)",
             data=exportar_df_a_excel(df_cons, f"Consolidado {sub_sel}", metadata_base, RUTA_LOGO),
@@ -1531,9 +1524,9 @@ elif modo_vista == "🌐 Reporte Global":
                 title="📊 Estado Documentario Global por Subproyecto",
             )
             fig_g.update_layout(height=360, xaxis_title="", yaxis_title="Documentos")
-            st.plotly_chart(fig_g, use_container_width=True)
+            st.plotly_chart(fig_g, width="stretch")
 
-            st.dataframe(df_glob, use_container_width=True, hide_index=True)
+            st.dataframe(df_glob, width="stretch", hide_index=True)
             st.download_button(
                 label="📥 Descargar Reporte Global (Excel)",
                 data=exportar_df_a_excel(df_glob, "Reporte Global", metadata_base, RUTA_LOGO),
@@ -1578,7 +1571,7 @@ elif modo_vista == "🛠️ Constructor Dinámico":
                 df_pers_disp, col_cfg_p = preparar_df_con_links(df_pers_final, df_base_pers)
                 st.dataframe(
                     estilizar_tabla_streamlit(df_pers_disp, col_pendiente),
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                     column_config=col_cfg_p,
                 )
@@ -1598,7 +1591,7 @@ elif modo_vista == "🛠️ Constructor Dinámico":
                         file_name=f"Reporte_Dinamico_{contrato_sel.replace(' ', '_')}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         key="btn_descarga_pers_xlsx",
-                        use_container_width=True,
+                        width="stretch",
                     )
 
                 with c_pbtn2:
@@ -1615,7 +1608,7 @@ elif modo_vista == "🛠️ Constructor Dinámico":
                         file_name=f"Reporte_Dinamico_{contrato_sel.replace(' ', '_')}.pdf",
                         mime="application/pdf",
                         key="btn_descarga_pers_pdf",
-                        use_container_width=True,
+                        width="stretch",
                     )
             else:
                 st.warning("Selecciona al menos un campo para generar la vista previa y exportar.")
