@@ -140,7 +140,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                 error_renombre = None
                 alc_curr, sub_curr, obra_curr, cont_curr = alcance_final, sub_final, obra_final, cont_final
 
-                # Validar colisiones antes de modificar
                 if existe_cont and nuevo_cont.strip() and nuevo_cont.strip() != cont_curr:
                     if nuevo_cont.strip() in estructura_actual[alc_curr][sub_curr][obra_curr]:
                         error_renombre = f"Ya existe un contrato llamado '{nuevo_cont.strip()}'."
@@ -158,7 +157,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                     st.error(f"❌ {error_renombre}")
                 else:
                     cambios = False
-                    # 1. Renombrar Contrato
                     if existe_cont and nuevo_cont.strip() and nuevo_cont.strip() != cont_curr:
                         estructura_actual[alc_curr][sub_curr][obra_curr][nuevo_cont.strip()] = (
                             estructura_actual[alc_curr][sub_curr][obra_curr].pop(cont_curr)
@@ -166,7 +164,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                         cont_curr = nuevo_cont.strip()
                         cambios = True
 
-                    # 2. Renombrar Tipo de Obra
                     if existe_obra and nueva_obra.strip() and nueva_obra.strip() != obra_curr:
                         estructura_actual[alc_curr][sub_curr][nueva_obra.strip()] = (
                             estructura_actual[alc_curr][sub_curr].pop(obra_curr)
@@ -174,7 +171,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                         obra_curr = nueva_obra.strip()
                         cambios = True
 
-                    # 3. Renombrar Subproyecto
                     if existe_sub and nuevo_sub.strip() and nuevo_sub.strip() != sub_curr:
                         estructura_actual[alc_curr][nuevo_sub.strip()] = (
                             estructura_actual[alc_curr].pop(sub_curr)
@@ -182,7 +178,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                         sub_curr = nuevo_sub.strip()
                         cambios = True
 
-                    # 4. Renombrar Alcance
                     if nuevo_alc.strip() and nuevo_alc.strip() != alc_curr:
                         estructura_actual[nuevo_alc.strip()] = estructura_actual.pop(alc_curr)
                         alc_curr = nuevo_alc.strip()
@@ -200,7 +195,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                         st.session_state["modo_editar_nombres"] = False
                         st.rerun()
 
-    # Precargar datos existentes si se está editando
     info_cont = contratos_dict.get(cont_final, {}) if cont_final in contratos_dict else {}
     cfg_sub = sub_data.get("config", {
         "campos_personalizados": {
@@ -268,7 +262,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
             placeholder=r"Ej: D:\Reportes_ACC\994440\C610"
         )
 
-    # Campos adicionales solo si es Tripartito
     empresa_1, empresa_2 = "", ""
     if tipo_contrato == "Tripartito":
         t1, t2 = st.columns(2)
@@ -320,7 +313,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
             if not all([alcance_final.strip(), sub_final.strip(), obra_final.strip(), cont_final.strip()]):
                 st.warning("Completa los 4 niveles de la jerarquía (Alcance, Subproyecto, Tipo de Obra y Contrato).")
             else:
-                # Reconstruir diccionario de campos personalizados
                 nuevos_campos = {}
                 for _, row in df_campos_edit.iterrows():
                     k_id = str(row.get("ID_CAMPO", "")).strip()
@@ -328,7 +320,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                     if k_id and v_nom and k_id.lower() != "nan":
                         nuevos_campos[k_id] = v_nom
 
-                # Reconstruir lista de carpetas
                 nuevas_carpetas = []
                 for _, row in df_carpetas_edit.iterrows():
                     c_nom = str(row.get("nombre", "")).strip()
@@ -341,7 +332,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                             "longitud_maxima": int(c_len) if pd.notna(c_len) else 10
                         })
 
-                # Armar objeto del contrato
                 datos_contrato = {
                     "nombre_proyecto": nombre_proy.strip(),
                     "tipo_contrato": tipo_contrato,
@@ -356,7 +346,6 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                     datos_contrato["nombre_empresa_1"] = empresa_1.strip()
                     datos_contrato["nombre_empresa_2"] = empresa_2.strip()
 
-                # Guardar en la jerarquía
                 estructura_actual.setdefault(alcance_final.strip(), {})
                 estructura_actual[alcance_final.strip()].setdefault(sub_final.strip(), {})
                 estructura_actual[alcance_final.strip()][sub_final.strip()]["config"] = {
@@ -389,3 +378,66 @@ def mostrar_editor_estructura(estructura_actual: dict, sha_actual=None):
                     st.rerun()
                 else:
                     st.error(f"Error al eliminar: {res.text}")
+
+
+ESTRUCTURA_RESPALDO = {}
+
+try:
+    ESTRUCTURA_PROYECTOS, _SHA_INICIAL = cargar_estructura_github(ESTRUCTURA_RESPALDO)
+except Exception:
+    ESTRUCTURA_PROYECTOS = ESTRUCTURA_RESPALDO
+
+
+def obtener_subproyectos(alcance: str):
+    if not alcance or alcance not in ESTRUCTURA_PROYECTOS:
+        return []
+    return [k for k in ESTRUCTURA_PROYECTOS[alcance].keys() if k != "config"]
+
+
+def _obtener_tipos_obra_dict(alcance: str, subproyecto: str) -> dict:
+    if not alcance or not subproyecto:
+        return {}
+    sub_data = ESTRUCTURA_PROYECTOS.get(alcance, {}).get(subproyecto, {})
+    if not isinstance(sub_data, dict):
+        return {}
+    if isinstance(sub_data.get("tipos_obra"), dict):
+        return sub_data["tipos_obra"]
+    return {k: v for k, v in sub_data.items() if k != "config" and isinstance(v, dict)}
+
+
+def obtener_tipos_obra(alcance: str, subproyecto: str):
+    return list(_obtener_tipos_obra_dict(alcance, subproyecto).keys())
+
+
+def obtener_contratos(alcance: str, subproyecto: str, tipo_obra: str):
+    if not tipo_obra:
+        return []
+    contratos_dict = _obtener_tipos_obra_dict(alcance, subproyecto).get(tipo_obra, {})
+    return list(contratos_dict.keys()) if isinstance(contratos_dict, dict) else []
+
+
+def obtener_info_contrato(alcance: str, subproyecto: str, tipo_obra: str, contrato: str) -> dict:
+    if not (alcance and subproyecto and tipo_obra and contrato):
+        return {}
+    sub_data = ESTRUCTURA_PROYECTOS.get(alcance, {}).get(subproyecto, {})
+    cfg_sub = sub_data.get("config", {}) if isinstance(sub_data, dict) else {}
+    contratos_dict = _obtener_tipos_obra_dict(alcance, subproyecto).get(tipo_obra, {})
+    raw_info = dict(contratos_dict.get(contrato, {}) or {})
+
+    carpetas_raw = raw_info.get("carpetas") or raw_info.get("carpetas_config") or []
+    carpetas_norm = []
+    for c in carpetas_raw:
+        if isinstance(c, dict):
+            item_c = dict(c)
+            if "carpeta" not in item_c and "nombre" in item_c:
+                item_c["carpeta"] = item_c["nombre"]
+            if "nombre_pestana" not in item_c and "carpeta" in item_c:
+                item_c["nombre_pestana"] = item_c["carpeta"]
+            carpetas_norm.append(item_c)
+
+    raw_info["carpetas"] = carpetas_norm
+    raw_info.setdefault("campos_personalizados", cfg_sub.get("campos_personalizados", {}))
+    raw_info.setdefault("id_campo_fecha", cfg_sub.get("id_campo_fecha", "6011839"))
+    raw_info.setdefault("id_campo_pendiente", cfg_sub.get("id_campo_pendiente", "6011840"))
+    raw_info.setdefault("urls_excluidas", [])
+    return raw_info
