@@ -604,12 +604,14 @@ def _procesar_carpeta_config(
 @st.cache_data(show_spinner=False, ttl=14400, max_entries=40)
 def extraer_datos_contrato_completo(
     contrato_key: str,
-    info_contrato = _descongelar_estructura(info_contrato_tuple)
-if not isinstance(info_contrato, dict):
-    info_contrato = {}
+    info_contrato_tuple: tuple,
     periodo_corte: str,
     version_cache: int = 0,
 ):
+    info_contrato = _descongelar_estructura(info_contrato_tuple)
+    if not isinstance(info_contrato, dict):
+        info_contrato = {}
+    
     info_contrato = dict(info_contrato_tuple)
     alcance_ctx = str(info_contrato.get("_alcance", "")).strip()
     subproyecto_ctx = str(info_contrato.get("_subproyecto", "")).strip()
