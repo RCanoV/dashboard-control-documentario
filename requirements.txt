@@ -8,3 +8,4 @@ Pillow
 pytz
 matplotlib
 numpy
+psycopg2-binary
