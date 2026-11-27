@@ -2496,4 +2496,3 @@ else:
                     st.info("Selecciona al menos una carpeta para explorar los campos disponibles.")
             else:
                 st.info("No hay datos extendidos disponibles para este contrato.")
-```[cite: 4, 6, 11]
