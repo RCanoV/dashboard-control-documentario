@@ -61,7 +61,6 @@ def corresponde_ejecutar_ahora(reporte: dict, ahora_peru: datetime, tolerancia_m
             hh, mm = map(int, str(h_str).strip().split(":"))
             minutos_conf = hh * 60 + mm
             diferencia = minutos_actuales - minutos_conf
-            # Acepta desde 5 min antes hasta 120 min después para absorber retrasos de GitHub Actions
             if -5 <= diferencia <= tolerancia_minutos:
                 return True
         except ValueError:
@@ -198,6 +197,36 @@ def construir_resumen_ejecutivo(hojas_info: list):
     return df_resumen, roles_cols, kpis
 
 
+def construir_resumen_por_estado(hojas_info: list) -> pd.DataFrame:
+    estados_set = set()
+    for info in hojas_info:
+        df_full = info["df_full"]
+        if "ESTADO" in df_full.columns:
+            s = df_full["ESTADO"].fillna("").astype(str).str.strip().str.upper()
+            s = s.replace({"": "SIN ESTADO", "NAN": "SIN ESTADO", "NONE": "SIN ESTADO", "NULL": "SIN ESTADO"})
+            estados_set.update(s.unique())
+
+    estados_ord = sorted(estados_set)
+    filas = []
+    for info in hojas_info:
+        df_full = info["df_full"]
+        meta = info["metadatos"]
+        fila = {"Contrato": meta["contrato"], "Carpeta": meta["carpeta"]}
+        if "ESTADO" in df_full.columns:
+            s = df_full["ESTADO"].fillna("").astype(str).str.strip().str.upper()
+            s = s.replace({"": "SIN ESTADO", "NAN": "SIN ESTADO", "NONE": "SIN ESTADO", "NULL": "SIN ESTADO"})
+            conteos = s.value_counts().to_dict()
+            for est in estados_ord:
+                fila[est.title()] = int(conteos.get(est, 0))
+        else:
+            for est in estados_ord:
+                fila[est.title()] = 0
+        fila["Total"] = int(len(df_full))
+        filas.append(fila)
+
+    return pd.DataFrame(filas)
+
+
 def generar_grafico_resumen(df_resumen: pd.DataFrame, roles_cols: list, ruta_img: str):
     if df_resumen.empty:
         return None
@@ -271,7 +300,7 @@ def limpiar_nombre_hoja(nombre: str, usados: set) -> str:
     return limpio
 
 
-def exportar_hojas_a_excel(hojas_info, ruta_excel, ruta_logo, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico):
+def exportar_hojas_a_excel(hojas_info, ruta_excel, ruta_logo, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico, df_resumen_estado=None):
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
 
@@ -319,15 +348,32 @@ def exportar_hojas_a_excel(hojas_info, ruta_excel, ruta_logo, nombre_rep, fecha_
             cell = ws_res.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else value)
             cell.fill = PatternFill(start_color=bg_row, end_color=bg_row, fill_type="solid")
 
-    fila_graf = fila_ini_res + len(df_resumen) + 2
+    fila_cursor = fila_ini_res + len(df_resumen) + 2
+
+    if df_resumen_estado is not None and not df_resumen_estado.empty:
+        ws_res.cell(row=fila_cursor, column=1, value="Resumen por Estado del Documento").font = Font(size=11, bold=True, color="1A365D")
+        fila_cursor += 1
+        for col_num, col_name in enumerate(df_resumen_estado.columns, 1):
+            c_est = ws_res.cell(row=fila_cursor, column=col_num, value=col_name)
+            c_est.font = Font(bold=True, color="FFFFFF")
+            c_est.fill = PatternFill(start_color="2B6CB0", end_color="2B6CB0", fill_type="solid")
+            c_est.alignment = Alignment(horizontal="center")
+        fila_cursor += 1
+        for r_idx, row_data in enumerate(df_resumen_estado.values, fila_cursor):
+            bg_row = "FFFFFF" if r_idx % 2 == 0 else "F7FAFC"
+            for c_idx, value in enumerate(row_data, 1):
+                cell = ws_res.cell(row=r_idx, column=c_idx, value="" if pd.isna(value) else value)
+                cell.fill = PatternFill(start_color=bg_row, end_color=bg_row, fill_type="solid")
+        fila_cursor += len(df_resumen_estado) + 2
+
     if ruta_grafico and os.path.exists(ruta_grafico):
         img_graf = ExcelImage(ruta_grafico)
         img_graf.width = 680
         img_graf.height = 250
-        ws_res.add_image(img_graf, f"A{fila_graf}")
-        fila_pie_res = fila_graf + 15
+        ws_res.add_image(img_graf, f"A{fila_cursor}")
+        fila_pie_res = fila_cursor + 15
     else:
-        fila_pie_res = fila_graf + 1
+        fila_pie_res = fila_cursor + 1
 
     pie_res = ws_res.cell(row=fila_pie_res, column=1, value="Desarrollado por Roberto Cano - Shougang Hierro Perú")
     pie_res.font = Font(italic=True, color="4A5568")
@@ -384,7 +430,7 @@ def exportar_hojas_a_excel(hojas_info, ruta_excel, ruta_logo, nombre_rep, fecha_
     wb.save(ruta_excel)
 
 
-def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico):
+def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico, df_resumen_estado=None):
     def agregar_pie_pagina(canvas, doc):
         canvas.saveState()
         canvas.setFont("Helvetica", 9)
@@ -448,7 +494,7 @@ def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora
             anchos_res.append(0.28 * ancho_util)
         else:
             anchos_res.append(0.08 * ancho_util)
-    norm_r = ancho_util / sum(anchos_res)
+    norm_r = ancho_util / max(1e-6, sum(anchos_res))
     anchos_res = [w * norm_r for w in anchos_res]
 
     tabla_res = Table(mat_res, repeatRows=1, colWidths=anchos_res)
@@ -460,7 +506,26 @@ def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
     ]))
     elements.append(tabla_res)
-    elements.append(Spacer(1, 14))
+    elements.append(Spacer(1, 12))
+
+    if df_resumen_estado is not None and not df_resumen_estado.empty:
+        elements.append(Paragraph("<b>Resumen por Estado del Documento</b>", styles["Heading4"]))
+        elements.append(Spacer(1, 4))
+        enc_est = [Paragraph(str(c), header_style) for c in df_resumen_estado.columns]
+        mat_est = [enc_est]
+        for _, row in df_resumen_estado.iterrows():
+            mat_est.append([Paragraph(str("" if pd.isna(v) else v).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"), cell_style) for v in row])
+        anchos_est = [ancho_util / max(1, len(df_resumen_estado.columns))] * len(df_resumen_estado.columns)
+        tabla_est = Table(mat_est, repeatRows=1, colWidths=anchos_est)
+        tabla_est.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2B6CB0")),
+            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F9FAFB")]),
+        ]))
+        elements.append(tabla_est)
+        elements.append(Spacer(1, 12))
 
     if ruta_grafico and os.path.exists(ruta_grafico):
         elements.append(RLImage(ruta_grafico, width=540, height=195, kind="proportional"))
@@ -530,7 +595,7 @@ def exportar_hojas_a_pdf(hojas_info, ruta_pdf, ruta_logo, nombre_rep, fecha_hora
                 anchos_columnas.append(0.15 * ancho_util)
             else:
                 anchos_columnas.append(0.10 * ancho_util)
-        factor_norm = ancho_util / sum(anchos_columnas)
+        factor_norm = ancho_util / max(1e-6, sum(anchos_columnas))
         anchos_columnas = [w * factor_norm for w in anchos_columnas]
 
         tabla = Table(data_matrix, repeatRows=1, colWidths=anchos_columnas)
@@ -744,7 +809,7 @@ def generar_tabla_html(df: pd.DataFrame) -> str:
     return html
 
 
-def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico=None, url_pdf_descarga=""):
+def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico=None, url_pdf_descarga="", df_resumen_estado=None):
     patron_email = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     para_raw = cfg.get("para", [])
     cc_raw = cfg.get("cc", [])
@@ -760,7 +825,6 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
         print("⚠️ Correo omitido: no hay destinatarios válidos o falta SMTP_USER.")
         return
 
-    # 14 MiB en disco ≈ 19.5 MB tras codificación Base64 (margen seguro bajo los 25 MB de Gmail)
     LIMITE_RAW_BYTES = 14 * 1024 * 1024
     tam_excel = os.path.getsize(ruta_excel) if os.path.exists(ruta_excel) else 0
     tam_pdf = os.path.getsize(ruta_pdf) if os.path.exists(ruta_pdf) else 0
@@ -838,6 +902,13 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
     cuerpo_texto = cuerpo_tpl.format(**variables) + nota_peso_txt
     cuerpo_intro_html = cuerpo_tpl.format(**variables).replace("\n", "<br>")
 
+    bloque_estado_html = ""
+    if df_resumen_estado is not None and not df_resumen_estado.empty:
+        bloque_estado_html = f"""
+        <h4 style="color: #1A365D; margin-top: 16px; margin-bottom: 6px;">Resumen por Estado Documentario</h4>
+        {generar_tabla_html(df_resumen_estado)}
+        """
+
     bloque_grafico_html = ""
     if ruta_grafico and os.path.exists(ruta_grafico):
         bloque_grafico_html = """
@@ -885,6 +956,7 @@ def enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_g
             </tr>
         </table>
         {generar_tabla_html(df_resumen)}
+        {bloque_estado_html}
         {bloque_grafico_html}
         {nota_peso_html}
         <p style="margin-top: 18px; font-size: 12px; color: #4A5568;">
@@ -978,7 +1050,6 @@ def main():
         if objetivos_lista and nombre_rep not in objetivos_lista:
             continue
 
-        # Solo procesar reportes configurados en modo Nube
         modo = cfg.get("modo_envio", "☁️ Nube (GitHub + Gmail)")
         if "Local" in modo:
             print(f"💻 Omitido en GitHub Actions '{nombre_rep}' (configurado para ejecución Local en PC).")
@@ -1081,6 +1152,9 @@ def main():
             continue
 
         df_resumen, roles_cols, kpis = construir_resumen_ejecutivo(hojas_info)
+        incluir_est = bool(cfg.get("incluir_resumen_estado", True))
+        df_resumen_estado = construir_resumen_por_estado(hojas_info) if incluir_est else None
+
         base_archivo = re.sub(r'[^\w\-]', '_', nombre_rep)
         ruta_grafico = f"grafico_{base_archivo}.png"
         generar_grafico_resumen(df_resumen, roles_cols, ruta_grafico)
@@ -1088,8 +1162,8 @@ def main():
         ruta_excel = f"{base_archivo}_{fecha_archivo}.xlsx"
         ruta_pdf = f"{base_archivo}_{fecha_archivo}.pdf"
 
-        exportar_hojas_a_excel(hojas_info, ruta_excel, RUTA_LOGO, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico)
-        exportar_hojas_a_pdf(hojas_info, ruta_pdf, RUTA_LOGO, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico)
+        exportar_hojas_a_excel(hojas_info, ruta_excel, RUTA_LOGO, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico, df_resumen_estado=df_resumen_estado)
+        exportar_hojas_a_pdf(hojas_info, ruta_pdf, RUTA_LOGO, nombre_rep, fecha_hora_str, df_resumen, kpis, ruta_grafico, df_resumen_estado=df_resumen_estado)
 
         tam_excel = os.path.getsize(ruta_excel) if os.path.exists(ruta_excel) else 0
         tam_pdf = os.path.getsize(ruta_pdf) if os.path.exists(ruta_pdf) else 0
@@ -1103,7 +1177,7 @@ def main():
             "url_pdf": url_pdf_descarga
         }
         try:
-            enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico, url_pdf_descarga=url_pdf_descarga)
+            enviar_correo(cfg, ruta_excel, ruta_pdf, variables, df_resumen, kpis, ruta_grafico, url_pdf_descarga=url_pdf_descarga, df_resumen_estado=df_resumen_estado)
         except Exception as e:
             print(f"❌ Error enviando correo de '{nombre_rep}': {e}")
 
