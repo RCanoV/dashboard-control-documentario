@@ -1049,7 +1049,7 @@ def exportar_df_a_pdf(df: pd.DataFrame, titulo: str, metadatos: dict, ruta_logo:
 
 
 # ====================================================================
-# --- 4. LÓGICA DE API AUTODESK (SESIÓN REUTILIZABLE + PARALELA) ---
+# --- 4. LÓGICA DE API AUTODESK (SIN POOLS ANIDADOS + TIMEOUTS) ---
 # ====================================================================
 _TOKEN_LOCK = threading.Lock()
 _TOKEN_CACHE = {"value": None, "expires_at": 0.0}
@@ -1060,7 +1060,7 @@ def _get_session() -> requests.Session:
     sess = getattr(_LOCAL_HTTP, "session", None)
     if sess is None:
         sess = requests.Session()
-        adapter = HTTPAdapter(pool_connections=16, pool_maxsize=16, max_retries=1)
+        adapter = HTTPAdapter(pool_connections=12, pool_maxsize=12, max_retries=1)
         sess.mount("https://", adapter)
         sess.mount("http://", adapter)
         _LOCAL_HTTP.session = sess
@@ -1093,32 +1093,41 @@ def obtener_token(forzar_renovacion: bool = False):
         url = "https://developer.api.autodesk.com/authentication/v2/token"
         headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
         data = {"grant_type": "client_credentials", "scope": "data:read"}
-        response = _get_session().post(url, headers=headers, data=data, auth=(CLIENT_ID, CLIENT_SECRET), timeout=20)
-        if response.status_code == 200:
-            payload = response.json()
-            tok = payload.get("access_token")
-            ttl = float(payload.get("expires_in", 3599))
-            _TOKEN_CACHE["value"] = tok
-            _TOKEN_CACHE["expires_at"] = time.time() + max(60.0, ttl - 120.0)
-            return tok
+        try:
+            response = _get_session().post(url, headers=headers, data=data, auth=(CLIENT_ID, CLIENT_SECRET), timeout=15)
+            if response.status_code == 200:
+                payload = response.json()
+                tok = payload.get("access_token")
+                ttl = float(payload.get("expires_in", 3599))
+                _TOKEN_CACHE["value"] = tok
+                _TOKEN_CACHE["expires_at"] = time.time() + max(60.0, ttl - 120.0)
+                return tok
+        except Exception:
+            pass
         return None
 
 
-def _request_ads_get(url: str, region_inicial: str = "US", timeout: int = 25):
+def _request_ads_get(url: str, region_inicial: str = "US", timeout: int = 15):
     session = _get_session()
     token = obtener_token()
     region = region_inicial
+    resp = None
 
-    for intento in range(6):
+    for intento in range(4):
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
             "x-ads-region": region
         }
-        resp = session.get(url, headers=headers, timeout=timeout)
+        try:
+            resp = session.get(url, headers=headers, timeout=timeout)
+        except Exception:
+            time.sleep(1.5)
+            continue
+
         if resp.status_code == 429:
             retry_after = float(resp.headers.get("Retry-After", 2 * (intento + 1)))
-            time.sleep(min(retry_after, 10.0))
+            time.sleep(min(retry_after, 6.0))
             continue
         if resp.status_code == 401:
             token = obtener_token(forzar_renovacion=True)
@@ -1155,8 +1164,10 @@ def deconstruir_diccionario(datos, prefijo, resultado):
 def obtener_tip_version_metadata(token, project_id, item_id):
     clean_item_id = item_id.split("?version=")[0]
     url = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/items/{urllib.parse.quote(clean_item_id, safe='')}/tip"
-    response = _request_ads_get(url, region_inicial="US", timeout=20)
-    return response.json().get("data", {}) if response.status_code == 200 else {}
+    response = _request_ads_get(url, region_inicial="US", timeout=15)
+    if response is not None and response.status_code == 200:
+        return response.json().get("data", {})
+    return {}
 
 
 def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_personalizados):
@@ -1174,13 +1185,16 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
     if tip_version:
         deconstruir_diccionario(tip_version, "VERSION", registro_plano)
 
-    vid = item.get("relationships", {}).get("tip", {}).get("data", {}).get("id", "")
+    vid = (
+        (tip_version or {}).get("id", "")
+        or item.get("relationships", {}).get("tip", {}).get("data", {}).get("id", "")
+    )
     if vid:
         vid_encoded = urllib.parse.quote(vid, safe='')
         url_attr = f"https://developer.api.autodesk.com/bim360/docs/v1/projects/{project_id.replace('b.', '')}/versions/{vid_encoded}/custom-attributes"
-        res_attr = _request_ads_get(url_attr, region_inicial="US", timeout=20)
+        res_attr = _request_ads_get(url_attr, region_inicial="US", timeout=15)
 
-        if res_attr.status_code == 200:
+        if res_attr is not None and res_attr.status_code == 200:
             try:
                 attrs = res_attr.json()
             except Exception:
@@ -1210,7 +1224,8 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
     return registro_plano
 
 
-def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
+def _recolectar_pdfs_recursivo(project_id, folder_id, longitud_maxima, ids_excluidos, ruta_actual, cola_pdfs):
+    """Recorre carpetas de forma ligera y acumula los PDFs sin crear sub-pools por carpeta."""
     if folder_id.replace("%3A", ":") in ids_excluidos:
         return
 
@@ -1218,12 +1233,14 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
     url_api = f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/folders/{encoded_fid}/contents"
 
     while url_api:
-        res = _request_ads_get(url_api, region_inicial="US", timeout=25)
-        if res.status_code != 200:
+        res = _request_ads_get(url_api, region_inicial="US", timeout=15)
+        if res is None or res.status_code != 200:
             break
 
-        data = res.json()
-        items_pdf = []
+        try:
+            data = res.json()
+        except Exception:
+            break
 
         for item in data.get("data", []):
             tipo = item.get("type")
@@ -1235,29 +1252,37 @@ def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_max
                 if sub_urn_raw in ids_excluidos:
                     continue
                 if len(name) <= longitud_maxima:
-                    escanear_recursivo(
-                        project_id, sub_urn_raw, headers, lista_datos,
-                        longitud_maxima, ids_excluidos, campos_personalizados,
-                        f"{ruta_actual} > {name}"
+                    _recolectar_pdfs_recursivo(
+                        project_id, sub_urn_raw, longitud_maxima,
+                        ids_excluidos, f"{ruta_actual} > {name}", cola_pdfs
                     )
-
             elif tipo == "items":
                 if ".pdf" in name.lower():
-                    items_pdf.append((item, name))
-
-        if items_pdf:
-            with ThreadPoolExecutor(max_workers=8) as executor:
-                futures = [
-                    executor.submit(procesar_archivo_pdf, i[0], project_id, headers, ruta_actual, i[1], campos_personalizados)
-                    for i in items_pdf
-                ]
-                for future in as_completed(futures):
-                    res_item = future.result()
-                    if res_item:
-                        lista_datos.append(res_item)
+                    cola_pdfs.append((item, project_id, ruta_actual, name))
 
         enlaces = data.get("links", {})
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
+
+
+def escanear_recursivo(project_id, folder_id, headers, lista_datos, longitud_maxima, ids_excluidos, campos_personalizados, ruta_actual="Raíz"):
+    cola_pdfs = []
+    _recolectar_pdfs_recursivo(project_id, folder_id, longitud_maxima, ids_excluidos, ruta_actual, cola_pdfs)
+
+    if not cola_pdfs:
+        return
+
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        futures = [
+            executor.submit(procesar_archivo_pdf, itm, pid, headers, r_act, nom, campos_personalizados)
+            for itm, pid, r_act, nom in cola_pdfs
+        ]
+        for future in as_completed(futures):
+            try:
+                res_item = future.result()
+                if res_item:
+                    lista_datos.append(res_item)
+            except Exception:
+                continue
 
 
 def _procesar_carpeta_config(config_carpeta, ids_excluidos, campos_personalizados, id_campo_fecha, id_campo_pendiente, col_pendiente, orden_columnas_deseado):
@@ -1352,22 +1377,16 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     col_pendiente = campos_personalizados.get(id_campo_pendiente)
     orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS", "URL_DOC"]
 
-    if carpetas_config:
-        with ThreadPoolExecutor(max_workers=min(6, len(carpetas_config))) as executor:
-            futures = [
-                executor.submit(
-                    _procesar_carpeta_config,
-                    cfg_c, ids_excluidos, campos_personalizados,
-                    id_campo_fecha, id_campo_pendiente, col_pendiente, orden_columnas_deseado
-                )
-                for cfg_c in carpetas_config
-            ]
-            for fut in as_completed(futures):
-                pest, df_p, df_t = fut.result()
-                if df_p is not None:
-                    dataframes_por_pestana[pest] = df_p
-                if df_t is not None:
-                    dataframes_completos_por_pestana[pest] = df_t
+    # Procesamiento secuencial limpio de carpetas (cada carpeta ya paraleliza sus PDFs con 6 workers)
+    for cfg_c in carpetas_config:
+        pest, df_p, df_t = _procesar_carpeta_config(
+            cfg_c, ids_excluidos, campos_personalizados,
+            id_campo_fecha, id_campo_pendiente, col_pendiente, orden_columnas_deseado
+        )
+        if df_p is not None:
+            dataframes_por_pestana[pest] = df_p
+        if df_t is not None:
+            dataframes_completos_por_pestana[pest] = df_t
 
     tz_pe = pytz.timezone('America/Lima')
     hora_cache = datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M')
@@ -1404,24 +1423,16 @@ def precargar_todos_los_contratos(periodo, progress_bar=None, status_text=None):
                         tareas.append((cont_nom, info_cont, campos, id_fec, id_pen, periodo))
 
     total_tareas = max(1, len(tareas))
-    completadas = 0
-
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = {
-            executor.submit(extraer_datos_contrato_completo, *t): t[0]
-            for t in tareas
-        }
-        for fut in as_completed(futures):
-            nombre_c = futures[fut]
-            try:
-                fut.result()
-            except Exception:
-                pass
-            completadas += 1
-            if progress_bar:
-                progress_bar.progress(min(1.0, completadas / total_tareas))
-            if status_text:
-                status_text.caption(f"Procesados {completadas}/{total_tareas}: {nombre_c}")
+    for idx, t in enumerate(tareas, start=1):
+        nombre_c = t[0]
+        if status_text:
+            status_text.caption(f"Cargando {idx}/{total_tareas}: {nombre_c}")
+        try:
+            extraer_datos_contrato_completo(*t)
+        except Exception:
+            pass
+        if progress_bar:
+            progress_bar.progress(min(1.0, idx / total_tareas))
 
 
 def preparar_df_con_links(df_in: pd.DataFrame) -> pd.DataFrame:
