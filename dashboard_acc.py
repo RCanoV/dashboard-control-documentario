@@ -2,7 +2,6 @@ import os
 import re
 import json
 import time
-import base64
 import urllib.parse
 from io import BytesIO
 from datetime import datetime, timedelta, timezone
@@ -12,6 +11,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import numpy as np
+import plotly.express as px
 
 import openpyxl
 from openpyxl.drawing.image import Image as ExcelImage
@@ -31,9 +31,9 @@ from modulo_estructura_proyectos import (
     obtener_contratos,
     obtener_info_contrato,
     cargar_estructura_github,
-    guardar_estructura_github,
     mostrar_editor_estructura,
 )
+from modulo_formulario_reportes import mostrar_formulario_reportes
 
 try:
     from modulo_bd import bd_disponible, guardar_documentos_bd, cargar_documentos_bd
@@ -50,9 +50,6 @@ st.set_page_config(
 )
 
 RUTA_LOGO = "logoshp.jpeg"
-GITHUB_REPO = "rcanov/dashboard-control-documentario"
-RUTA_CONFIG_REPORTES = "config_reportes.json"
-DIAS_SEMANA_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 ORDEN_COLUMNAS_DASHBOARD = [
     "CODIGO",
     "REV",
@@ -74,7 +71,7 @@ def obtener_periodo_actual() -> str:
     return f"{fecha_corte}_04AM"
 
 
-def _leer_secreto_o_env(clave: str) -> str:
+def _leer_secreto_o_env(clave: str, defecto: str = "") -> str:
     try:
         if clave in st.secrets:
             val = str(st.secrets[clave]).strip()
@@ -82,61 +79,12 @@ def _leer_secreto_o_env(clave: str) -> str:
                 return val
     except Exception:
         pass
-    return str(os.environ.get(clave, "")).strip()
+    return str(os.environ.get(clave, defecto)).strip()
 
 
 CLIENT_ID = _leer_secreto_o_env("CLIENT_ID")
 CLIENT_SECRET = _leer_secreto_o_env("CLIENT_SECRET")
-GITHUB_TOKEN = _leer_secreto_o_env("GITHUB_TOKEN")
-
-
-def _headers_github() -> dict:
-    return {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-
-
-def cargar_reportes_github() -> tuple[dict, str | None]:
-    if GITHUB_TOKEN:
-        try:
-            url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_CONFIG_REPORTES}"
-            r = requests.get(url, headers=_headers_github(), timeout=20)
-            if r.status_code == 200:
-                data = r.json()
-                raw = base64.b64decode(data.get("content", "")).decode("utf-8").strip()
-                parsed = json.loads(raw) if raw else {}
-                if isinstance(parsed, dict):
-                    return parsed, data.get("sha")
-        except Exception:
-            pass
-
-    if os.path.exists(RUTA_CONFIG_REPORTES):
-        try:
-            with open(RUTA_CONFIG_REPORTES, "r", encoding="utf-8") as f:
-                raw = f.read().strip()
-                parsed = json.loads(raw) if raw else {}
-                if isinstance(parsed, dict):
-                    return parsed, None
-        except Exception:
-            pass
-    return {}, None
-
-
-def guardar_reportes_github(reportes_dict: dict, sha: str | None = None):
-    if not GITHUB_TOKEN:
-        return None
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{RUTA_CONFIG_REPORTES}"
-    contenido_b64 = base64.b64encode(
-        json.dumps(reportes_dict, indent=4, ensure_ascii=False).encode("utf-8")
-    ).decode("utf-8")
-    payload = {
-        "message": "Actualización de configuración de reportes diarios desde Dashboard",
-        "content": contenido_b64,
-    }
-    if sha:
-        payload["sha"] = sha
-    return requests.put(url, headers=_headers_github(), json=payload, timeout=25)
+ADMIN_PASSWORD = _leer_secreto_o_env("ADMIN_PASSWORD", "shp2026")
 
 
 def listar_carpetas_de_estructura(estructura: dict) -> list[dict]:
@@ -525,7 +473,7 @@ def _procesar_carpeta_config(
                 incluir_extra=True,
             )
             if df_bd is not None and not df_bd.empty:
-                df_todo_bd = df_bd.rename(columns={"CODIGO": "CODIGO"})
+                df_todo_bd = df_bd.copy()
                 if "DIAS" in df_todo_bd.columns and col_pendiente in df_todo_bd.columns:
                     df_todo_bd.loc[
                         df_todo_bd[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO",
@@ -537,18 +485,18 @@ def _procesar_carpeta_config(
                 if not cols_vista:
                     cols_vista = [c for c in ORDEN_COLUMNAS_DASHBOARD if c in df_todo_bd.columns]
                 df_vista_bd = df_todo_bd[cols_vista].copy()
-                return nombre_pestana, df_vista_bd, df_todo_bd, "Cargado desde Supabase PostgreSQL"
+                return nombre_pestana, df_vista_bd, df_todo_bd, "🟢 Cargado desde Supabase PostgreSQL"
         except Exception as e_bd:
-            diagnostico = f"Error leyendo BD: {e_bd}"
+            diagnostico = f"⚠️ Error leyendo BD: {e_bd}"
 
     url_carp = str(config_carpeta.get("url", "")).strip()
     project_id, fid = extraer_project_y_folder_id(url_carp)
     token = obtener_token_acc(CLIENT_ID, CLIENT_SECRET)
 
     if not token:
-        diagnostico = "Falta configurar CLIENT_ID o CLIENT_SECRET válidos para consultar Autodesk ACC."
+        diagnostico = "⚠️ Falta configurar CLIENT_ID o CLIENT_SECRET válidos para consultar Autodesk ACC."
     elif not project_id or not fid:
-        diagnostico = f"URL de carpeta inválida o vacía en '{nombre_pestana}'."
+        diagnostico = f"⚠️ URL de carpeta inválida o vacía en '{nombre_pestana}'."
 
     datos_carpeta = []
     if token and project_id and fid:
@@ -564,11 +512,11 @@ def _procesar_carpeta_config(
         )
         if not datos_carpeta:
             diagnostico = (
-                f"No se encontraron archivos PDF en '{nombre_pestana}' (revisa URL, "
+                f"ℹ️ No se encontraron archivos PDF en '{nombre_pestana}' (revisa URL, "
                 f"longitud máxima de subcarpeta o URLs excluidas)."
             )
         else:
-            diagnostico = f"Consultado en vivo desde Autodesk ACC ({len(datos_carpeta)} PDFs)"
+            diagnostico = f"☁️ Consultado en vivo desde Autodesk ACC ({len(datos_carpeta)} PDFs)"
 
     df_vista, df_todo = _normalizar_df_carpeta(
         datos_carpeta=datos_carpeta,
@@ -699,12 +647,31 @@ def extraer_datos_contrato_completo(
 def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict:
     total = len(df_full) if df_full is not None else 0
     if total == 0:
-        return {"Cerrados": 0, "Pendientes": 0, "Total": 0, "Avance (%)": 0.0}
+        return {
+            "Cerrados": 0,
+            "Pendientes": 0,
+            "Total": 0,
+            "Avance (%)": 0.0,
+            "Mayor Retraso": "Sin datos",
+        }
 
     cerrados = 0
+    mayor_retraso = "Sin pendientes"
     if col_pendiente and col_pendiente in df_full.columns:
         est_u = df_full[col_pendiente].astype(str).str.strip().str.upper()
         cerrados = int((est_u == "CERRADO").sum())
+
+        df_abiertos = df_full[est_u != "CERRADO"].copy()
+        if not df_abiertos.empty and "DIAS" in df_abiertos.columns:
+            df_abiertos["DIAS_NUM"] = pd.to_numeric(df_abiertos["DIAS"], errors="coerce").fillna(0)
+            if df_abiertos["DIAS_NUM"].max() > 0:
+                idx_max = df_abiertos["DIAS_NUM"].idxmax()
+                cod = str(df_abiertos.loc[idx_max, "CODIGO"]) if "CODIGO" in df_abiertos.columns else "Doc"
+                d_max = int(df_abiertos.loc[idx_max, "DIAS_NUM"])
+                resp = str(df_abiertos.loc[idx_max, col_pendiente]).strip()
+                mayor_retraso = f"{cod} ({d_max} d) [{resp}]"
+            else:
+                mayor_retraso = "Sin retrasos"
 
     pendientes = total - cerrados
     avance = round((cerrados / total * 100), 1) if total > 0 else 0.0
@@ -713,6 +680,7 @@ def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict
         "Pendientes": pendientes,
         "Total": total,
         "Avance (%)": avance,
+        "Mayor Retraso": mayor_retraso,
     }
 
 
@@ -743,6 +711,70 @@ def obtener_colores_estado(estado):
         return "#f8d7da", "#721c24"
     else:
         return "#cce5ff", "#004085"
+
+
+def color_barra_responsable(valor: str) -> str:
+    v = str(valor).strip().upper()
+    if v == "CERRADO":
+        return "#28a745"
+    if "CONTRATISTA" in v or "EMPRESA" in v:
+        return "#ffc107"
+    if "SUPERVISION" in v:
+        return "#dc3545"
+    if "SHP" in v:
+        return "#007bff"
+    return "#6c757d"
+
+
+def renderizar_graficos_carpeta(df_t: pd.DataFrame, col_pendiente: str, nombre_carpeta: str):
+    if df_t is None or df_t.empty:
+        return
+
+    g1, g2 = st.columns(2)
+    with g1:
+        if col_pendiente in df_t.columns:
+            serie_p = df_t[col_pendiente].fillna("").astype(str).str.strip()
+            serie_p = serie_p.replace({"": "Sin Asignar", "nan": "Sin Asignar", "None": "Sin Asignar"})
+            df_p = serie_p.value_counts().reset_index()
+            df_p.columns = ["Responsable", "Cantidad"]
+            mapa_colores = {r: color_barra_responsable(r) for r in df_p["Responsable"]}
+
+            fig_p = px.bar(
+                df_p,
+                x="Responsable",
+                y="Cantidad",
+                color="Responsable",
+                color_discrete_map=mapa_colores,
+                text="Cantidad",
+                title=f"📊 Distribución por Responsable — {nombre_carpeta}",
+            )
+            fig_p.update_traces(textposition="outside")
+            fig_p.update_layout(
+                showlegend=False,
+                height=340,
+                margin=dict(l=10, r=10, t=45, b=10),
+                xaxis_title="",
+                yaxis_title="Documentos",
+            )
+            st.plotly_chart(fig_p, use_container_width=True, key=f"graf_pen_{nombre_carpeta}")
+
+    with g2:
+        df_est = construir_tabla_resumen_por_estado(df_t)
+        if not df_est.empty:
+            fig_e = px.pie(
+                df_est,
+                names="Estado",
+                values="Cantidad",
+                hole=0.45,
+                title=f"🍩 Distribución por Estado — {nombre_carpeta}",
+            )
+            fig_e.update_traces(textposition="inside", textinfo="percent+value")
+            fig_e.update_layout(
+                height=340,
+                margin=dict(l=10, r=10, t=45, b=10),
+                legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5),
+            )
+            st.plotly_chart(fig_e, use_container_width=True, key=f"graf_est_{nombre_carpeta}")
 
 
 def estilizar_tabla_streamlit(df: pd.DataFrame, col_pendiente: str = None):
@@ -919,146 +951,45 @@ def exportar_df_a_pdf(
     return buf.getvalue()
 
 
-def _render_modo_administrador(estructura_actual: dict, sha_estructura):
-    st.subheader("⚙️ Modo Administrador — Estructura y Reportes Diarios")
-    tab_est, tab_rep = st.tabs(["🏗️ Estructura de Proyectos", "✉️ Crear / Editar Reportes Diarios"])
+def _render_modo_administrador():
+    st.subheader("🔐 Modo Administrador — Estructura y Reportes Diarios")
 
-    with tab_est:
-        mostrar_editor_estructura(estructura_actual, sha_estructura)
+    if "admin_autenticado" not in st.session_state:
+        st.session_state["admin_autenticado"] = False
+
+    if not st.session_state["admin_autenticado"]:
+        st.info("Ingresa la contraseña de administrador para gestionar la estructura de proyectos y los reportes automáticos.")
+        with st.form("form_login_admin"):
+            pwd_ingresada = st.text_input("Contraseña de Administrador:", type="password")
+            btn_entrar = st.form_submit_button("🔓 Ingresar", type="primary")
+            if btn_entrar:
+                if pwd_ingresada == ADMIN_PASSWORD:
+                    st.session_state["admin_autenticado"] = True
+                    st.rerun()
+                else:
+                    st.error("❌ Contraseña incorrecta.")
+        return
+
+    col_adm_info, col_adm_logout = st.columns([4, 1])
+    with col_adm_info:
+        st.success("✅ Sesión de administrador activa.")
+    with col_adm_logout:
+        if st.button("🔒 Cerrar Sesión", use_container_width=True):
+            st.session_state["admin_autenticado"] = False
+            st.rerun()
+
+    estructura_fresca, sha_fresco = cargar_estructura_github(ESTRUCTURA_PROYECTOS)
+
+    tab_rep, tab_est = st.tabs([
+        "✉️ Programar y Enviar Reportes Diarios",
+        "🏗️ Estructura de Proyectos y Contratos",
+    ])
 
     with tab_rep:
-        reportes_dict, sha_rep = cargar_reportes_github()
-        if not GITHUB_TOKEN:
-            st.warning("Configura `GITHUB_TOKEN` en Secrets de Streamlit para guardar cambios en `config_reportes.json`.")
+        mostrar_formulario_reportes(estructura_fresca)
 
-        nombres_existentes = list(reportes_dict.keys())
-        opciones_rep = ["➕ Nuevo Reporte Diario"] + nombres_existentes
-        rep_sel = st.selectbox("Selecciona un reporte para editar o crea uno nuevo:", opciones_rep)
-
-        es_nuevo = rep_sel == "➕ Nuevo Reporte Diario"
-        cfg_base = {} if es_nuevo else dict(reportes_dict.get(rep_sel, {}))
-
-        nombre_rep = st.text_input(
-            "Nombre del Reporte Diario:",
-            value="" if es_nuevo else rep_sel,
-            placeholder="Ej: 998316 Nuevo Muelle - Pendientes Diarios",
-        ).strip()
-
-        c_a1, c_a2, c_a3 = st.columns(3)
-        activo_rep = c_a1.checkbox("Reporte activo", value=bool(cfg_base.get("activo", True)))
-        incluir_est_rep = c_a2.checkbox("Incluir resumen por estado", value=bool(cfg_base.get("incluir_resumen_estado", True)))
-        modo_envio_rep = c_a3.selectbox(
-            "Modo de envío",
-            ["☁️ Nube (GitHub + Gmail)", "💻 Local (PC)"],
-            index=0 if "Local" not in str(cfg_base.get("modo_envio", "")) else 1,
-        )
-
-        c_d1, c_d2 = st.columns(2)
-        dias_sel = c_d1.multiselect(
-            "Días de envío",
-            DIAS_SEMANA_ES,
-            default=cfg_base.get("dias_semana", ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]),
-        )
-        horarios_default = ", ".join(cfg_base.get("horarios", ["10:00", "14:00"]))
-        horarios_txt = c_d2.text_input("Horarios (HH:MM separados por coma)", value=horarios_default)
-
-        c_m1, c_m2 = st.columns(2)
-        para_default = ", ".join(cfg_base.get("para", [])) if isinstance(cfg_base.get("para"), list) else str(cfg_base.get("para", ""))
-        cc_default = ", ".join(cfg_base.get("cc", [])) if isinstance(cfg_base.get("cc"), list) else str(cfg_base.get("cc", ""))
-        para_txt = c_m1.text_area("Para (correos separados por coma o punto y coma)", value=para_default, height=70)
-        cc_txt = c_m2.text_area("CC (opcional)", value=cc_default, height=70)
-
-        asunto_txt = st.text_input(
-            "Asunto del correo",
-            value=cfg_base.get("asunto", "Reporte Control Documentario - {nombre_reporte} ({fecha})"),
-        )
-        cuerpo_txt = st.text_area(
-            "Cuerpo del correo",
-            value=cfg_base.get(
-                "cuerpo",
-                "Estimados,\n\nSe remite el reporte {nombre_reporte} al {fecha} ({total_registros} registros).",
-            ),
-            height=90,
-        )
-
-        carpetas_catalogo = listar_carpetas_de_estructura(estructura_actual)
-        mapa_etiquetas = {item["etiqueta"]: item for item in carpetas_catalogo}
-
-        prev_sel = []
-        for c_prev in cfg_base.get("carpetas_seleccionadas", []):
-            etq = f"{c_prev.get('subproyecto', '')} | {c_prev.get('contrato', '')} | {c_prev.get('carpeta', '')}"
-            if etq in mapa_etiquetas:
-                prev_sel.append(etq)
-
-        carpetas_elegidas = st.multiselect(
-            "Carpetas incluidas en el reporte",
-            list(mapa_etiquetas.keys()),
-            default=prev_sel,
-        )
-
-        cols_elegidas = st.multiselect(
-            "Columnas a exportar en Excel / PDF",
-            ORDEN_COLUMNAS_DASHBOARD,
-            default=[c for c in cfg_base.get("columnas_excel", ORDEN_COLUMNAS_DASHBOARD) if c in ORDEN_COLUMNAS_DASHBOARD] or ORDEN_COLUMNAS_DASHBOARD,
-        )
-
-        b_save, b_del = st.columns([2, 1])
-        with b_save:
-            if st.button("💾 Guardar Reporte Diario en GitHub", type="primary", use_container_width=True):
-                if not nombre_rep:
-                    st.warning("Ingresa un nombre para el reporte diario.")
-                else:
-                    if not es_nuevo and rep_sel != nombre_rep and rep_sel in reportes_dict:
-                        del reportes_dict[rep_sel]
-
-                    lista_carpetas_cfg = []
-                    for etq in carpetas_elegidas:
-                        src = mapa_etiquetas[etq]
-                        lista_carpetas_cfg.append({
-                            "alcance": src["alcance"],
-                            "subproyecto": src["subproyecto"],
-                            "tipo_obra": src["tipo_obra"],
-                            "contrato": src["contrato"],
-                            "carpeta": src["carpeta"],
-                            "url": src["url"],
-                            "longitud_maxima": src["longitud_maxima"],
-                            "urls_excluidas": src["urls_excluidas"],
-                            "config_sub": src["config_sub"],
-                        })
-
-                    reportes_dict[nombre_rep] = {
-                        "activo": activo_rep,
-                        "incluir_resumen_estado": incluir_est_rep,
-                        "modo_envio": modo_envio_rep,
-                        "dias_semana": dias_sel,
-                        "horarios": [h.strip() for h in horarios_txt.split(",") if h.strip()],
-                        "para": [c.strip() for c in re.split(r"[;,]", para_txt) if c.strip()],
-                        "cc": [c.strip() for c in re.split(r"[;,]", cc_txt) if c.strip()],
-                        "asunto": asunto_txt.strip(),
-                        "cuerpo": cuerpo_txt,
-                        "carpetas_seleccionadas": lista_carpetas_cfg,
-                        "columnas_excel": cols_elegidas or ORDEN_COLUMNAS_DASHBOARD,
-                        "condiciones_filtro": cfg_base.get("condiciones_filtro", []),
-                    }
-
-                    res = guardar_reportes_github(reportes_dict, sha_rep)
-                    if res is not None and res.status_code in (200, 201):
-                        st.success(f"✅ Reporte '{nombre_rep}' guardado en {RUTA_CONFIG_REPORTES}.")
-                        st.rerun()
-                    else:
-                        detalle = res.text if res is not None else "No se encontró GITHUB_TOKEN."
-                        st.error(f"No se pudo guardar en GitHub: {detalle}")
-
-        with b_del:
-            if not es_nuevo and rep_sel in reportes_dict:
-                if st.button("🗑️ Eliminar Reporte", use_container_width=True):
-                    del reportes_dict[rep_sel]
-                    res = guardar_reportes_github(reportes_dict, sha_rep)
-                    if res is not None and res.status_code in (200, 201):
-                        st.success(f"Reporte '{rep_sel}' eliminado.")
-                        st.rerun()
-                    else:
-                        st.error("No se pudo eliminar el reporte en GitHub.")
+    with tab_est:
+        mostrar_editor_estructura(estructura_fresca, sha_fresco)
 
 
 # --- Estado inicial de sesión ---
@@ -1073,9 +1004,9 @@ periodo_actual = obtener_periodo_actual()
 with st.sidebar:
     if os.path.exists(RUTA_LOGO):
         st.image(RUTA_LOGO, width=180)
-    st.title("Control Documentario")
-    st.caption(f"Corte activo: `{periodo_actual}`")
-    st.caption(f"Última sincronización: {st.session_state.ultima_actualizacion}")
+    st.title("📊 Control Documentario")
+    st.caption(f"🗓️ Corte activo: `{periodo_actual}`")
+    st.caption(f"🕒 Última sincronización: {st.session_state.ultima_actualizacion}")
 
     estado_bd = "🟢 Supabase PostgreSQL activo" if bd_disponible() else "⚪ Caché en memoria (sin BD)"
     st.info(estado_bd)
@@ -1087,41 +1018,41 @@ with st.sidebar:
 
     st.divider()
     alcances = list(ESTRUCTURA_PROYECTOS.keys()) if isinstance(ESTRUCTURA_PROYECTOS, dict) else []
-    alcance_sel = st.selectbox("Alcance", alcances, index=0 if alcances else None)
+    alcance_sel = st.selectbox("📌 Alcance", alcances, index=0 if alcances else None)
 
     subproyectos = obtener_subproyectos(alcance_sel) if alcance_sel else []
-    sub_sel = st.selectbox("Subproyecto", subproyectos, index=0 if subproyectos else None)
+    sub_sel = st.selectbox("🏗️ Subproyecto", subproyectos, index=0 if subproyectos else None)
 
     info_sub = ESTRUCTURA_PROYECTOS.get(alcance_sel, {}).get(sub_sel, {}) if (alcance_sel and sub_sel) else {}
     tipos_obra = obtener_tipos_obra(alcance_sel, sub_sel) if (alcance_sel and sub_sel) else []
-    tipo_sel = st.selectbox("Tipo de Obra", tipos_obra, index=0 if tipos_obra else None)
+    tipo_sel = st.selectbox("🔧 Tipo de Obra", tipos_obra, index=0 if tipos_obra else None)
 
     contratos = obtener_contratos(alcance_sel, sub_sel, tipo_sel) if (alcance_sel and sub_sel and tipo_sel) else []
-    contrato_sel = st.selectbox("Contrato", contratos, index=0 if contratos else None)
+    contrato_sel = st.selectbox("📄 Contrato", contratos, index=0 if contratos else None)
 
     st.divider()
     modo_vista = st.radio(
-        "Vista del Dashboard",
+        "🧭 Vista del Dashboard",
         [
-            "Detalle de Contrato",
-            "Consolidado de Subproyecto",
-            "Reporte Global",
-            "Constructor Dinámico",
-            "Modo Administrador",
+            "📁 Detalle de Contrato",
+            "🗂️ Consolidado de Subproyecto",
+            "🌐 Reporte Global",
+            "🛠️ Constructor Dinámico",
+            "🔐 Modo Administrador",
         ],
     )
 
 # --- Cabecera principal ---
 st.title("📊 Tablero de Control Documentario - Shougang Hierro Perú")
 
-if modo_vista == "Modo Administrador":
-    _render_modo_administrador(ESTRUCTURA_PROYECTOS, _SHA_INICIAL)
+if modo_vista == "🔐 Modo Administrador":
+    _render_modo_administrador()
     st.stop()
 
 if not alcance_sel or not sub_sel or not tipo_sel or not contrato_sel:
     st.warning(
         "Selecciona un Alcance, Subproyecto, Tipo de Obra y Contrato en la barra lateral "
-        "(o entra a **Modo Administrador** para configurar la estructura)."
+        "(o entra a **🔐 Modo Administrador** para configurar la estructura)."
     )
     st.stop()
 
@@ -1150,35 +1081,56 @@ metadata_base = {
     "fecha": fecha_export_str,
     "alcance": alcance_sel,
     "subproyecto": sub_sel,
-    "tipo_obra": tipo_sel,
+    "tipo_obra": tipo_obra_sel if "tipo_obra_sel" in locals() else tipo_sel,
     "contrato": contrato_sel,
 }
 
 # --- 1. Detalle de Contrato ---
-if modo_vista == "Detalle de Contrato":
+if modo_vista == "📁 Detalle de Contrato":
     st.subheader(f"📁 Detalle de Contrato: {contrato_sel}")
+
+    # Ficha informativa del contrato
+    with st.expander("ℹ️ Información del Contrato", expanded=False):
+        ic1, ic2, ic3 = st.columns(3)
+        ic1.markdown(f"**Proyecto:** {info_contrato_raw.get('nombre_proyecto') or 'N/A'}")
+        ic1.markdown(f"**Tipo de Contrato:** {info_contrato_raw.get('tipo_contrato') or 'N/A'}")
+        ic2.markdown(f"**Supervisor:** {info_contrato_raw.get('nombre_supervisor') or 'N/A'}")
+        ic2.markdown(f"**Coordinador SHP:** {info_contrato_raw.get('coordinador_shp') or 'N/A'}")
+        ic3.markdown(f"**Admin. Contratos:** {info_contrato_raw.get('administrador_contratos') or 'N/A'}")
+
     if not datos_vista:
         st.info("No hay carpetas configuradas para este contrato en `estructura_proyectos.json`.")
     else:
-        pestanas = st.tabs(list(datos_vista.keys()))
+        pestanas = st.tabs([f"📂 {k}" for k in datos_vista.keys()])
         for tab, nombre_carpeta in zip(pestanas, datos_vista.keys()):
             with tab:
                 df_c = datos_vista[nombre_carpeta]
                 df_t = datos_completos.get(nombre_carpeta, df_c)
                 diag_carp = diagnosticos.get(nombre_carpeta, "")
                 if diag_carp:
-                    st.caption(f"Estado fuente: {diag_carp}")
+                    st.caption(f"Fuente: {diag_carp}")
 
                 res_k = construir_resumen_carpeta(df_t, col_pendiente)
                 k1, k2, k3, k4 = st.columns(4)
-                k1.metric("Total Documentos", res_k["Total"])
-                k2.metric("Cerrados", res_k["Cerrados"])
-                k3.metric("Pendientes", res_k["Pendientes"])
-                k4.metric("Avance (%)", f"{res_k['Avance (%)']}%")
+                k1.metric("📄 Total Documentos", res_k["Total"])
+                k2.metric("✅ Cerrados", res_k["Cerrados"])
+                k3.metric("⏳ Pendientes", res_k["Pendientes"])
+                k4.metric("📈 Avance (%)", f"{res_k['Avance (%)']}%")
 
-                with st.expander("📌 Resumen por Estado del Documento"):
-                    st.dataframe(construir_tabla_resumen_por_estado(df_t), use_container_width=True, hide_index=True)
+                if res_k["Mayor Retraso"] not in ("Sin datos", "Sin pendientes", "Sin retrasos"):
+                    st.warning(f"⏰ **Mayor retraso abierto:** {res_k['Mayor Retraso']}")
 
+                # Gráficos interactivos Plotly
+                renderizar_graficos_carpeta(df_t, col_pendiente, nombre_carpeta)
+
+                with st.expander("📌 Tabla Resumen por Estado del Documento"):
+                    st.dataframe(
+                        construir_tabla_resumen_por_estado(df_t),
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+
+                st.markdown("#### 🔍 Filtros y Detalle Documentario")
                 col_f1, col_f2, col_f3 = st.columns(3)
                 estados_disp = ["Todos"]
                 if "ESTADO" in df_c.columns:
@@ -1207,11 +1159,15 @@ if modo_vista == "Detalle de Contrato":
                             mask_b = mask_b | df_filtrado[col_b].astype(str).str.contains(f_busq, case=False, na=False)
                     df_filtrado = df_filtrado[mask_b]
 
-                st.caption(f"Mostrando {len(df_filtrado)} de {len(df_c)} documentos en {nombre_carpeta}")
+                st.caption(f"Mostrando **{len(df_filtrado)}** de **{len(df_c)}** documentos en `{nombre_carpeta}`")
                 if df_filtrado.empty:
                     st.warning("No hay registros para mostrar en esta carpeta con el filtro o corte actual.")
                 else:
-                    st.dataframe(estilizar_tabla_streamlit(df_filtrado, col_pendiente), use_container_width=True, hide_index=True)
+                    st.dataframe(
+                        estilizar_tabla_streamlit(df_filtrado, col_pendiente),
+                        use_container_width=True,
+                        hide_index=True,
+                    )
 
                 c_b1, c_b2 = st.columns(2)
                 excel_bytes = exportar_df_a_excel(
@@ -1247,7 +1203,7 @@ if modo_vista == "Detalle de Contrato":
                 )
 
 # --- 2. Consolidado de Subproyecto ---
-elif modo_vista == "Consolidado de Subproyecto":
+elif modo_vista == "🗂️ Consolidado de Subproyecto":
     st.subheader(f"🗂️ Consolidado de Subproyecto: {sub_sel}")
     filas_cons = []
     obras_sub = (
@@ -1284,6 +1240,29 @@ elif modo_vista == "Consolidado de Subproyecto":
 
     df_cons = pd.DataFrame(filas_cons)
     if not df_cons.empty:
+        tot_s = int(df_cons["Total"].sum())
+        cer_s = int(df_cons["Cerrados"].sum())
+        pen_s = int(df_cons["Pendientes"].sum())
+        av_s = round(cer_s / tot_s * 100, 1) if tot_s > 0 else 0.0
+
+        ks1, ks2, ks3, ks4 = st.columns(4)
+        ks1.metric("📄 Total Subproyecto", tot_s)
+        ks2.metric("✅ Cerrados", cer_s)
+        ks3.metric("⏳ Pendientes", pen_s)
+        ks4.metric("📈 Avance Global", f"{av_s}%")
+
+        df_graf_s = df_cons.groupby("Contrato", as_index=False)[["Cerrados", "Pendientes"]].sum()
+        fig_s = px.bar(
+            df_graf_s,
+            x="Contrato",
+            y=["Cerrados", "Pendientes"],
+            barmode="stack",
+            color_discrete_map={"Cerrados": "#28a745", "Pendientes": "#ffc107"},
+            title=f"📊 Avance por Contrato — {sub_sel}",
+        )
+        fig_s.update_layout(height=360, xaxis_title="", yaxis_title="Documentos")
+        st.plotly_chart(fig_s, use_container_width=True)
+
         st.dataframe(df_cons, use_container_width=True, hide_index=True)
         st.download_button(
             label="📥 Descargar Consolidado (Excel)",
@@ -1296,9 +1275,9 @@ elif modo_vista == "Consolidado de Subproyecto":
         st.info("No hay información consolidada disponible para este subproyecto.")
 
 # --- 3. Reporte Global ---
-elif modo_vista == "Reporte Global":
+elif modo_vista == "🌐 Reporte Global":
     st.subheader("🌐 Reporte Global de Contratos")
-    if st.button("Cargar Todos los Contratos Configurados", key="btn_cargar_global"):
+    if st.button("🚀 Cargar Todos los Contratos Configurados", type="primary", key="btn_cargar_global"):
         filas_glob = []
         with st.spinner("Cargando todos los contratos configurados..."):
             for item_c in listar_carpetas_de_estructura(ESTRUCTURA_PROYECTOS):
@@ -1335,6 +1314,29 @@ elif modo_vista == "Reporte Global":
                 })
         df_glob = pd.DataFrame(filas_glob)
         if not df_glob.empty:
+            tot_g = int(df_glob["Total"].sum())
+            cer_g = int(df_glob["Cerrados"].sum())
+            pen_g = int(df_glob["Pendientes"].sum())
+            av_g = round(cer_g / tot_g * 100, 1) if tot_g > 0 else 0.0
+
+            kg1, kg2, kg3, kg4 = st.columns(4)
+            kg1.metric("📄 Total Global", tot_g)
+            kg2.metric("✅ Cerrados", cer_g)
+            kg3.metric("⏳ Pendientes", pen_g)
+            kg4.metric("📈 Avance Global", f"{av_g}%")
+
+            df_graf_g = df_glob.groupby("Subproyecto", as_index=False)[["Cerrados", "Pendientes"]].sum()
+            fig_g = px.bar(
+                df_graf_g,
+                x="Subproyecto",
+                y=["Cerrados", "Pendientes"],
+                barmode="stack",
+                color_discrete_map={"Cerrados": "#28a745", "Pendientes": "#ffc107"},
+                title="📊 Estado Documentario Global por Subproyecto",
+            )
+            fig_g.update_layout(height=360, xaxis_title="", yaxis_title="Documentos")
+            st.plotly_chart(fig_g, use_container_width=True)
+
             st.dataframe(df_glob, use_container_width=True, hide_index=True)
             st.download_button(
                 label="📥 Descargar Reporte Global (Excel)",
@@ -1344,10 +1346,10 @@ elif modo_vista == "Reporte Global":
                 key="dl_global_xlsx",
             )
     else:
-        st.info("Haz clic en **Cargar Todos los Contratos Configurados** para generar el resumen global.")
+        st.info("Haz clic en **🚀 Cargar Todos los Contratos Configurados** para generar el resumen global.")
 
 # --- 4. Constructor Dinámico de Reporte Personalizado ---
-elif modo_vista == "Constructor Dinámico":
+elif modo_vista == "🛠️ Constructor Dinámico":
     st.subheader(f"🛠️ Constructor Dinámico de Reporte Personalizado - {contrato_sel}")
     if datos_completos:
         carpetas_disp = list(datos_completos.keys())
