@@ -1137,19 +1137,51 @@ def _render_vista_carpeta(
 
     st.markdown("#### 🔍 Filtros y Detalle Documentario")
     col_f1, col_f2, col_f3 = st.columns(3)
+
     estados_disp = ["Todos"]
     if "ESTADO" in df_c.columns:
-        estados_disp += sorted(
-            [x for x in df_c["ESTADO"].dropna().astype(str).str.strip().unique() if x]
+        serie_est_norm = (
+            df_c["ESTADO"]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .replace({"": "Sin Estado", "nan": "Sin Estado", "None": "Sin Estado"})
         )
+        estados_disp += sorted(serie_est_norm.unique().tolist())
     f_estado = col_f1.selectbox("Filtrar por Estado", estados_disp, key=f"est_{nombre_carpeta}")
 
     pend_disp = ["Todos"]
     if col_pendiente in df_c.columns:
-        pend_disp += sorted(
-            [x for x in df_c[col_pendiente].dropna().astype(str).str.strip().unique() if x]
+        serie_pen_norm = (
+            df_c[col_pendiente]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .replace({"": "Sin Asignar", "nan": "Sin Asignar", "None": "Sin Asignar"})
         )
+        pend_disp += sorted(serie_pen_norm.unique().tolist())
     f_pend = col_f2.selectbox("Filtrar por Pendiente Por", pend_disp, key=f"pen_{nombre_carpeta}")
+    f_busq = col_f3.text_input("Buscar código o descripción", key=f"busq_{nombre_carpeta}").strip()
+
+    df_filtrado = df_c.copy()
+    if f_estado != "Todos" and "ESTADO" in df_filtrado.columns:
+        est_f = (
+            df_filtrado["ESTADO"]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .replace({"": "Sin Estado", "nan": "Sin Estado", "None": "Sin Estado"})
+        )
+        df_filtrado = df_filtrado[est_f == f_estado]
+    if f_pend != "Todos" and col_pendiente in df_filtrado.columns:
+        pen_f = (
+            df_filtrado[col_pendiente]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .replace({"": "Sin Asignar", "nan": "Sin Asignar", "None": "Sin Asignar"})
+        )
+        df_filtrado = df_filtrado[pen_f == f_pend]
     f_busq = col_f3.text_input("Buscar código o descripción", key=f"busq_{nombre_carpeta}").strip()
 
     df_filtrado = df_c.copy()
