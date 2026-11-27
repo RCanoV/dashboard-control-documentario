@@ -29,7 +29,7 @@ from reportlab.platypus import Image as RLImage
 # Librerías para exportación a Excel (OpenPyXL)
 import openpyxl
 from openpyxl.drawing.image import Image as ExcelImage
-from openpyxl.styles import Font, Alignment, PatternFill
+from openpyxl.styles import Font, PatternFill
 
 # Conexión al editor de estructura
 from modulo_estructura_proyectos import cargar_estructura_github, mostrar_editor_estructura
@@ -1067,6 +1067,14 @@ def _get_session() -> requests.Session:
     return sess
 
 
+def _formatear_hms(segundos: float) -> str:
+    total_seg = max(0, int(round(segundos)))
+    hh = total_seg // 3600
+    mm = (total_seg % 3600) // 60
+    ss = total_seg % 60
+    return f"{hh:02d}h {mm:02d}m {ss:02d}s"
+
+
 def obtener_periodo_actual():
     tz_peru = pytz.timezone('America/Lima')
     ahora = datetime.now(tz_peru)
@@ -1172,7 +1180,6 @@ def obtener_tip_version_metadata(token, project_id, item_id):
 
 def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_personalizados):
     item_id = item.get("id", "")
-    token_val = headers.get("Authorization", "").replace("Bearer ", "") or obtener_token()
 
     registro_plano = {
         "NOMBRE_DEL_ARCHIVO": name,
@@ -1181,7 +1188,7 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
     }
     deconstruir_diccionario(item, "ITEM", registro_plano)
 
-    tip_version = obtener_tip_version_metadata(token=token_val, project_id=project_id, item_id=item_id)
+    tip_version = obtener_tip_version_metadata(token="", project_id=project_id, item_id=item_id)
     if tip_version:
         deconstruir_diccionario(tip_version, "VERSION", registro_plano)
 
@@ -1225,7 +1232,6 @@ def procesar_archivo_pdf(item, project_id, headers, ruta_actual, name, campos_pe
 
 
 def _recolectar_pdfs_recursivo(project_id, folder_id, longitud_maxima, ids_excluidos, ruta_actual, cola_pdfs):
-    """Recorre carpetas de forma ligera y acumula los PDFs sin crear sub-pools por carpeta."""
     if folder_id.replace("%3A", ":") in ids_excluidos:
         return
 
@@ -1377,7 +1383,6 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
     col_pendiente = campos_personalizados.get(id_campo_pendiente)
     orden_columnas_deseado = ["CODIGO", "REV", "DESCRIPCION", "FECHA", "ESTADO", "PENDIENTE POR", "DIAS", "URL_DOC"]
 
-    # Procesamiento secuencial limpio de carpetas (cada carpeta ya paraleliza sus PDFs con 6 workers)
     for cfg_c in carpetas_config:
         pest, df_p, df_t = _procesar_carpeta_config(
             cfg_c, ids_excluidos, campos_personalizados,
@@ -1396,14 +1401,6 @@ def extraer_datos_contrato_completo(contrato_key, info_contrato, campos_personal
         "datos_completos": dataframes_completos_por_pestana,
         "hora_actualizacion": hora_cache
     }
-
-
-def _formatear_hms(segundos: float) -> str:
-    total_seg = max(0, int(round(segundos)))
-    hh = total_seg // 3600
-    mm = (total_seg % 3600) // 60
-    ss = total_seg % 60
-    return f"{hh:02d}h {mm:02d}m {ss:02d}s"
 
 
 def precargar_todos_los_contratos(periodo, progress_bar=None, status_text=None):
@@ -1585,7 +1582,7 @@ if st.session_state["es_admin"]:
     if seccion == "📊 Reportes":
         vista_modo = st.sidebar.radio(
             "Tipo de reporte:",
-            ["Detalle de Contrato", "Consolidado de Subproyecto"]
+            ["Detalle de Contrato", "Consolidado de Subproyecto", "Reporte Global"]
         )
     elif seccion == "🛠️ Herramientas":
         vista_modo = "📝 Programar Reportes Diarios"
@@ -1598,7 +1595,7 @@ if st.session_state["es_admin"]:
 else:
     vista_modo = st.sidebar.radio(
         "Tipo de reporte:",
-        ["Detalle de Contrato", "Consolidado de Subproyecto"]
+        ["Detalle de Contrato", "Consolidado de Subproyecto", "Reporte Global"]
     )
 
     with st.sidebar.expander("🔐 Acceso Administrador"):
@@ -1620,7 +1617,7 @@ st.sidebar.markdown("---")
 
 if st.sidebar.button("🔄 Actualizar Todos los Contratos", use_container_width=True):
     extraer_datos_contrato_completo.clear()
-    st.sidebar.warning("Descargando data global en paralelo (Autodesk API)...")
+    st.sidebar.warning("Descargando data global (Autodesk API)...")
     barra_p = st.sidebar.progress(0.0)
     texto_p = st.sidebar.empty()
     precargar_todos_los_contratos(periodo_actual, progress_bar=barra_p, status_text=texto_p)
@@ -1637,7 +1634,7 @@ metadata_export = {
 
 if "preload" in st.query_params and st.query_params["preload"] == "true":
     st.title("🤖 Modo Bot: Actualizando Caché Global")
-    st.warning("Descargando toda la data de Autodesk en paralelo...")
+    st.warning("Descargando toda la data de Autodesk...")
     barra_bot = st.progress(0.0)
     texto_bot = st.empty()
     precargar_todos_los_contratos(periodo_actual, progress_bar=barra_bot, status_text=texto_bot)
@@ -1656,6 +1653,193 @@ if vista_modo == "📝 Programar Reportes Diarios":
 
 elif vista_modo == "🏗️ Administrar Estructura":
     mostrar_editor_estructura(ESTRUCTURA_MAESTRA, SHA_ESTRUCTURA)
+
+elif vista_modo == "Reporte Global":
+    st.subheader("🌐 Reporte Global — Todos los Alcances, Subproyectos y Contratos")
+    st.markdown(
+        '<div class="bloque-guia">Consolida la información de todos los contratos configurados en '
+        '<b>ESTRUCTURA_MAESTRA</b> en una sola vista y permite exportar todo el reporte global a Excel o PDF.</div>',
+        unsafe_allow_html=True
+    )
+
+    _, col_g_act2 = st.columns([2, 1])
+    with col_g_act2:
+        if st.button("⚡ Refrescar Todo", key="btn_refrescar_todo_global", use_container_width=True):
+            extraer_datos_contrato_completo.clear()
+
+    filas_globales = []
+    total_docs_global = 0
+    total_cerrados_global = 0
+    total_pendientes_global = 0
+
+    lista_contratos_global = []
+    for alc_nom, subs_map in ESTRUCTURA_MAESTRA.items():
+        if not isinstance(subs_map, dict):
+            continue
+        for sub_nom, sub_cfg_map in subs_map.items():
+            if sub_nom == "config" or not isinstance(sub_cfg_map, dict):
+                continue
+            cfg_sub_g = sub_cfg_map.get("config", {})
+            campos_g = cfg_sub_g.get("campos_personalizados", {})
+            id_fec_g = cfg_sub_g.get("id_campo_fecha", "")
+            id_pen_g = cfg_sub_g.get("id_campo_pendiente", "")
+            col_pen_g = campos_g.get(id_pen_g, "PENDIENTE POR")
+
+            for obra_nom, cont_map in sub_cfg_map.items():
+                if obra_nom == "config" or not isinstance(cont_map, dict):
+                    continue
+                for cont_nom, info_c_g in cont_map.items():
+                    if isinstance(info_c_g, dict) and info_c_g.get("carpetas_config"):
+                        lista_contratos_global.append((
+                            alc_nom, sub_nom, obra_nom, cont_nom,
+                            info_c_g, campos_g, id_fec_g, id_pen_g, col_pen_g
+                        ))
+
+    barra_glob = st.progress(0.0)
+    estado_glob = st.empty()
+
+    for idx_g, (alc_nom, sub_nom, obra_nom, cont_nom, info_c_g, campos_g, id_fec_g, id_pen_g, col_pen_g) in enumerate(lista_contratos_global, start=1):
+        estado_glob.caption(f"Consolidando {idx_g}/{len(lista_contratos_global)}: {sub_nom} › {cont_nom}")
+        res_g = extraer_datos_contrato_completo(
+            cont_nom, info_c_g, campos_g, id_fec_g, id_pen_g, periodo_actual
+        )
+        pests_g = res_g.get("datos", {})
+
+        for carp_nom, df_c_g in pests_g.items():
+            if df_c_g is None or df_c_g.empty:
+                continue
+
+            total_c = len(df_c_g)
+            cerr_c = 0
+            conteo_roles_c = {}
+
+            if col_pen_g in df_c_g.columns:
+                est_series = df_c_g[col_pen_g].astype(str).str.strip().str.upper()
+                cerr_c = int((est_series == "CERRADO").sum())
+                for val_e in est_series:
+                    if val_e and val_e not in ["CERRADO", "NAN", "NAT", "NONE", "NULL", ""]:
+                        rol_fmt = val_e.title()
+                        conteo_roles_c[rol_fmt] = conteo_roles_c.get(rol_fmt, 0) + 1
+
+            pend_c = total_c - cerr_c
+            avance_c = (cerr_c / total_c * 100.0) if total_c > 0 else 0.0
+
+            mayor_retraso_str = "Sin pendientes"
+            if col_pen_g in df_c_g.columns:
+                est_series = df_c_g[col_pen_g].astype(str).str.strip().str.upper()
+                df_ab = df_c_g[est_series != "CERRADO"].copy()
+                if not df_ab.empty and "DIAS" in df_ab.columns:
+                    df_ab["DIAS_NUM"] = pd.to_numeric(df_ab["DIAS"], errors="coerce").fillna(0)
+                    if df_ab["DIAS_NUM"].max() > 0:
+                        idx_m = df_ab["DIAS_NUM"].idxmax()
+                        cod_m = str(df_ab.loc[idx_m, COL_CODIGO])
+                        dias_m = int(df_ab.loc[idx_m, "DIAS_NUM"])
+                        resp_m = str(df_ab.loc[idx_m, col_pen_g]).strip()
+                        mayor_retraso_str = f"{cod_m} ({dias_m} días) [{resp_m}]"
+                    else:
+                        mayor_retraso_str = "Sin retrasos"
+
+            fila_g = {
+                "Alcance": alc_nom,
+                "Subproyecto": sub_nom,
+                "Tipo de Obra": obra_nom,
+                "Contrato": cont_nom,
+                "Carpeta": carp_nom,
+                "Cerrados": cerr_c,
+                "Pendientes": pend_c,
+                "Total": total_c,
+                "Avance (%)": f"{avance_c:.1f}%",
+                "Mayor Retraso": mayor_retraso_str,
+            }
+            for rol_k, rol_v in conteo_roles_c.items():
+                fila_g[rol_k] = rol_v
+
+            filas_globales.append(fila_g)
+            total_docs_global += total_c
+            total_cerrados_global += cerr_c
+            total_pendientes_global += pend_c
+
+        barra_glob.progress(min(1.0, idx_g / max(1, len(lista_contratos_global))))
+
+    barra_glob.empty()
+    estado_glob.empty()
+
+    avance_global_pct = (total_cerrados_global / total_docs_global * 100.0) if total_docs_global > 0 else 0.0
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Total Documentos (Global)", total_docs_global)
+    k2.metric("Cerrados (Global)", total_cerrados_global)
+    k3.metric("Pendientes (Global)", total_pendientes_global, delta="Requieren atención" if total_pendientes_global > 0 else "Al día", delta_color="inverse")
+    k4.metric("Avance Global", f"{avance_global_pct:.1f}%")
+
+    if filas_globales:
+        df_global = pd.DataFrame(filas_globales).fillna(0)
+        cols_base_g = [
+            "Alcance", "Subproyecto", "Tipo de Obra", "Contrato",
+            "Carpeta", "Cerrados", "Pendientes", "Total", "Avance (%)", "Mayor Retraso"
+        ]
+        cols_extra_g = sorted([c for c in df_global.columns if c not in cols_base_g])
+        df_global = df_global[cols_base_g + cols_extra_g]
+
+        for col_int in ["Cerrados", "Pendientes", "Total"] + cols_extra_g:
+            df_global[col_int] = pd.to_numeric(df_global[col_int], errors="coerce").fillna(0).astype(int)
+
+        fg1, fg2, fg3 = st.columns(3)
+        with fg1:
+            sel_alc_g = st.multiselect("Filtrar Alcance:", sorted(df_global["Alcance"].unique()), default=sorted(df_global["Alcance"].unique()), key="g_f_alc")
+        with fg2:
+            sel_sub_g = st.multiselect("Filtrar Subproyecto:", sorted(df_global["Subproyecto"].unique()), default=sorted(df_global["Subproyecto"].unique()), key="g_f_sub")
+        with fg3:
+            sel_obra_g = st.multiselect("Filtrar Tipo de Obra:", sorted(df_global["Tipo de Obra"].unique()), default=sorted(df_global["Tipo de Obra"].unique()), key="g_f_obra")
+
+        df_global_filt = df_global[
+            df_global["Alcance"].isin(sel_alc_g)
+            & df_global["Subproyecto"].isin(sel_sub_g)
+            & df_global["Tipo de Obra"].isin(sel_obra_g)
+        ].copy()
+
+        st.dataframe(df_global_filt, use_container_width=True, height=420, hide_index=True)
+
+        meta_global = {
+            "fecha": datetime.now(tz_pe).strftime('%d/%m/%Y %H:%M'),
+            "alcance": ", ".join(sel_alc_g) if sel_alc_g else "Todos",
+            "subproyecto": ", ".join(sel_sub_g) if sel_sub_g else "Todos",
+        }
+
+        cg_b1, cg_b2 = st.columns(2)
+        with cg_b1:
+            excel_global = exportar_df_a_excel(
+                df_global_filt,
+                "Reporte Global Consolidado - Control Documentario SHP",
+                meta_global,
+                ruta_logo
+            )
+            st.download_button(
+                label="📊 Exportar Reporte Global (Excel)",
+                data=excel_global,
+                file_name=f"Reporte_Global_SHP_{periodo_actual}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+        with cg_b2:
+            resumenes_por_contrato_global = {
+                c_name: grp[["Carpeta", "Cerrados", "Pendientes", "Total", "Avance (%)", "Mayor Retraso"]]
+                for c_name, grp in df_global_filt.groupby("Contrato")
+            }
+            pdf_global = generar_pdf_subproyecto(
+                meta_global,
+                df_global_filt[["Tipo de Obra", "Contrato", "Cerrados", "Pendientes", "Total", "Avance (%)"]].groupby(["Tipo de Obra", "Contrato"], as_index=False).sum(numeric_only=True),
+                ruta_logo,
+                resumenes_por_contrato_global
+            )
+            st.download_button(
+                label="📄 Exportar Reporte Global (PDF)",
+                data=pdf_global,
+                file_name=f"Reporte_Global_SHP_{periodo_actual}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+    else:
+        st.info("No hay datos cargados aún. Usa '🔄 Actualizar Todos los Contratos' en la barra lateral o '⚡ Refrescar Todo'.")
 
 elif vista_modo == "Consolidado de Subproyecto":
     st.subheader(f"📊 Resumen Consolidado: {subproyecto_activo}")
@@ -2227,7 +2411,7 @@ else:
                     if not st.session_state["pers_cols_state"]:
                         st.session_state["pers_cols_state"] = cols_principales
 
-                    b_sel1, b_sel2, b_sel3 = st.columns([1, 1, 2])
+                    b_sel1, b_sel2, _ = st.columns([1, 1, 2])
                     with b_sel1:
                         if st.button("✅ Todos los campos", key="btn_todos_campos", use_container_width=True):
                             st.session_state["pers_cols_state"] = todas_las_columnas
@@ -2312,3 +2496,4 @@ else:
                     st.info("Selecciona al menos una carpeta para explorar los campos disponibles.")
             else:
                 st.info("No hay datos extendidos disponibles para este contrato.")
+```[cite: 4, 6, 11]
