@@ -388,10 +388,34 @@ except Exception:
     ESTRUCTURA_PROYECTOS = ESTRUCTURA_RESPALDO
 
 
+_CLAVES_NO_OBRA = {
+    "config",
+    "nombre",
+    "descripcion",
+    "ruta_guardado_local",
+    "urls_excluidas",
+    "carpetas_config",
+    "carpetas",
+    "campos_personalizados",
+    "id_campo_fecha",
+    "id_campo_pendiente",
+    "tipo_contrato",
+    "nombre_proyecto",
+    "nombre_supervisor",
+    "coordinador_shp",
+    "administrador_contratos",
+    "nombre_empresa_1",
+    "nombre_empresa_2",
+}
+
+
 def obtener_subproyectos(alcance: str):
     if not alcance or alcance not in ESTRUCTURA_PROYECTOS:
         return []
-    return [k for k in ESTRUCTURA_PROYECTOS[alcance].keys() if k != "config"]
+    alc_data = ESTRUCTURA_PROYECTOS.get(alcance, {})
+    if not isinstance(alc_data, dict):
+        return []
+    return [k for k, v in alc_data.items() if k != "config" and isinstance(v, dict)]
 
 
 def _obtener_tipos_obra_dict(alcance: str, subproyecto: str) -> dict:
@@ -400,9 +424,18 @@ def _obtener_tipos_obra_dict(alcance: str, subproyecto: str) -> dict:
     sub_data = ESTRUCTURA_PROYECTOS.get(alcance, {}).get(subproyecto, {})
     if not isinstance(sub_data, dict):
         return {}
-    if isinstance(sub_data.get("tipos_obra"), dict):
-        return sub_data["tipos_obra"]
-    return {k: v for k, v in sub_data.items() if k != "config" and isinstance(v, dict)}
+
+    for wrapper_key in ("tipos_obra", "tipos_de_obra", "obras"):
+        if isinstance(sub_data.get(wrapper_key), dict):
+            return {
+                k: v for k, v in sub_data[wrapper_key].items()
+                if k not in _CLAVES_NO_OBRA and isinstance(v, dict)
+            }
+
+    return {
+        k: v for k, v in sub_data.items()
+        if k not in _CLAVES_NO_OBRA and isinstance(v, dict)
+    }
 
 
 def obtener_tipos_obra(alcance: str, subproyecto: str):
@@ -412,8 +445,12 @@ def obtener_tipos_obra(alcance: str, subproyecto: str):
 def obtener_contratos(alcance: str, subproyecto: str, tipo_obra: str):
     if not tipo_obra:
         return []
-    contratos_dict = _obtener_tipos_obra_dict(alcance, subproyecto).get(tipo_obra, {})
-    return list(contratos_dict.keys()) if isinstance(contratos_dict, dict) else []
+    obra_data = _obtener_tipos_obra_dict(alcance, subproyecto).get(tipo_obra, {})
+    if not isinstance(obra_data, dict):
+        return []
+    if isinstance(obra_data.get("contratos"), dict):
+        return [k for k, v in obra_data["contratos"].items() if isinstance(v, dict)]
+    return [k for k, v in obra_data.items() if k not in _CLAVES_NO_OBRA and isinstance(v, dict)]
 
 
 def obtener_info_contrato(alcance: str, subproyecto: str, tipo_obra: str, contrato: str) -> dict:
@@ -421,8 +458,13 @@ def obtener_info_contrato(alcance: str, subproyecto: str, tipo_obra: str, contra
         return {}
     sub_data = ESTRUCTURA_PROYECTOS.get(alcance, {}).get(subproyecto, {})
     cfg_sub = sub_data.get("config", {}) if isinstance(sub_data, dict) else {}
-    contratos_dict = _obtener_tipos_obra_dict(alcance, subproyecto).get(tipo_obra, {})
-    raw_info = dict(contratos_dict.get(contrato, {}) or {})
+    obra_data = _obtener_tipos_obra_dict(alcance, subproyecto).get(tipo_obra, {})
+    contratos_dict = (
+        obra_data.get("contratos", {})
+        if isinstance(obra_data, dict) and isinstance(obra_data.get("contratos"), dict)
+        else obra_data
+    )
+    raw_info = dict(contratos_dict.get(contrato, {}) or {}) if isinstance(contratos_dict, dict) else {}
 
     carpetas_raw = raw_info.get("carpetas") or raw_info.get("carpetas_config") or []
     carpetas_norm = []
