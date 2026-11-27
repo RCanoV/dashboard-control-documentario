@@ -5,7 +5,6 @@ import time
 import urllib.parse
 from io import BytesIO
 from datetime import datetime, timedelta, timezone
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import streamlit as st
 import requests
@@ -205,97 +204,54 @@ def deconstruir_diccionario(datos, prefijo: str, resultado: dict):
         resultado[prefijo] = datos
 
 
-def obtener_tip_version_metadata(token: str, project_id: str, item_id: str) -> dict:
-    if not token or not project_id or not item_id:
-        return {}
-    clean_item_id = item_id.split("?version=")[0]
-    url = (
-        f"https://developer.api.autodesk.com/data/v1/projects/{project_id}/"
-        f"items/{urllib.parse.quote(clean_item_id, safe='')}/tip"
-    )
-    for region in ("US", "EMEA"):
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "x-ads-region": region,
-        }
-        for _ in range(3):
-            r = requests.get(url, headers=headers, timeout=25)
-            if r.status_code == 429:
-                time.sleep(2)
-                continue
-            if r.status_code == 200:
-                return r.json().get("data", {}) or {}
-            break
-    return {}
-
-
-def procesar_archivo_pdf_acc(
+def obtener_atributos_en_lote_acc(
     token: str,
-    item: dict,
     project_id: str,
-    ruta_actual: str,
-    nombre_archivo: str,
+    version_ids: list[str],
     campos_personalizados: dict,
 ) -> dict:
-    item_id = str(item.get("id", "")).strip()
-    url_webview = (
-        item.get("links", {}).get("webView", {}).get("href", "")
-        if isinstance(item.get("links"), dict)
-        else ""
-    )
+    """Consulta customAttributes en lotes de 50 versiones (evita HTTP 429 y campos None)."""
+    mapa_attrs = {}
+    if not token or not project_id or not version_ids or not campos_personalizados:
+        return mapa_attrs
 
-    registro = {
-        "NOMBRE_DEL_ARCHIVO": nombre_archivo,
-        "RUTA_EN_AUTODESK": ruta_actual,
-        "ITEM_ID": item_id,
-        "URL_DOC": str(url_webview or "").strip(),
+    proj_sin_b = project_id.replace("b.", "")
+    url_batch = (
+        f"https://developer.api.autodesk.com/bim360/docs/v1/projects/"
+        f"{proj_sin_b}/versions:batch-get"
+    )
+    campos_objetivo = set(str(k) for k in campos_personalizados.keys())
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
     }
-    deconstruir_diccionario(item, "ITEM", registro)
 
-    tip_version = obtener_tip_version_metadata(token, project_id, item_id)
-    if tip_version:
-        if not registro["URL_DOC"] and isinstance(tip_version.get("links"), dict):
-            registro["URL_DOC"] = str(
-                tip_version.get("links", {}).get("webView", {}).get("href", "")
-            ).strip()
-        deconstruir_diccionario(tip_version, "VERSION", registro)
-
-    vid = (
-        item.get("relationships", {})
-        .get("tip", {})
-        .get("data", {})
-        .get("id", "")
-    )
-    if vid:
-        vid_encoded = urllib.parse.quote(vid, safe="")
-        url_attr = (
-            f"https://developer.api.autodesk.com/bim360/docs/v1/projects/"
-            f"{project_id.replace('b.', '')}/versions/{vid_encoded}/custom-attributes"
-        )
-        for intento in range(4):
-            res_attr = requests.get(
-                url_attr,
-                headers={
-                    "Authorization": f"Bearer {token}",
-                    "Content-Type": "application/json",
-                },
-                timeout=25,
-            )
-            if res_attr.status_code == 429:
+    for i in range(0, len(version_ids), 50):
+        lote = version_ids[i : i + 50]
+        for intento in range(5):
+            r = requests.post(url_batch, headers=headers, json={"urns": lote}, timeout=45)
+            if r.status_code == 429:
+                espera = int(r.headers.get("Retry-After", 3 * (intento + 1)))
+                time.sleep(espera)
+                continue
+            if r.status_code == 200:
+                for res_v in r.json().get("results", []):
+                    vid = str(res_v.get("urn", "")).strip()
+                    vals = {}
+                    for attr in res_v.get("customAttributes", []) or []:
+                        aid = str(attr.get("id", ""))
+                        if aid in campos_objetivo:
+                            val = attr.get("value")
+                            vals[f"CAMPO_CUSTOM_{aid}"] = "" if val is None else str(val).strip()
+                    if vid:
+                        mapa_attrs[vid] = vals
+                break
+            if r.status_code in (500, 502, 503, 504):
                 time.sleep(2 * (intento + 1))
                 continue
-            if res_attr.status_code == 200:
-                campos_objetivo = set(str(k) for k in campos_personalizados.keys())
-                for attr in res_attr.json():
-                    attr_id = str(attr.get("id"))
-                    if attr_id in campos_objetivo:
-                        registro[f"CAMPO_CUSTOM_{attr_id}"] = str(
-                            attr.get("value", "")
-                        ).strip()
             break
 
-    return registro
+    return mapa_attrs
 
 
 def escanear_recursivo_acc(
@@ -358,26 +314,44 @@ def escanear_recursivo_acc(
                 items_pdf.append((item, name))
 
         if items_pdf:
-            with ThreadPoolExecutor(max_workers=3) as executor:
-                futures = [
-                    executor.submit(
-                        procesar_archivo_pdf_acc,
-                        token,
-                        it,
-                        project_id,
-                        ruta_actual,
-                        nom,
-                        campos_personalizados,
-                    )
-                    for it, nom in items_pdf
-                ]
-                for fut in as_completed(futures):
-                    try:
-                        res_item = fut.result()
-                        if res_item:
-                            lista_datos.append(res_item)
-                    except Exception:
-                        pass
+            vids_lote = []
+            registros_lote = []
+            for it, nom in items_pdf:
+                item_id = str(it.get("id", "")).strip()
+                url_webview = (
+                    it.get("links", {}).get("webView", {}).get("href", "")
+                    if isinstance(it.get("links"), dict)
+                    else ""
+                )
+                vid = (
+                    it.get("relationships", {})
+                    .get("tip", {})
+                    .get("data", {})
+                    .get("id", "")
+                )
+                reg = {
+                    "NOMBRE_DEL_ARCHIVO": nom,
+                    "RUTA_EN_AUTODESK": ruta_actual,
+                    "ITEM_ID": item_id,
+                    "URL_DOC": str(url_webview or "").strip(),
+                    "_VID": vid,
+                }
+                deconstruir_diccionario(it, "ITEM", reg)
+                registros_lote.append(reg)
+                if vid:
+                    vids_lote.append(vid)
+
+            mapa_lote = obtener_atributos_en_lote_acc(
+                token=token,
+                project_id=project_id,
+                version_ids=vids_lote,
+                campos_personalizados=campos_personalizados,
+            )
+            for reg in registros_lote:
+                vid = reg.pop("_VID", "")
+                if vid in mapa_lote:
+                    reg.update(mapa_lote[vid])
+                lista_datos.append(reg)
 
         enlaces = data.get("links", {})
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
