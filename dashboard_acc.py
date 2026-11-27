@@ -358,7 +358,7 @@ def escanear_recursivo_acc(
                 items_pdf.append((item, name))
 
         if items_pdf:
-            with ThreadPoolExecutor(max_workers=5) as executor:
+            with ThreadPoolExecutor(max_workers=3) as executor:
                 futures = [
                     executor.submit(
                         procesar_archivo_pdf_acc,
