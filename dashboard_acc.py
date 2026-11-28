@@ -171,60 +171,97 @@ def listar_carpetas_de_estructura(estructura: dict) -> list[dict]:
     return items
 
 
-def recolectar_contratos_para_consolidado(
+def obtener_opciones_cascada_consolidado(
     estructura: dict,
-    nivel: str,
-    alcance_sel: str,
-    sub_sel: str,
-    tipo_sel: str,
-    contrato_sel: str,
+    alcances_sel: list[str],
+    subs_sel: list[str],
+    tipos_sel: list[str],
+):
+    subs_disp, tipos_disp, contratos_disp = [], [], []
+    if not isinstance(estructura, dict):
+        return subs_disp, tipos_disp, contratos_disp
+
+    for alc in alcances_sel:
+        subs_dict = estructura.get(alc, {})
+        if not isinstance(subs_dict, dict):
+            continue
+        for s_nom, s_info in subs_dict.items():
+            if s_nom == "config" or not isinstance(s_info, dict):
+                continue
+            if s_nom not in subs_disp:
+                subs_disp.append(s_nom)
+            if subs_sel and s_nom not in subs_sel:
+                continue
+
+            obras_dict = (
+                s_info.get("tipos_obra")
+                if isinstance(s_info.get("tipos_obra"), dict)
+                else {k: v for k, v in s_info.items() if k != "config" and isinstance(v, dict)}
+            )
+            for t_obra, c_dict in obras_dict.items():
+                if not isinstance(c_dict, dict):
+                    continue
+                if t_obra not in tipos_disp:
+                    tipos_disp.append(t_obra)
+                if tipos_sel and t_obra not in tipos_sel:
+                    continue
+
+                for c_nom, c_info in c_dict.items():
+                    if isinstance(c_info, dict) and c_nom not in contratos_disp:
+                        contratos_disp.append(c_nom)
+
+    return subs_disp, tipos_disp, contratos_disp
+
+
+def recolectar_contratos_multiseleccion(
+    estructura: dict,
+    alcances_sel: list[str],
+    subs_sel: list[str],
+    tipos_sel: list[str],
+    contratos_sel: list[str],
 ) -> list[dict]:
     contratos_out = []
-    if not isinstance(estructura, dict) or not alcance_sel:
+    if not isinstance(estructura, dict):
         return contratos_out
 
-    subs_dict = estructura.get(alcance_sel, {})
-    if not isinstance(subs_dict, dict):
-        return contratos_out
-
-    for s_nom, s_info in subs_dict.items():
-        if s_nom == "config" or not isinstance(s_info, dict):
+    for alc in alcances_sel:
+        subs_dict = estructura.get(alc, {})
+        if not isinstance(subs_dict, dict):
             continue
-        if nivel in ("Proyecto", "Tipo de Obra", "Contrato") and s_nom != sub_sel:
-            continue
-
-        cfg_sub = s_info.get("config", {}) if isinstance(s_info.get("config"), dict) else {}
-        obras_dict = (
-            s_info.get("tipos_obra")
-            if isinstance(s_info.get("tipos_obra"), dict)
-            else {k: v for k, v in s_info.items() if k != "config" and isinstance(v, dict)}
-        )
-
-        for t_obra, c_dict in obras_dict.items():
-            if not isinstance(c_dict, dict):
+        for s_nom, s_info in subs_dict.items():
+            if s_nom == "config" or not isinstance(s_info, dict):
                 continue
-            if nivel in ("Tipo de Obra", "Contrato") and t_obra != tipo_sel:
+            if s_nom not in subs_sel:
                 continue
 
-            for c_nom, c_info in c_dict.items():
-                if not isinstance(c_info, dict):
-                    continue
-                if nivel == "Contrato" and c_nom != contrato_sel:
+            cfg_sub = s_info.get("config", {}) if isinstance(s_info.get("config"), dict) else {}
+            obras_dict = (
+                s_info.get("tipos_obra")
+                if isinstance(s_info.get("tipos_obra"), dict)
+                else {k: v for k, v in s_info.items() if k != "config" and isinstance(v, dict)}
+            )
+
+            for t_obra, c_dict in obras_dict.items():
+                if not isinstance(c_dict, dict) or t_obra not in tipos_sel:
                     continue
 
-                c_ctx = dict(c_info)
-                if not c_ctx.get("campos_personalizados") and cfg_sub.get("campos_personalizados"):
-                    c_ctx["campos_personalizados"] = cfg_sub.get("campos_personalizados", {})
-                if not c_ctx.get("id_campo_fecha") and cfg_sub.get("id_campo_fecha"):
-                    c_ctx["id_campo_fecha"] = cfg_sub.get("id_campo_fecha", "6011839")
-                if not c_ctx.get("id_campo_pendiente") and cfg_sub.get("id_campo_pendiente"):
-                    c_ctx["id_campo_pendiente"] = cfg_sub.get("id_campo_pendiente", "6011840")
+                for c_nom, c_info in c_dict.items():
+                    if not isinstance(c_info, dict) or c_nom not in contratos_sel:
+                        continue
 
-                c_ctx["_alcance"] = alcance_sel
-                c_ctx["_subproyecto"] = s_nom
-                c_ctx["_tipo_obra"] = t_obra
-                c_ctx["_contrato"] = c_nom
-                contratos_out.append(c_ctx)
+                    c_ctx = dict(c_info)
+                    if not c_ctx.get("campos_personalizados") and cfg_sub.get("campos_personalizados"):
+                        c_ctx["campos_personalizados"] = cfg_sub.get("campos_personalizados", {})
+                    if not c_ctx.get("id_campo_fecha") and cfg_sub.get("id_campo_fecha"):
+                        c_ctx["id_campo_fecha"] = cfg_sub.get("id_campo_fecha", "6011839")
+                    if not c_ctx.get("id_campo_pendiente") and cfg_sub.get("id_campo_pendiente"):
+                        c_ctx["id_campo_pendiente"] = cfg_sub.get("id_campo_pendiente", "6011840")
+
+                    c_ctx["_alcance"] = alc
+                    c_ctx["_subproyecto"] = s_nom
+                    c_ctx["_tipo_obra"] = t_obra
+                    c_ctx["_contrato"] = c_nom
+                    contratos_out.append(c_ctx)
 
     return contratos_out
 
@@ -1494,118 +1531,181 @@ if modo_vista == "📁 Detalle de Contrato":
                     metadata_base=metadata_base,
                 )
 
-# --- 2. Consolidado (Alcance / Proyecto / Tipo de Obra / Contrato) ---
+# --- 2. Consolidado (Multiselección + Botón Aplicar + Barra de Avance) ---
 elif modo_vista == "🗂️ Consolidado":
     st.subheader("🗂️ Consolidado Documentario")
 
-    c_opt1, c_opt2 = st.columns(2)
-    with c_opt1:
-        nivel_cons = st.selectbox(
-            "📌 Consolidar por:",
-            ["Alcance", "Proyecto", "Tipo de Obra", "Contrato"],
-            index=1,
-            key="nivel_consolidado",
+    alcances_todos = list(ESTRUCTURA_PROYECTOS.keys()) if isinstance(ESTRUCTURA_PROYECTOS, dict) else []
+
+    f1, f2 = st.columns(2)
+    with f1:
+        alcances_cons = st.multiselect(
+            "📌 Alcances / Proyectos",
+            options=alcances_todos,
+            default=[alcance_sel] if alcance_sel in alcances_todos else alcances_todos[:1],
+            key="cons_ms_alcances",
         )
 
-    mapa_opciones_agrup = {
-        "Alcance": ["PROYECTO", "TIPO DE OBRA", "CONTRATO", "CARPETA", "ALCANCE"],
-        "Proyecto": ["CONTRATO", "TIPO DE OBRA", "CARPETA", "PROYECTO"],
-        "Tipo de Obra": ["CONTRATO", "CARPETA", "TIPO DE OBRA"],
-        "Contrato": ["CARPETA", "CONTRATO"],
-    }
-    opciones_agrup = mapa_opciones_agrup[nivel_cons]
-    with c_opt2:
+    subs_disp, _, _ = obtener_opciones_cascada_consolidado(
+        ESTRUCTURA_PROYECTOS, alcances_cons, [], []
+    )
+    with f2:
+        default_subs = [sub_sel] if sub_sel in subs_disp else subs_disp
+        subs_cons = st.multiselect(
+            "🏗️ Subproyectos",
+            options=subs_disp,
+            default=default_subs,
+            key="cons_ms_subs",
+        )
+
+    _, tipos_disp, _ = obtener_opciones_cascada_consolidado(
+        ESTRUCTURA_PROYECTOS, alcances_cons, subs_cons, []
+    )
+    f3, f4 = st.columns(2)
+    with f3:
+        tipos_cons = st.multiselect(
+            "🔧 Tipos de Obra",
+            options=tipos_disp,
+            default=tipos_disp,
+            key="cons_ms_tipos",
+        )
+
+    _, _, contratos_disp = obtener_opciones_cascada_consolidado(
+        ESTRUCTURA_PROYECTOS, alcances_cons, subs_cons, tipos_cons
+    )
+    with f4:
+        contratos_cons = st.multiselect(
+            "📄 Contratos",
+            options=contratos_disp,
+            default=contratos_disp,
+            key="cons_ms_contratos",
+        )
+
+    g_col1, g_col2 = st.columns([3, 1])
+    with g_col1:
         agrupar_por = st.selectbox(
             "📊 Agrupar tabla y gráfico por:",
-            opciones_agrup,
+            ["CONTRATO", "SUBPROYECTO", "TIPO DE OBRA", "ALCANCE", "CARPETA"],
             index=0,
-            key=f"agrupar_cons_{nivel_cons}",
+            key="cons_agrupar_por",
+        )
+    with g_col2:
+        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        btn_aplicar = st.button("✅ Aplicar", type="primary", width="stretch", key="btn_aplicar_consolidado")
+
+    if btn_aplicar:
+        contratos_a_consolidar = recolectar_contratos_multiseleccion(
+            estructura=ESTRUCTURA_PROYECTOS,
+            alcances_sel=alcances_cons,
+            subs_sel=subs_cons,
+            tipos_sel=tipos_cons,
+            contratos_sel=contratos_cons,
         )
 
-    etiqueta_objetivo = {
-        "Alcance": alcance_sel,
-        "Proyecto": sub_sel,
-        "Tipo de Obra": f"{sub_sel} → {tipo_sel}",
-        "Contrato": contrato_sel,
-    }[nivel_cons]
-    st.caption(f"Consolidando **{nivel_cons}**: `{etiqueta_objetivo}` | Agrupado por: **{agrupar_por}**")
+        if not contratos_a_consolidar:
+            st.warning("Selecciona al menos un Alcance, Subproyecto, Tipo de Obra y Contrato antes de aplicar.")
+            st.session_state["consolidado_resultado"] = None
+        else:
+            total_c = len(contratos_a_consolidar)
+            barra = st.progress(0, text=f"Iniciando consolidación de {total_c} contrato(s)...")
+            estado_prog = st.empty()
 
-    contratos_a_consolidar = recolectar_contratos_para_consolidado(
-        estructura=ESTRUCTURA_PROYECTOS,
-        nivel=nivel_cons,
-        alcance_sel=alcance_sel,
-        sub_sel=sub_sel,
-        tipo_sel=tipo_sel,
-        contrato_sel=contrato_sel,
-    )
+            grupos_dfs = {}
+            filas_detalle = []
 
-    grupos_dfs = {}
-    filas_detalle = []
+            for idx, c_ctx in enumerate(contratos_a_consolidar, start=1):
+                c_nom = c_ctx["_contrato"]
+                estado_prog.caption(
+                    f"🔄 Procesando ({idx}/{total_c}): **{c_ctx['_subproyecto']}** → `{c_nom}`"
+                )
+                res_c = extraer_datos_contrato_completo(
+                    contrato_key=f"{c_ctx['_alcance']}::{c_ctx['_subproyecto']}::{c_ctx['_tipo_obra']}::{c_nom}",
+                    info_contrato_tuple=_congelar_estructura(c_ctx),
+                    periodo_corte=periodo_actual,
+                    version_cache=st.session_state.version_cache,
+                )
+                cp = res_c.get("col_pendiente", "PENDIENTE POR")
+                for carp_nom, df_full in res_c.get("datos_completos", {}).items():
+                    df_full_u = normalizar_columnas_mayusculas(df_full) if df_full is not None else pd.DataFrame()
+                    rk = construir_resumen_carpeta(df_full_u, cp)
+                    meta_fila = {
+                        "ALCANCE": c_ctx["_alcance"],
+                        "SUBPROYECTO": c_ctx["_subproyecto"],
+                        "TIPO DE OBRA": c_ctx["_tipo_obra"],
+                        "CONTRATO": c_nom,
+                        "CARPETA": carp_nom,
+                    }
+                    filas_detalle.append({**meta_fila, **rk})
 
-    with st.spinner(f"Consolidando {nivel_cons}: {etiqueta_objetivo}..."):
-        for c_ctx in contratos_a_consolidar:
-            c_nom = c_ctx["_contrato"]
-            res_c = extraer_datos_contrato_completo(
-                contrato_key=f"{c_ctx['_alcance']}::{c_ctx['_subproyecto']}::{c_ctx['_tipo_obra']}::{c_nom}",
-                info_contrato_tuple=_congelar_estructura(c_ctx),
-                periodo_corte=periodo_actual,
-                version_cache=st.session_state.version_cache,
-            )
-            cp = res_c.get("col_pendiente", "PENDIENTE POR")
-            for carp_nom, df_full in res_c.get("datos_completos", {}).items():
-                df_full_u = normalizar_columnas_mayusculas(df_full) if df_full is not None else pd.DataFrame()
-                rk = construir_resumen_carpeta(df_full_u, cp)
-                meta_fila = {
-                    "ALCANCE": c_ctx["_alcance"],
-                    "PROYECTO": c_ctx["_subproyecto"],
-                    "TIPO DE OBRA": c_ctx["_tipo_obra"],
-                    "CONTRATO": c_nom,
-                    "CARPETA": carp_nom,
-                }
-                filas_detalle.append({**meta_fila, **rk})
+                    clave_grupo = meta_fila[agrupar_por]
+                    if clave_grupo not in grupos_dfs:
+                        grupos_dfs[clave_grupo] = {"dfs": [], "col_pendiente": cp}
+                    if not df_full_u.empty:
+                        grupos_dfs[clave_grupo]["dfs"].append(df_full_u)
 
-                clave_grupo = meta_fila[agrupar_por]
-                if clave_grupo not in grupos_dfs:
-                    grupos_dfs[clave_grupo] = {"dfs": [], "col_pendiente": cp}
-                if not df_full_u.empty:
-                    grupos_dfs[clave_grupo]["dfs"].append(df_full_u)
+                barra.progress(
+                    idx / total_c,
+                    text=f"Consolidado: {idx}/{total_c} contrato(s) procesados ({int(idx / total_c * 100)}%)",
+                )
 
-    filas_agrupadas = []
-    for clave_grupo, info_g in grupos_dfs.items():
-        df_comb = pd.concat(info_g["dfs"], ignore_index=True) if info_g["dfs"] else pd.DataFrame()
-        rk_g = construir_resumen_carpeta(df_comb, info_g["col_pendiente"])
-        filas_agrupadas.append({
-            agrupar_por: clave_grupo,
-            **rk_g,
-        })
+            filas_agrupadas = []
+            for clave_grupo, info_g in grupos_dfs.items():
+                df_comb = pd.concat(info_g["dfs"], ignore_index=True) if info_g["dfs"] else pd.DataFrame()
+                rk_g = construir_resumen_carpeta(df_comb, info_g["col_pendiente"])
+                filas_agrupadas.append({
+                    agrupar_por: clave_grupo,
+                    **rk_g,
+                })
 
-    df_agrupado = pd.DataFrame(filas_agrupadas)
-    df_detalle = pd.DataFrame(filas_detalle)
+            barra.empty()
+            estado_prog.empty()
 
-    if not df_agrupado.empty:
+            st.session_state["consolidado_resultado"] = {
+                "df_agrupado": pd.DataFrame(filas_agrupadas),
+                "df_detalle": pd.DataFrame(filas_detalle),
+                "agrupar_por": agrupar_por,
+                "meta": {
+                    "fecha": fecha_export_str,
+                    "alcance": ", ".join(alcances_cons) if alcances_cons else "Ninguno",
+                    "subproyecto": ", ".join(subs_cons) if subs_cons else "Ninguno",
+                    "tipo_obra": ", ".join(tipos_cons) if tipos_cons else "Ninguno",
+                    "contrato": ", ".join(contratos_cons) if contratos_cons else "Ninguno",
+                },
+                "total_contratos": total_c,
+            }
+
+    res_cons = st.session_state.get("consolidado_resultado")
+    if res_cons and not res_cons["df_agrupado"].empty:
+        df_agrupado = res_cons["df_agrupado"]
+        df_detalle = res_cons["df_detalle"]
+        agrup_actual = res_cons["agrupar_por"]
+        meta_cons = res_cons["meta"]
+
+        st.success(f"✅ Consolidado generado sobre **{res_cons['total_contratos']}** contrato(s), agrupado por **{agrup_actual}**.")
+
         tot_s = int(df_agrupado["TOTAL"].sum())
         cer_s = int(df_agrupado["CERRADOS"].sum())
         pen_s = int(df_agrupado["PENDIENTES"].sum())
         av_s = round(cer_s / tot_s * 100, 1) if tot_s > 0 else 0.0
 
         ks1, ks2, ks3, ks4 = st.columns(4)
-        ks1.metric(f"📄 Total {nivel_cons}", tot_s)
+        ks1.metric("📄 Total Documentos", tot_s)
         ks2.metric("✅ Cerrados", cer_s)
         ks3.metric("⏳ Pendientes", pen_s)
         ks4.metric("📈 Avance Global", f"{av_s:.1f}%")
 
         fig_s = px.bar(
             df_agrupado,
-            x=agrupar_por,
+            x=agrup_actual,
             y=["CERRADOS", "PENDIENTES"],
             barmode="stack",
             color_discrete_map={"CERRADOS": "#28a745", "PENDIENTES": "#ffc107"},
-            title=f"📊 Avance por {agrupar_por.title()} — {etiqueta_objetivo}",
+            title=f"📊 Avance Consolidado por {agrup_actual.title()}",
         )
         fig_s.update_layout(height=360, xaxis_title="", yaxis_title="Documentos")
         st.plotly_chart(fig_s, width="stretch")
 
-        st.markdown(f"#### 📋 Resumen Agrupado por {agrupar_por}")
+        st.markdown(f"#### 📋 Resumen Agrupado por {agrup_actual}")
         st.dataframe(
             df_agrupado,
             width="stretch",
@@ -1613,7 +1713,7 @@ elif modo_vista == "🗂️ Consolidado":
             column_config=obtener_config_columnas_porcentaje(df_agrupado),
         )
 
-        if agrupar_por != "CARPETA" and not df_detalle.empty:
+        if agrup_actual != "CARPETA" and not df_detalle.empty:
             with st.expander("📂 Ver desglose completo por carpeta", expanded=False):
                 st.dataframe(
                     df_detalle,
@@ -1622,21 +1722,13 @@ elif modo_vista == "🗂️ Consolidado":
                     column_config=obtener_config_columnas_porcentaje(df_detalle),
                 )
 
-        meta_cons = {
-            "fecha": fecha_export_str,
-            "alcance": alcance_sel,
-            "subproyecto": sub_sel if nivel_cons != "Alcance" else "Todos",
-            "tipo_obra": tipo_sel if nivel_cons in ("Tipo de Obra", "Contrato") else "Todos",
-            "contrato": contrato_sel if nivel_cons == "Contrato" else "Todos",
-        }
-        nombre_archivo_cons = f"Consolidado_{nivel_cons}_{agrupar_por}".replace(" ", "_")
-
+        nombre_archivo_cons = f"Consolidado_{agrup_actual}".replace(" ", "_")
         c_dl1, c_dl2 = st.columns(2)
         c_dl1.download_button(
             label="📥 Descargar Consolidado (Excel)",
             data=exportar_df_a_excel(
                 df_agrupado,
-                f"Consolidado por {nivel_cons} ({etiqueta_objetivo}) - Agrupado por {agrupar_por}",
+                f"Consolidado Documentario - Agrupado por {agrup_actual}",
                 meta_cons,
                 RUTA_LOGO,
             ),
@@ -1649,7 +1741,7 @@ elif modo_vista == "🗂️ Consolidado":
             label="📄 Descargar Consolidado (PDF)",
             data=exportar_df_a_pdf(
                 df_agrupado,
-                f"Consolidado por {nivel_cons} ({etiqueta_objetivo}) - Agrupado por {agrupar_por}",
+                f"Consolidado Documentario - Agrupado por {agrup_actual}",
                 meta_cons,
                 RUTA_LOGO,
             ),
@@ -1659,7 +1751,7 @@ elif modo_vista == "🗂️ Consolidado":
             width="stretch",
         )
     else:
-        st.info("No hay información consolidada disponible para la selección actual.")
+        st.info("Selecciona los filtros que deseas consolidar y haz clic en **✅ Aplicar** para generar el reporte.")
 
 # --- 3. Reporte Global ---
 elif modo_vista == "🌐 Reporte Global":
