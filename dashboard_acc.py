@@ -87,6 +87,41 @@ ADMIN_USER = _leer_secreto_o_env("ADMIN_USER", "rcano")
 ADMIN_PASSWORD = _leer_secreto_o_env("ADMIN_PASSWORD", "shp2026")
 
 
+def normalizar_columnas_mayusculas(df: pd.DataFrame) -> pd.DataFrame:
+    if df is None:
+        return df
+    df_out = df.copy()
+    df_out.columns = [str(c).strip().upper() for c in df_out.columns]
+    return df_out
+
+
+def _es_columna_porcentaje(nombre_col: str) -> bool:
+    col_u = str(nombre_col).strip().upper()
+    return "%" in col_u or "PORCENTAJE" in col_u or "AVANCE" in col_u
+
+
+def obtener_config_columnas_porcentaje(df: pd.DataFrame) -> dict:
+    cfg = {}
+    if df is None or df.empty:
+        return cfg
+    for col in df.columns:
+        if _es_columna_porcentaje(col) and pd.api.types.is_numeric_dtype(df[col]):
+            cfg[col] = st.column_config.NumberColumn(str(col).upper(), format="%.1f%%")
+    return cfg
+
+
+def _resolver_col_pendiente(df: pd.DataFrame, col_pendiente: str = None):
+    if df is None or not col_pendiente:
+        return None
+    if col_pendiente in df.columns:
+        return col_pendiente
+    objetivo = str(col_pendiente).strip().upper()
+    for c in df.columns:
+        if str(c).strip().upper() == objetivo:
+            return c
+    return None
+
+
 def listar_carpetas_de_estructura(estructura: dict) -> list[dict]:
     items = []
     if not isinstance(estructura, dict):
@@ -134,6 +169,64 @@ def listar_carpetas_de_estructura(estructura: dict) -> list[dict]:
                             },
                         })
     return items
+
+
+def recolectar_contratos_para_consolidado(
+    estructura: dict,
+    nivel: str,
+    alcance_sel: str,
+    sub_sel: str,
+    tipo_sel: str,
+    contrato_sel: str,
+) -> list[dict]:
+    contratos_out = []
+    if not isinstance(estructura, dict) or not alcance_sel:
+        return contratos_out
+
+    subs_dict = estructura.get(alcance_sel, {})
+    if not isinstance(subs_dict, dict):
+        return contratos_out
+
+    for s_nom, s_info in subs_dict.items():
+        if s_nom == "config" or not isinstance(s_info, dict):
+            continue
+        if nivel in ("Proyecto", "Tipo de Obra", "Contrato") and s_nom != sub_sel:
+            continue
+
+        cfg_sub = s_info.get("config", {}) if isinstance(s_info.get("config"), dict) else {}
+        obras_dict = (
+            s_info.get("tipos_obra")
+            if isinstance(s_info.get("tipos_obra"), dict)
+            else {k: v for k, v in s_info.items() if k != "config" and isinstance(v, dict)}
+        )
+
+        for t_obra, c_dict in obras_dict.items():
+            if not isinstance(c_dict, dict):
+                continue
+            if nivel in ("Tipo de Obra", "Contrato") and t_obra != tipo_sel:
+                continue
+
+            for c_nom, c_info in c_dict.items():
+                if not isinstance(c_info, dict):
+                    continue
+                if nivel == "Contrato" and c_nom != contrato_sel:
+                    continue
+
+                c_ctx = dict(c_info)
+                if not c_ctx.get("campos_personalizados") and cfg_sub.get("campos_personalizados"):
+                    c_ctx["campos_personalizados"] = cfg_sub.get("campos_personalizados", {})
+                if not c_ctx.get("id_campo_fecha") and cfg_sub.get("id_campo_fecha"):
+                    c_ctx["id_campo_fecha"] = cfg_sub.get("id_campo_fecha", "6011839")
+                if not c_ctx.get("id_campo_pendiente") and cfg_sub.get("id_campo_pendiente"):
+                    c_ctx["id_campo_pendiente"] = cfg_sub.get("id_campo_pendiente", "6011840")
+
+                c_ctx["_alcance"] = alcance_sel
+                c_ctx["_subproyecto"] = s_nom
+                c_ctx["_tipo_obra"] = t_obra
+                c_ctx["_contrato"] = c_nom
+                contratos_out.append(c_ctx)
+
+    return contratos_out
 
 
 @st.cache_data(show_spinner=False, ttl=2800, max_entries=4)
@@ -363,9 +456,10 @@ def _limpiar_dias_entero(df: pd.DataFrame, col_pendiente: str) -> pd.DataFrame:
     df = df.copy()
     if "DIAS" in df.columns:
         df["DIAS"] = pd.to_numeric(df["DIAS"], errors="coerce").fillna(0).round(0).astype(int)
-        if col_pendiente and col_pendiente in df.columns:
+        col_pen_real = _resolver_col_pendiente(df, col_pendiente)
+        if col_pen_real:
             df.loc[
-                df[col_pendiente].astype(str).str.strip().str.upper() == "CERRADO",
+                df[col_pen_real].astype(str).str.strip().str.upper() == "CERRADO",
                 "DIAS",
             ] = 0
     return df
@@ -385,7 +479,7 @@ def _normalizar_df_carpeta(
     carpeta: str,
 ):
     if not datos_carpeta:
-        cols_vacias = [c for c in orden_columnas_deseado if c] or list(ORDEN_COLUMNAS_DASHBOARD)
+        cols_vacias = [str(c).upper() for c in orden_columnas_deseado if c] or list(ORDEN_COLUMNAS_DASHBOARD)
         vacio = pd.DataFrame(columns=cols_vacias)
         return vacio, vacio
 
@@ -417,9 +511,10 @@ def _normalizar_df_carpeta(
         "ITEM_ATTRIBUTES_EXTENSION_DATA_DESCRIPTION": "DESCRIPCION",
     }
     for cid, nombre_col in (campos_personalizados or {}).items():
-        renombres[f"CAMPO_CUSTOM_{cid}"] = nombre_col
+        renombres[f"CAMPO_CUSTOM_{cid}"] = str(nombre_col).strip().upper()
 
     df_todo = df_completo.rename(columns=renombres)
+    df_todo = normalizar_columnas_mayusculas(df_todo)
     df_todo = _limpiar_dias_entero(df_todo, col_pendiente)
 
     df_todo["ALCANCE"] = alcance
@@ -428,7 +523,8 @@ def _normalizar_df_carpeta(
     df_todo["CONTRATO"] = contrato
     df_todo["CARPETA"] = carpeta
 
-    cols_vista = [c for c in (orden_columnas_deseado or ORDEN_COLUMNAS_DASHBOARD) if c in df_todo.columns]
+    orden_u = [str(c).strip().upper() for c in (orden_columnas_deseado or ORDEN_COLUMNAS_DASHBOARD)]
+    cols_vista = [c for c in orden_u if c in df_todo.columns]
     if not cols_vista:
         cols_vista = [c for c in ORDEN_COLUMNAS_DASHBOARD if c in df_todo.columns]
 
@@ -469,10 +565,10 @@ def _procesar_carpeta_config(
                 incluir_extra=True,
             )
             if df_bd is not None and not df_bd.empty:
-                df_todo_bd = _limpiar_dias_entero(df_bd, col_pendiente)
-                cols_vista = [
-                    c for c in (orden_columnas_deseado or ORDEN_COLUMNAS_DASHBOARD) if c in df_todo_bd.columns
-                ]
+                df_todo_bd = normalizar_columnas_mayusculas(df_bd)
+                df_todo_bd = _limpiar_dias_entero(df_todo_bd, col_pendiente)
+                orden_u = [str(c).strip().upper() for c in (orden_columnas_deseado or ORDEN_COLUMNAS_DASHBOARD)]
+                cols_vista = [c for c in orden_u if c in df_todo_bd.columns]
                 if not cols_vista:
                     cols_vista = [c for c in ORDEN_COLUMNAS_DASHBOARD if c in df_todo_bd.columns]
                 df_vista_bd = df_todo_bd[cols_vista].copy()
@@ -587,7 +683,7 @@ def extraer_datos_contrato_completo(
 
     id_campo_fecha = str(info_contrato.get("id_campo_fecha", ""))
     id_campo_pendiente = str(info_contrato.get("id_campo_pendiente", ""))
-    col_pendiente = campos_personalizados.get(id_campo_pendiente, "PENDIENTE POR")
+    col_pendiente = str(campos_personalizados.get(id_campo_pendiente, "PENDIENTE POR")).strip().upper()
 
     orden_cols = info_contrato.get("columnas_visibles")
     if not isinstance(orden_cols, list) or not orden_cols:
@@ -649,7 +745,7 @@ def ejecutar_actualizacion_contrato_actual(info_contrato_ctx: dict, periodo_cort
     campos_pers = info_contrato_ctx.get("campos_personalizados") or {}
     id_fecha = str(info_contrato_ctx.get("id_campo_fecha", "6011839"))
     id_pend = str(info_contrato_ctx.get("id_campo_pendiente", "6011840"))
-    col_pen = campos_pers.get(id_pend, "PENDIENTE POR")
+    col_pen = str(campos_pers.get(id_pend, "PENDIENTE POR")).strip().upper()
     ids_excl = {
         extraer_project_y_folder_id(u)[1]
         for u in info_contrato_ctx.get("urls_excluidas", [])
@@ -691,17 +787,18 @@ def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict
     total = len(df_full) if df_full is not None else 0
     if total == 0:
         return {
-            "Cerrados": 0,
-            "Pendientes": 0,
-            "Total": 0,
-            "Avance (%)": 0.0,
-            "Mayor Retraso": "Sin datos",
+            "CERRADOS": 0,
+            "PENDIENTES": 0,
+            "TOTAL": 0,
+            "AVANCE (%)": 0.0,
+            "MAYOR RETRASO": "Sin datos",
         }
 
     cerrados = 0
     mayor_retraso = "Sin pendientes"
-    if col_pendiente and col_pendiente in df_full.columns:
-        est_u = df_full[col_pendiente].astype(str).str.strip().str.upper()
+    col_pen_real = _resolver_col_pendiente(df_full, col_pendiente)
+    if col_pen_real:
+        est_u = df_full[col_pen_real].astype(str).str.strip().str.upper()
         cerrados = int((est_u == "CERRADO").sum())
 
         df_abiertos = df_full[est_u != "CERRADO"].copy()
@@ -711,7 +808,7 @@ def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict
                 idx_max = df_abiertos["DIAS_NUM"].idxmax()
                 cod = str(df_abiertos.loc[idx_max, "CODIGO"]) if "CODIGO" in df_abiertos.columns else "Doc"
                 d_max = int(df_abiertos.loc[idx_max, "DIAS_NUM"])
-                resp = str(df_abiertos.loc[idx_max, col_pendiente]).strip()
+                resp = str(df_abiertos.loc[idx_max, col_pen_real]).strip()
                 mayor_retraso = f"{cod} ({d_max} d) [{resp}]"
             else:
                 mayor_retraso = "Sin retrasos"
@@ -719,34 +816,34 @@ def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict
     pendientes = total - cerrados
     avance = round((cerrados / total * 100), 1) if total > 0 else 0.0
     return {
-        "Cerrados": cerrados,
-        "Pendientes": pendientes,
-        "Total": total,
-        "Avance (%)": avance,
-        "Mayor Retraso": mayor_retraso,
+        "CERRADOS": cerrados,
+        "PENDIENTES": pendientes,
+        "TOTAL": total,
+        "AVANCE (%)": avance,
+        "MAYOR RETRASO": mayor_retraso,
     }
 
 
 def construir_tabla_resumen_por_estado(df_full: pd.DataFrame, incluir_total: bool = True) -> pd.DataFrame:
     if df_full is None or df_full.empty or "ESTADO" not in df_full.columns:
-        return pd.DataFrame(columns=["Estado", "Cantidad", "Porcentaje (%)"])
+        return pd.DataFrame(columns=["ESTADO", "CANTIDAD", "PORCENTAJE (%)"])
     s = df_full["ESTADO"].fillna("").astype(str).str.strip()
     s = s.replace({"": "Sin Estado", "nan": "Sin Estado", "None": "Sin Estado"})
     vc = s.value_counts()
     total = int(len(df_full))
     filas = [
         {
-            "Estado": k,
-            "Cantidad": int(v),
-            "Porcentaje (%)": round(int(v) / max(1, total) * 100, 1),
+            "ESTADO": k,
+            "CANTIDAD": int(v),
+            "PORCENTAJE (%)": round(int(v) / max(1, total) * 100, 1),
         }
         for k, v in vc.items()
     ]
     if incluir_total and filas:
         filas.append({
-            "Estado": "TOTAL",
-            "Cantidad": total,
-            "Porcentaje (%)": 100.0,
+            "ESTADO": "TOTAL",
+            "CANTIDAD": total,
+            "PORCENTAJE (%)": 100.0,
         })
     return pd.DataFrame(filas)
 
@@ -782,20 +879,21 @@ def renderizar_graficos_carpeta(df_t: pd.DataFrame, col_pendiente: str, nombre_c
 
     g1, g2 = st.columns(2)
     with g1:
-        if col_pendiente in df_t.columns:
-            serie_p = df_t[col_pendiente].fillna("").astype(str).str.strip()
+        col_pen_real = _resolver_col_pendiente(df_t, col_pendiente)
+        if col_pen_real:
+            serie_p = df_t[col_pen_real].fillna("").astype(str).str.strip()
             serie_p = serie_p.replace({"": "Sin Asignar", "nan": "Sin Asignar", "None": "Sin Asignar"})
             df_p = serie_p.value_counts().reset_index()
-            df_p.columns = ["Responsable", "Cantidad"]
-            mapa_colores = {r: color_barra_responsable(r) for r in df_p["Responsable"]}
+            df_p.columns = ["RESPONSABLE", "CANTIDAD"]
+            mapa_colores = {r: color_barra_responsable(r) for r in df_p["RESPONSABLE"]}
 
             fig_p = px.bar(
                 df_p,
-                x="Responsable",
-                y="Cantidad",
-                color="Responsable",
+                x="RESPONSABLE",
+                y="CANTIDAD",
+                color="RESPONSABLE",
                 color_discrete_map=mapa_colores,
-                text="Cantidad",
+                text="CANTIDAD",
                 title=f"📊 Distribución por Responsable — {nombre_carpeta}",
             )
             fig_p.update_traces(textposition="outside")
@@ -813,10 +911,10 @@ def renderizar_graficos_carpeta(df_t: pd.DataFrame, col_pendiente: str, nombre_c
         if not df_est.empty:
             fig_e = px.bar(
                 df_est,
-                x="Estado",
-                y="Cantidad",
-                color="Estado",
-                text="Cantidad",
+                x="ESTADO",
+                y="CANTIDAD",
+                color="ESTADO",
+                text="CANTIDAD",
                 title=f"📊 Distribución por Estado — {nombre_carpeta}",
             )
             fig_e.update_traces(textposition="outside")
@@ -831,15 +929,16 @@ def renderizar_graficos_carpeta(df_t: pd.DataFrame, col_pendiente: str, nombre_c
 
 
 def preparar_df_con_links(df_vista: pd.DataFrame, df_full: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    df_out = df_vista.copy()
-    col_cfg = {}
+    df_out = normalizar_columnas_mayusculas(df_vista)
+    df_full_u = normalizar_columnas_mayusculas(df_full) if df_full is not None else None
+    col_cfg = obtener_config_columnas_porcentaje(df_out)
 
     if "DIAS" in df_out.columns:
         df_out["DIAS"] = pd.to_numeric(df_out["DIAS"], errors="coerce").fillna(0).round(0).astype(int)
         col_cfg["DIAS"] = st.column_config.NumberColumn("DIAS", format="%d")
 
-    if "CODIGO" in df_out.columns and df_full is not None and "URL_DOC" in df_full.columns:
-        urls_serie = df_full["URL_DOC"].reindex(df_out.index).fillna("").astype(str).str.strip()
+    if "CODIGO" in df_out.columns and df_full_u is not None and "URL_DOC" in df_full_u.columns:
+        urls_serie = df_full_u["URL_DOC"].reindex(df_out.index).fillna("").astype(str).str.strip()
         tiene_links = urls_serie.str.startswith("http").any()
         if tiene_links:
             codigos_link = []
@@ -861,11 +960,12 @@ def preparar_df_con_links(df_vista: pd.DataFrame, df_full: pd.DataFrame) -> tupl
 def estilizar_tabla_streamlit(df: pd.DataFrame, col_pendiente: str = None):
     if df is None or df.empty:
         return df
-    if not col_pendiente or col_pendiente not in df.columns:
+    col_pen_real = _resolver_col_pendiente(df, col_pendiente)
+    if not col_pen_real:
         return df.style
 
     def _aplicar_estilo_fila(row):
-        bg, fg = obtener_colores_estado(row[col_pendiente])
+        bg, fg = obtener_colores_estado(row[col_pen_real])
         return [f"background-color: {bg}; color: {fg}; font-weight: 500;" for _ in row]
 
     return df.style.apply(_aplicar_estilo_fila, axis=1)
@@ -899,32 +999,45 @@ def exportar_df_a_excel(
         ws[f"A{r_i}"].font = Font(bold=True)
 
     fila_ini = 9
-    if df is not None and not df.empty:
-        for col_num, col_name in enumerate(df.columns, 1):
-            c = ws.cell(row=fila_ini, column=col_num, value=str(col_name))
+    df_exp = normalizar_columnas_mayusculas(df) if df is not None else pd.DataFrame()
+    if not df_exp.empty:
+        cols_exp = list(df_exp.columns)
+        for col_num, col_name in enumerate(cols_exp, 1):
+            col_u = str(col_name).upper()
+            c = ws.cell(row=fila_ini, column=col_num, value=col_u)
             c.font = Font(bold=True, color="FFFFFF")
             c.fill = PatternFill(start_color="1A365D", end_color="1A365D", fill_type="solid")
             c.alignment = Alignment(horizontal="center")
-            col_u = str(col_name).upper()
-            ancho = 42 if col_u == "DESCRIPCION" else (28 if col_u == "CODIGO" else 18)
+            ancho = 42 if col_u in ("DESCRIPCION", "MAYOR RETRASO") else (28 if col_u == "CODIGO" else 18)
             ws.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = ancho
 
-        idx_pen = (
-            df.columns.tolist().index(col_pendiente)
-            if (col_pendiente and col_pendiente in df.columns)
-            else None
-        )
-        for r_idx, row_data in enumerate(df.values, fila_ini + 1):
+        col_pen_real = _resolver_col_pendiente(df_exp, col_pendiente)
+        idx_pen = cols_exp.index(col_pen_real) if col_pen_real else None
+
+        for r_idx, row_data in enumerate(df_exp.values, fila_ini + 1):
             bg_hex, fg_hex = "FFFFFF", "000000"
             if idx_pen is not None:
                 bg, fg = obtener_colores_estado(row_data[idx_pen])
                 bg_hex, fg_hex = bg.replace("#", ""), fg.replace("#", "")
             for c_idx, val in enumerate(row_data, 1):
-                cell = ws.cell(row=r_idx, column=c_idx, value="" if pd.isna(val) else val)
+                col_n = cols_exp[c_idx - 1]
+                if pd.isna(val):
+                    valor_celda = ""
+                    es_pct_num = False
+                elif _es_columna_porcentaje(col_n) and isinstance(val, (int, float, np.number)):
+                    valor_celda = float(val) / 100.0
+                    es_pct_num = True
+                else:
+                    valor_celda = val
+                    es_pct_num = False
+
+                cell = ws.cell(row=r_idx, column=c_idx, value=valor_celda)
+                if es_pct_num:
+                    cell.number_format = "0.0%"
                 cell.fill = PatternFill(start_color=bg_hex, end_color=bg_hex, fill_type="solid")
                 cell.font = Font(color=fg_hex)
 
-        fila_pie = fila_ini + len(df) + 2
+        fila_pie = fila_ini + len(df_exp) + 2
     else:
         fila_pie = fila_ini + 2
 
@@ -991,8 +1104,9 @@ def exportar_df_a_pdf(
     elements.append(cab)
     elements.append(Spacer(1, 12))
 
-    if df is not None and not df.empty:
-        enc = [Paragraph(str(c), header_style) for c in df.columns]
+    df_exp = normalizar_columnas_mayusculas(df) if df is not None else pd.DataFrame()
+    if not df_exp.empty:
+        enc = [Paragraph(str(c).upper(), header_style) for c in df_exp.columns]
         mat = [enc]
         estilos = [
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1A365D")),
@@ -1000,27 +1114,37 @@ def exportar_df_a_pdf(
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#D1D5DB")),
         ]
-        for r_idx, (_, row) in enumerate(df.iterrows(), start=1):
-            if col_pendiente and col_pendiente in df.columns:
-                bg_c, fg_c = obtener_colores_estado(row[col_pendiente])
+        col_pen_real = _resolver_col_pendiente(df_exp, col_pendiente)
+
+        for r_idx, (_, row) in enumerate(df_exp.iterrows(), start=1):
+            if col_pen_real:
+                bg_c, fg_c = obtener_colores_estado(row[col_pen_real])
             else:
                 bg_c = "#ffffff" if r_idx % 2 != 0 else "#f9fafb"
                 fg_c = "#000000"
             estilos.append(("BACKGROUND", (0, r_idx), (-1, r_idx), colors.HexColor(bg_c)))
             fila_p = []
-            for col_n in df.columns:
+            for col_n in df_exp.columns:
+                val = row[col_n]
+                if pd.isna(val):
+                    val_str = ""
+                elif _es_columna_porcentaje(col_n) and isinstance(val, (int, float, np.number)):
+                    val_str = f"{float(val):.1f}%"
+                else:
+                    val_str = str(val)
+
                 val_s = (
-                    ("" if pd.isna(row[col_n]) else str(row[col_n]))
+                    val_str
                     .replace("&", "&amp;")
                     .replace("<", "&lt;")
                     .replace(">", "&gt;")
                 )
-                if col_pendiente and col_pendiente in df.columns:
+                if col_pen_real:
                     val_s = f'<font color="{fg_c}">{val_s}</font>'
                 fila_p.append(Paragraph(val_s, cell_style))
             mat.append(fila_p)
 
-        anchos = [ancho_util / max(1, len(df.columns))] * len(df.columns)
+        anchos = [ancho_util / max(1, len(df_exp.columns))] * len(df_exp.columns)
         t = Table(mat, repeatRows=1, colWidths=anchos)
         t.setStyle(TableStyle(estilos))
         elements.append(t)
@@ -1088,30 +1212,35 @@ def _render_vista_carpeta(
 
     res_k = construir_resumen_carpeta(df_t, col_pendiente)
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("📄 Total Documentos", res_k["Total"])
-    k2.metric("✅ Cerrados", res_k["Cerrados"])
-    k3.metric("⏳ Pendientes", res_k["Pendientes"])
-    k4.metric("📈 Avance (%)", f"{res_k['Avance (%)']}%")
+    k1.metric("📄 Total Documentos", res_k["TOTAL"])
+    k2.metric("✅ Cerrados", res_k["CERRADOS"])
+    k3.metric("⏳ Pendientes", res_k["PENDIENTES"])
+    k4.metric("📈 Avance (%)", f"{res_k['AVANCE (%)']:.1f}%")
 
-    if res_k["Mayor Retraso"] not in ("Sin datos", "Sin pendientes", "Sin retrasos"):
-        st.warning(f"⏰ **Mayor retraso abierto:** {res_k['Mayor Retraso']}")
+    if res_k["MAYOR RETRASO"] not in ("Sin datos", "Sin pendientes", "Sin retrasos"):
+        st.warning(f"⏰ **Mayor retraso abierto:** {res_k['MAYOR RETRASO']}")
 
     renderizar_graficos_carpeta(df_t, col_pendiente, nombre_carpeta)
 
     with st.expander("📌 Tabla Resumen por Estado del Documento", expanded=True):
+        df_res_estado = construir_tabla_resumen_por_estado(df_t, incluir_total=True)
         st.dataframe(
-            construir_tabla_resumen_por_estado(df_t, incluir_total=True),
+            df_res_estado,
             width="stretch",
             hide_index=True,
+            column_config=obtener_config_columnas_porcentaje(df_res_estado),
         )
 
     st.markdown("#### 🔍 Filtros y Detalle Documentario")
     col_f1, col_f2, col_f3 = st.columns(3)
 
+    df_c_u = normalizar_columnas_mayusculas(df_c)
+    col_pen_real = _resolver_col_pendiente(df_c_u, col_pendiente)
+
     estados_disp = ["Todos"]
-    if "ESTADO" in df_c.columns:
+    if "ESTADO" in df_c_u.columns:
         serie_est_norm = (
-            df_c["ESTADO"]
+            df_c_u["ESTADO"]
             .fillna("")
             .astype(str)
             .str.strip()
@@ -1121,9 +1250,9 @@ def _render_vista_carpeta(
     f_estado = col_f1.selectbox("Filtrar por Estado", estados_disp, key=f"est_{nombre_carpeta}")
 
     pend_disp = ["Todos"]
-    if col_pendiente in df_c.columns:
+    if col_pen_real:
         serie_pen_norm = (
-            df_c[col_pendiente]
+            df_c_u[col_pen_real]
             .fillna("")
             .astype(str)
             .str.strip()
@@ -1133,7 +1262,7 @@ def _render_vista_carpeta(
     f_pend = col_f2.selectbox("Filtrar por Pendiente Por", pend_disp, key=f"pen_{nombre_carpeta}")
     f_busq = col_f3.text_input("Buscar código o descripción", key=f"busq_{nombre_carpeta}").strip()
 
-    df_filtrado = df_c.copy()
+    df_filtrado = df_c_u.copy()
     if f_estado != "Todos" and "ESTADO" in df_filtrado.columns:
         est_f = (
             df_filtrado["ESTADO"]
@@ -1143,9 +1272,9 @@ def _render_vista_carpeta(
             .replace({"": "Sin Estado", "nan": "Sin Estado", "None": "Sin Estado"})
         )
         df_filtrado = df_filtrado[est_f == f_estado]
-    if f_pend != "Todos" and col_pendiente in df_filtrado.columns:
+    if f_pend != "Todos" and col_pen_real:
         pen_f = (
-            df_filtrado[col_pendiente]
+            df_filtrado[col_pen_real]
             .fillna("")
             .astype(str)
             .str.strip()
@@ -1159,7 +1288,7 @@ def _render_vista_carpeta(
                 mask_b = mask_b | df_filtrado[col_b].astype(str).str.contains(f_busq, case=False, na=False)
         df_filtrado = df_filtrado[mask_b]
 
-    st.caption(f"Mostrando **{len(df_filtrado)}** de **{len(df_c)}** documentos en `{nombre_carpeta}`")
+    st.caption(f"Mostrando **{len(df_filtrado)}** de **{len(df_c_u)}** documentos en `{nombre_carpeta}`")
     if df_filtrado.empty:
         st.warning("No hay registros para mostrar en esta carpeta con el filtro o corte actual.")
     else:
@@ -1249,7 +1378,7 @@ with st.sidebar:
         "🧭 Vista del Dashboard",
         [
             "📁 Detalle de Contrato",
-            "🗂️ Consolidado de Subproyecto",
+            "🗂️ Consolidado",
             "🌐 Reporte Global",
             "🛠️ Constructor Dinámico",
             "🔐 Modo Administrador",
@@ -1327,8 +1456,8 @@ if modo_vista == "📁 Detalle de Contrato":
             dfs_v_all = []
             dfs_t_all = []
             for nom_c in nombres_carpetas:
-                df_vi = datos_vista[nom_c].copy()
-                df_ti = datos_completos.get(nom_c, df_vi).copy()
+                df_vi = normalizar_columnas_mayusculas(datos_vista[nom_c])
+                df_ti = normalizar_columnas_mayusculas(datos_completos.get(nom_c, df_vi))
                 if not df_vi.empty:
                     if "CARPETA" not in df_vi.columns:
                         df_vi.insert(0, "CARPETA", nom_c)
@@ -1365,77 +1494,172 @@ if modo_vista == "📁 Detalle de Contrato":
                     metadata_base=metadata_base,
                 )
 
-# --- 2. Consolidado de Subproyecto ---
-elif modo_vista == "🗂️ Consolidado de Subproyecto":
-    st.subheader(f"🗂️ Consolidado de Subproyecto: {sub_sel}")
-    filas_cons = []
-    obras_sub = (
-        info_sub.get("tipos_obra")
-        if isinstance(info_sub.get("tipos_obra"), dict)
-        else {k: v for k, v in info_sub.items() if k != "config" and isinstance(v, dict)}
+# --- 2. Consolidado (Alcance / Proyecto / Tipo de Obra / Contrato) ---
+elif modo_vista == "🗂️ Consolidado":
+    st.subheader("🗂️ Consolidado Documentario")
+
+    c_opt1, c_opt2 = st.columns(2)
+    with c_opt1:
+        nivel_cons = st.selectbox(
+            "📌 Consolidar por:",
+            ["Alcance", "Proyecto", "Tipo de Obra", "Contrato"],
+            index=1,
+            key="nivel_consolidado",
+        )
+
+    mapa_opciones_agrup = {
+        "Alcance": ["PROYECTO", "TIPO DE OBRA", "CONTRATO", "CARPETA", "ALCANCE"],
+        "Proyecto": ["CONTRATO", "TIPO DE OBRA", "CARPETA", "PROYECTO"],
+        "Tipo de Obra": ["CONTRATO", "CARPETA", "TIPO DE OBRA"],
+        "Contrato": ["CARPETA", "CONTRATO"],
+    }
+    opciones_agrup = mapa_opciones_agrup[nivel_cons]
+    with c_opt2:
+        agrupar_por = st.selectbox(
+            "📊 Agrupar tabla y gráfico por:",
+            opciones_agrup,
+            index=0,
+            key=f"agrupar_cons_{nivel_cons}",
+        )
+
+    etiqueta_objetivo = {
+        "Alcance": alcance_sel,
+        "Proyecto": sub_sel,
+        "Tipo de Obra": f"{sub_sel} → {tipo_sel}",
+        "Contrato": contrato_sel,
+    }[nivel_cons]
+    st.caption(f"Consolidando **{nivel_cons}**: `{etiqueta_objetivo}` | Agrupado por: **{agrupar_por}**")
+
+    contratos_a_consolidar = recolectar_contratos_para_consolidado(
+        estructura=ESTRUCTURA_PROYECTOS,
+        nivel=nivel_cons,
+        alcance_sel=alcance_sel,
+        sub_sel=sub_sel,
+        tipo_sel=tipo_sel,
+        contrato_sel=contrato_sel,
     )
-    for t_obra, c_dict in obras_sub.items():
-        if not isinstance(c_dict, dict):
-            continue
-        for c_nom, c_info in c_dict.items():
-            if not isinstance(c_info, dict):
-                continue
-            c_ctx = dict(c_info)
-            c_ctx["_alcance"] = alcance_sel
-            c_ctx["_subproyecto"] = sub_sel
-            c_ctx["_tipo_obra"] = t_obra
-            c_ctx["_contrato"] = c_nom
+
+    grupos_dfs = {}
+    filas_detalle = []
+
+    with st.spinner(f"Consolidando {nivel_cons}: {etiqueta_objetivo}..."):
+        for c_ctx in contratos_a_consolidar:
+            c_nom = c_ctx["_contrato"]
             res_c = extraer_datos_contrato_completo(
-                contrato_key=c_nom,
+                contrato_key=f"{c_ctx['_alcance']}::{c_ctx['_subproyecto']}::{c_ctx['_tipo_obra']}::{c_nom}",
                 info_contrato_tuple=_congelar_estructura(c_ctx),
                 periodo_corte=periodo_actual,
                 version_cache=st.session_state.version_cache,
             )
             cp = res_c.get("col_pendiente", "PENDIENTE POR")
             for carp_nom, df_full in res_c.get("datos_completos", {}).items():
-                rk = construir_resumen_carpeta(df_full, cp)
-                filas_cons.append({
-                    "Tipo de Obra": t_obra,
-                    "Contrato": c_nom,
-                    "Carpeta": carp_nom,
-                    **rk,
-                })
+                df_full_u = normalizar_columnas_mayusculas(df_full) if df_full is not None else pd.DataFrame()
+                rk = construir_resumen_carpeta(df_full_u, cp)
+                meta_fila = {
+                    "ALCANCE": c_ctx["_alcance"],
+                    "PROYECTO": c_ctx["_subproyecto"],
+                    "TIPO DE OBRA": c_ctx["_tipo_obra"],
+                    "CONTRATO": c_nom,
+                    "CARPETA": carp_nom,
+                }
+                filas_detalle.append({**meta_fila, **rk})
 
-    df_cons = pd.DataFrame(filas_cons)
-    if not df_cons.empty:
-        tot_s = int(df_cons["Total"].sum())
-        cer_s = int(df_cons["Cerrados"].sum())
-        pen_s = int(df_cons["Pendientes"].sum())
+                clave_grupo = meta_fila[agrupar_por]
+                if clave_grupo not in grupos_dfs:
+                    grupos_dfs[clave_grupo] = {"dfs": [], "col_pendiente": cp}
+                if not df_full_u.empty:
+                    grupos_dfs[clave_grupo]["dfs"].append(df_full_u)
+
+    filas_agrupadas = []
+    for clave_grupo, info_g in grupos_dfs.items():
+        df_comb = pd.concat(info_g["dfs"], ignore_index=True) if info_g["dfs"] else pd.DataFrame()
+        rk_g = construir_resumen_carpeta(df_comb, info_g["col_pendiente"])
+        filas_agrupadas.append({
+            agrupar_por: clave_grupo,
+            **rk_g,
+        })
+
+    df_agrupado = pd.DataFrame(filas_agrupadas)
+    df_detalle = pd.DataFrame(filas_detalle)
+
+    if not df_agrupado.empty:
+        tot_s = int(df_agrupado["TOTAL"].sum())
+        cer_s = int(df_agrupado["CERRADOS"].sum())
+        pen_s = int(df_agrupado["PENDIENTES"].sum())
         av_s = round(cer_s / tot_s * 100, 1) if tot_s > 0 else 0.0
 
         ks1, ks2, ks3, ks4 = st.columns(4)
-        ks1.metric("📄 Total Subproyecto", tot_s)
+        ks1.metric(f"📄 Total {nivel_cons}", tot_s)
         ks2.metric("✅ Cerrados", cer_s)
         ks3.metric("⏳ Pendientes", pen_s)
-        ks4.metric("📈 Avance Global", f"{av_s}%")
+        ks4.metric("📈 Avance Global", f"{av_s:.1f}%")
 
-        df_graf_s = df_cons.groupby("Contrato", as_index=False)[["Cerrados", "Pendientes"]].sum()
         fig_s = px.bar(
-            df_graf_s,
-            x="Contrato",
-            y=["Cerrados", "Pendientes"],
+            df_agrupado,
+            x=agrupar_por,
+            y=["CERRADOS", "PENDIENTES"],
             barmode="stack",
-            color_discrete_map={"Cerrados": "#28a745", "Pendientes": "#ffc107"},
-            title=f"📊 Avance por Contrato — {sub_sel}",
+            color_discrete_map={"CERRADOS": "#28a745", "PENDIENTES": "#ffc107"},
+            title=f"📊 Avance por {agrupar_por.title()} — {etiqueta_objetivo}",
         )
         fig_s.update_layout(height=360, xaxis_title="", yaxis_title="Documentos")
         st.plotly_chart(fig_s, width="stretch")
 
-        st.dataframe(df_cons, width="stretch", hide_index=True)
-        st.download_button(
+        st.markdown(f"#### 📋 Resumen Agrupado por {agrupar_por}")
+        st.dataframe(
+            df_agrupado,
+            width="stretch",
+            hide_index=True,
+            column_config=obtener_config_columnas_porcentaje(df_agrupado),
+        )
+
+        if agrupar_por != "CARPETA" and not df_detalle.empty:
+            with st.expander("📂 Ver desglose completo por carpeta", expanded=False):
+                st.dataframe(
+                    df_detalle,
+                    width="stretch",
+                    hide_index=True,
+                    column_config=obtener_config_columnas_porcentaje(df_detalle),
+                )
+
+        meta_cons = {
+            "fecha": fecha_export_str,
+            "alcance": alcance_sel,
+            "subproyecto": sub_sel if nivel_cons != "Alcance" else "Todos",
+            "tipo_obra": tipo_sel if nivel_cons in ("Tipo de Obra", "Contrato") else "Todos",
+            "contrato": contrato_sel if nivel_cons == "Contrato" else "Todos",
+        }
+        nombre_archivo_cons = f"Consolidado_{nivel_cons}_{agrupar_por}".replace(" ", "_")
+
+        c_dl1, c_dl2 = st.columns(2)
+        c_dl1.download_button(
             label="📥 Descargar Consolidado (Excel)",
-            data=exportar_df_a_excel(df_cons, f"Consolidado {sub_sel}", metadata_base, RUTA_LOGO),
-            file_name=f"Consolidado_{sub_sel}.xlsx".replace(" ", "_"),
+            data=exportar_df_a_excel(
+                df_agrupado,
+                f"Consolidado por {nivel_cons} ({etiqueta_objetivo}) - Agrupado por {agrupar_por}",
+                meta_cons,
+                RUTA_LOGO,
+            ),
+            file_name=f"{nombre_archivo_cons}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             key="dl_cons_sub_xlsx",
+            width="stretch",
+        )
+        c_dl2.download_button(
+            label="📄 Descargar Consolidado (PDF)",
+            data=exportar_df_a_pdf(
+                df_agrupado,
+                f"Consolidado por {nivel_cons} ({etiqueta_objetivo}) - Agrupado por {agrupar_por}",
+                meta_cons,
+                RUTA_LOGO,
+            ),
+            file_name=f"{nombre_archivo_cons}.pdf",
+            mime="application/pdf",
+            key="dl_cons_sub_pdf",
+            width="stretch",
         )
     else:
-        st.info("No hay información consolidada disponible para este subproyecto.")
+        st.info("No hay información consolidada disponible para la selección actual.")
 
 # --- 3. Reporte Global ---
 elif modo_vista == "🌐 Reporte Global":
@@ -1470,37 +1694,44 @@ elif modo_vista == "🌐 Reporte Global":
                 df_full = paq.get("datos_completos", {}).get(item_c["carpeta"], pd.DataFrame())
                 rk = construir_resumen_carpeta(df_full, cp)
                 filas_glob.append({
-                    "Subproyecto": item_c["subproyecto"],
-                    "Contrato": item_c["contrato"],
-                    "Carpeta": item_c["carpeta"],
+                    "ALCANCE": item_c["alcance"],
+                    "PROYECTO": item_c["subproyecto"],
+                    "TIPO DE OBRA": item_c["tipo_obra"],
+                    "CONTRATO": item_c["contrato"],
+                    "CARPETA": item_c["carpeta"],
                     **rk,
                 })
         df_glob = pd.DataFrame(filas_glob)
         if not df_glob.empty:
-            tot_g = int(df_glob["Total"].sum())
-            cer_g = int(df_glob["Cerrados"].sum())
-            pen_g = int(df_glob["Pendientes"].sum())
+            tot_g = int(df_glob["TOTAL"].sum())
+            cer_g = int(df_glob["CERRADOS"].sum())
+            pen_g = int(df_glob["PENDIENTES"].sum())
             av_g = round(cer_g / tot_g * 100, 1) if tot_g > 0 else 0.0
 
             kg1, kg2, kg3, kg4 = st.columns(4)
             kg1.metric("📄 Total Global", tot_g)
             kg2.metric("✅ Cerrados", cer_g)
             kg3.metric("⏳ Pendientes", pen_g)
-            kg4.metric("📈 Avance Global", f"{av_g}%")
+            kg4.metric("📈 Avance Global", f"{av_g:.1f}%")
 
-            df_graf_g = df_glob.groupby("Subproyecto", as_index=False)[["Cerrados", "Pendientes"]].sum()
+            df_graf_g = df_glob.groupby("PROYECTO", as_index=False)[["CERRADOS", "PENDIENTES"]].sum()
             fig_g = px.bar(
                 df_graf_g,
-                x="Subproyecto",
-                y=["Cerrados", "Pendientes"],
+                x="PROYECTO",
+                y=["CERRADOS", "PENDIENTES"],
                 barmode="stack",
-                color_discrete_map={"Cerrados": "#28a745", "Pendientes": "#ffc107"},
-                title="📊 Estado Documentario Global por Subproyecto",
+                color_discrete_map={"CERRADOS": "#28a745", "PENDIENTES": "#ffc107"},
+                title="📊 Estado Documentario Global por Proyecto",
             )
             fig_g.update_layout(height=360, xaxis_title="", yaxis_title="Documentos")
             st.plotly_chart(fig_g, width="stretch")
 
-            st.dataframe(df_glob, width="stretch", hide_index=True)
+            st.dataframe(
+                df_glob,
+                width="stretch",
+                hide_index=True,
+                column_config=obtener_config_columnas_porcentaje(df_glob),
+            )
             st.download_button(
                 label="📥 Descargar Reporte Global (Excel)",
                 data=exportar_df_a_excel(df_glob, "Reporte Global", metadata_base, RUTA_LOGO),
@@ -1525,7 +1756,7 @@ elif modo_vista == "🛠️ Constructor Dinámico":
         if carpetas_sel:
             dfs_unidos = []
             for cp_nom in carpetas_sel:
-                df_tmp = datos_completos[cp_nom].copy()
+                df_tmp = normalizar_columnas_mayusculas(datos_completos[cp_nom])
                 if "CARPETA" not in df_tmp.columns:
                     df_tmp["CARPETA"] = cp_nom
                 dfs_unidos.append(df_tmp)
@@ -1557,7 +1788,7 @@ elif modo_vista == "🛠️ Constructor Dinámico":
                         f"Reporte Dinámico - {contrato_sel}",
                         metadata_base,
                         RUTA_LOGO,
-                        col_pendiente if col_pendiente in df_pers_final.columns else None,
+                        col_pendiente if _resolver_col_pendiente(df_pers_final, col_pendiente) else None,
                     )
                     st.download_button(
                         label="📥 Descargar Reporte Dinámico (Excel)",
@@ -1574,7 +1805,7 @@ elif modo_vista == "🛠️ Constructor Dinámico":
                         f"Reporte Dinámico - {contrato_sel}",
                         metadata_base,
                         RUTA_LOGO,
-                        col_pendiente if col_pendiente in df_pers_final.columns else None,
+                        col_pendiente if _resolver_col_pendiente(df_pers_final, col_pendiente) else None,
                     )
                     st.download_button(
                         label="📄 Descargar Reporte Dinámico (PDF)",
