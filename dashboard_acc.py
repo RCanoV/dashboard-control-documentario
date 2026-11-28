@@ -1518,33 +1518,43 @@ if modo_vista == "📁 Detalle de Contrato":
 
         # Pestaña 0: Todas las Carpetas
         with pestanas[0]:
-            dfs_v_all = []
-            dfs_t_all = []
-            for nom_c in nombres_carpetas:
-                df_vi = normalizar_columnas_mayusculas(datos_vista[nom_c])
-                df_ti = normalizar_columnas_mayusculas(datos_completos.get(nom_c, df_vi))
-                if not df_vi.empty:
-                    if "CARPETA" not in df_vi.columns:
-                        df_vi.insert(0, "CARPETA", nom_c)
-                    dfs_v_all.append(df_vi)
-                if not df_ti.empty:
-                    dfs_t_all.append(df_ti)
+            carpetas_sel_todas = st.multiselect(
+                "📂 Selecciona las carpetas a incluir en esta vista:",
+                options=nombres_carpetas,
+                default=nombres_carpetas,
+                key=f"ms_todas_carpetas_{contrato_sel}",
+            )
 
-            df_v_todas = (
-                pd.concat(dfs_v_all, ignore_index=True)
-                if dfs_v_all
-                else pd.DataFrame(columns=["CARPETA"] + ORDEN_COLUMNAS_DASHBOARD)
-            )
-            df_t_todas = pd.concat(dfs_t_all, ignore_index=True) if dfs_t_all else df_v_todas.copy()
-            _render_vista_carpeta(
-                nombre_carpeta="Todas las Carpetas",
-                df_c=df_v_todas,
-                df_t=df_t_todas,
-                col_pendiente=col_pendiente,
-                diag_carp=f"Consolidado de {len(nombres_carpetas)} carpetas ({len(df_t_todas)} documentos)",
-                contrato_sel=contrato_sel,
-                metadata_base=metadata_base,
-            )
+            if not carpetas_sel_todas:
+                st.info("Selecciona al menos una carpeta para visualizar los indicadores, gráficos y documentos.")
+            else:
+                dfs_v_all = []
+                dfs_t_all = []
+                for nom_c in carpetas_sel_todas:
+                    df_vi = normalizar_columnas_mayusculas(datos_vista[nom_c])
+                    df_ti = normalizar_columnas_mayusculas(datos_completos.get(nom_c, df_vi))
+                    if not df_vi.empty:
+                        if "CARPETA" not in df_vi.columns:
+                            df_vi.insert(0, "CARPETA", nom_c)
+                        dfs_v_all.append(df_vi)
+                    if not df_ti.empty:
+                        dfs_t_all.append(df_ti)
+
+                df_v_todas = (
+                    pd.concat(dfs_v_all, ignore_index=True)
+                    if dfs_v_all
+                    else pd.DataFrame(columns=["CARPETA"] + ORDEN_COLUMNAS_DASHBOARD)
+                )
+                df_t_todas = pd.concat(dfs_t_all, ignore_index=True) if dfs_t_all else df_v_todas.copy()
+                _render_vista_carpeta(
+                    nombre_carpeta="Todas las Carpetas",
+                    df_c=df_v_todas,
+                    df_t=df_t_todas,
+                    col_pendiente=col_pendiente,
+                    diag_carp=f"Consolidado de {len(carpetas_sel_todas)} de {len(nombres_carpetas)} carpetas ({len(df_t_todas)} documentos)",
+                    contrato_sel=contrato_sel,
+                    metadata_base=metadata_base,
+                )
 
         # Pestañas individuales por carpeta
         for tab, nombre_carpeta in zip(pestanas[1:], nombres_carpetas):
