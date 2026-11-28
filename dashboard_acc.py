@@ -487,6 +487,18 @@ def escanear_recursivo_acc(
         url_api = enlaces["next"].get("href") if "next" in enlaces else None
 
 
+def _obtener_mascara_anulados(df: pd.DataFrame, col_pendiente: str) -> pd.Series:
+    if df is None or df.empty:
+        return pd.Series(dtype=bool)
+    mask = pd.Series(False, index=df.index)
+    col_pen_real = _resolver_col_pendiente(df, col_pendiente)
+    if col_pen_real:
+        mask = mask | (df[col_pen_real].fillna("").astype(str).str.strip().str.upper() == "ANULADO")
+    if "ESTADO" in df.columns:
+        mask = mask | (df["ESTADO"].fillna("").astype(str).str.strip().str.upper() == "ANULADO")
+    return mask
+
+
 def _limpiar_dias_entero(df: pd.DataFrame, col_pendiente: str) -> pd.DataFrame:
     if df is None or df.empty:
         return df
@@ -494,11 +506,12 @@ def _limpiar_dias_entero(df: pd.DataFrame, col_pendiente: str) -> pd.DataFrame:
     if "DIAS" in df.columns:
         df["DIAS"] = pd.to_numeric(df["DIAS"], errors="coerce").fillna(0).round(0).astype(int)
         col_pen_real = _resolver_col_pendiente(df, col_pendiente)
+        mask_cerrado = _obtener_mascara_anulados(df, col_pendiente)
         if col_pen_real:
-            df.loc[
-                df[col_pen_real].astype(str).str.strip().str.upper() == "CERRADO",
-                "DIAS",
-            ] = 0
+            mask_cerrado = mask_cerrado | (
+                df[col_pen_real].fillna("").astype(str).str.strip().str.upper() == "CERRADO"
+            )
+        df.loc[mask_cerrado, "DIAS"] = 0
     return df
 
 
@@ -825,35 +838,43 @@ def construir_resumen_carpeta(df_full: pd.DataFrame, col_pendiente: str) -> dict
     if total == 0:
         return {
             "CERRADOS": 0,
+            "ANULADOS": 0,
             "PENDIENTES": 0,
             "TOTAL": 0,
             "AVANCE (%)": 0.0,
             "MAYOR RETRASO": "Sin datos",
         }
 
-    cerrados = 0
-    mayor_retraso = "Sin pendientes"
+    mask_anulados = _obtener_mascara_anulados(df_full, col_pendiente)
+    anulados = int(mask_anulados.sum())
+
+    mask_cerrados = mask_anulados.copy()
     col_pen_real = _resolver_col_pendiente(df_full, col_pendiente)
     if col_pen_real:
-        est_u = df_full[col_pen_real].astype(str).str.strip().str.upper()
-        cerrados = int((est_u == "CERRADO").sum())
+        mask_cerrados = mask_cerrados | (
+            df_full[col_pen_real].fillna("").astype(str).str.strip().str.upper() == "CERRADO"
+        )
 
-        df_abiertos = df_full[est_u != "CERRADO"].copy()
-        if not df_abiertos.empty and "DIAS" in df_abiertos.columns:
-            df_abiertos["DIAS_NUM"] = pd.to_numeric(df_abiertos["DIAS"], errors="coerce").fillna(0)
-            if df_abiertos["DIAS_NUM"].max() > 0:
-                idx_max = df_abiertos["DIAS_NUM"].idxmax()
-                cod = str(df_abiertos.loc[idx_max, "CODIGO"]) if "CODIGO" in df_abiertos.columns else "Doc"
-                d_max = int(df_abiertos.loc[idx_max, "DIAS_NUM"])
-                resp = str(df_abiertos.loc[idx_max, col_pen_real]).strip()
-                mayor_retraso = f"{cod} ({d_max} d) [{resp}]"
-            else:
-                mayor_retraso = "Sin retrasos"
-
+    cerrados = int(mask_cerrados.sum())
     pendientes = total - cerrados
     avance = round((cerrados / total * 100), 1) if total > 0 else 0.0
+
+    mayor_retraso = "Sin pendientes"
+    df_abiertos = df_full[~mask_cerrados].copy()
+    if not df_abiertos.empty and "DIAS" in df_abiertos.columns:
+        df_abiertos["DIAS_NUM"] = pd.to_numeric(df_abiertos["DIAS"], errors="coerce").fillna(0)
+        if df_abiertos["DIAS_NUM"].max() > 0:
+            idx_max = df_abiertos["DIAS_NUM"].idxmax()
+            cod = str(df_abiertos.loc[idx_max, "CODIGO"]) if "CODIGO" in df_abiertos.columns else "Doc"
+            d_max = int(df_abiertos.loc[idx_max, "DIAS_NUM"])
+            resp = str(df_abiertos.loc[idx_max, col_pen_real]).strip() if col_pen_real else "Sin Asignar"
+            mayor_retraso = f"{cod} ({d_max} d) [{resp}]"
+        else:
+            mayor_retraso = "Sin retrasos"
+
     return {
         "CERRADOS": cerrados,
+        "ANULADOS": anulados,
         "PENDIENTES": pendientes,
         "TOTAL": total,
         "AVANCE (%)": avance,
@@ -889,6 +910,8 @@ def obtener_colores_estado(estado):
     estado = str(estado).strip().upper()
     if estado == "CERRADO":
         return "#d4edda", "#155724"
+    elif estado == "ANULADO":
+        return "#e2e3e5", "#383d41"
     elif "CONTRATISTA" in estado or "EMPRESA" in estado:
         return "#fff3cd", "#856404"
     elif estado == "SUPERVISION":
@@ -901,6 +924,8 @@ def color_barra_responsable(valor: str) -> str:
     v = str(valor).strip().upper()
     if v == "CERRADO":
         return "#28a745"
+    if v == "ANULADO":
+        return "#6c757d"
     if "CONTRATISTA" in v or "EMPRESA" in v:
         return "#ffc107"
     if "SUPERVISION" in v:
@@ -1248,11 +1273,12 @@ def _render_vista_carpeta(
         st.caption(f"Fuente: {diag_carp}")
 
     res_k = construir_resumen_carpeta(df_t, col_pendiente)
-    k1, k2, k3, k4 = st.columns(4)
+    k1, k2, k3, k4, k5 = st.columns(5)
     k1.metric("📄 Total Documentos", res_k["TOTAL"])
-    k2.metric("✅ Cerrados", res_k["CERRADOS"])
-    k3.metric("⏳ Pendientes", res_k["PENDIENTES"])
-    k4.metric("📈 Avance (%)", f"{res_k['AVANCE (%)']:.1f}%")
+    k2.metric("✅ Cerrados", res_k["CERRADOS"], help="Incluye documentos anulados")
+    k3.metric("🚫 Anulados", res_k["ANULADOS"])
+    k4.metric("⏳ Pendientes", res_k["PENDIENTES"])
+    k5.metric("📈 Avance (%)", f"{res_k['AVANCE (%)']:.1f}%")
 
     if res_k["MAYOR RETRASO"] not in ("Sin datos", "Sin pendientes", "Sin retrasos"):
         st.warning(f"⏰ **Mayor retraso abierto:** {res_k['MAYOR RETRASO']}")
@@ -1723,14 +1749,16 @@ elif modo_vista == "🗂️ Consolidado":
 
         tot_s = int(df_agrupado["TOTAL"].sum())
         cer_s = int(df_agrupado["CERRADOS"].sum())
+        anu_s = int(df_agrupado["ANULADOS"].sum())
         pen_s = int(df_agrupado["PENDIENTES"].sum())
         av_s = round(cer_s / tot_s * 100, 1) if tot_s > 0 else 0.0
 
-        ks1, ks2, ks3, ks4 = st.columns(4)
+        ks1, ks2, ks3, ks4, ks5 = st.columns(5)
         ks1.metric("📄 Total Documentos", tot_s)
-        ks2.metric("✅ Cerrados", cer_s)
-        ks3.metric("⏳ Pendientes", pen_s)
-        ks4.metric("📈 Avance Global", f"{av_s:.1f}%")
+        ks2.metric("✅ Cerrados", cer_s, help="Incluye documentos anulados")
+        ks3.metric("🚫 Anulados", anu_s)
+        ks4.metric("⏳ Pendientes", pen_s)
+        ks5.metric("📈 Avance Global", f"{av_s:.1f}%")
 
         fig_s = px.bar(
             df_agrupado,
@@ -1835,14 +1863,16 @@ elif modo_vista == "🌐 Reporte Global":
         if not df_glob.empty:
             tot_g = int(df_glob["TOTAL"].sum())
             cer_g = int(df_glob["CERRADOS"].sum())
+            anu_g = int(df_glob["ANULADOS"].sum())
             pen_g = int(df_glob["PENDIENTES"].sum())
             av_g = round(cer_g / tot_g * 100, 1) if tot_g > 0 else 0.0
 
-            kg1, kg2, kg3, kg4 = st.columns(4)
+            kg1, kg2, kg3, kg4, kg5 = st.columns(5)
             kg1.metric("📄 Total Global", tot_g)
-            kg2.metric("✅ Cerrados", cer_g)
-            kg3.metric("⏳ Pendientes", pen_g)
-            kg4.metric("📈 Avance Global", f"{av_g:.1f}%")
+            kg2.metric("✅ Cerrados", cer_g, help="Incluye documentos anulados")
+            kg3.metric("🚫 Anulados", anu_g)
+            kg4.metric("⏳ Pendientes", pen_g)
+            kg5.metric("📈 Avance Global", f"{av_g:.1f}%")
 
             df_graf_g = df_glob.groupby("PROYECTO", as_index=False)[["CERRADOS", "PENDIENTES"]].sum()
             fig_g = px.bar(
