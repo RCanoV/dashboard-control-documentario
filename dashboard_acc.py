@@ -1269,10 +1269,29 @@ def _render_vista_carpeta(
         )
 
     st.markdown("#### 🔍 Filtros y Detalle Documentario")
-    col_f1, col_f2, col_f3 = st.columns(3)
-
     df_c_u = normalizar_columnas_mayusculas(df_c)
     col_pen_real = _resolver_col_pendiente(df_c_u, col_pendiente)
+    tiene_col_carpeta = "CARPETA" in df_c_u.columns
+
+    if tiene_col_carpeta:
+        col_f0, col_f1, col_f2, col_f3 = st.columns(4)
+        serie_carp_norm = (
+            df_c_u["CARPETA"]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .replace({"": "Sin Carpeta", "nan": "Sin Carpeta", "None": "Sin Carpeta"})
+        )
+        carpetas_disp = sorted(serie_carp_norm.unique().tolist())
+        f_carpetas = col_f0.multiselect(
+            "Filtrar por Carpeta",
+            options=carpetas_disp,
+            default=carpetas_disp,
+            key=f"carp_{nombre_carpeta}",
+        )
+    else:
+        col_f1, col_f2, col_f3 = st.columns(3)
+        f_carpetas = None
 
     estados_disp = ["Todos"]
     if "ESTADO" in df_c_u.columns:
@@ -1300,6 +1319,15 @@ def _render_vista_carpeta(
     f_busq = col_f3.text_input("Buscar código o descripción", key=f"busq_{nombre_carpeta}").strip()
 
     df_filtrado = df_c_u.copy()
+    if tiene_col_carpeta and f_carpetas is not None:
+        carp_f = (
+            df_filtrado["CARPETA"]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .replace({"": "Sin Carpeta", "nan": "Sin Carpeta", "None": "Sin Carpeta"})
+        )
+        df_filtrado = df_filtrado[carp_f.isin(f_carpetas)]
     if f_estado != "Todos" and "ESTADO" in df_filtrado.columns:
         est_f = (
             df_filtrado["ESTADO"]
